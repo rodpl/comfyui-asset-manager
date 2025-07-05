@@ -1,0 +1,16 @@
+[project]
+name = "comfyui-asset-manager"
+description = "ComfyUI Asset Manager for managing assets in ComfyUI"
+version = "0.1.0"
+license = {file = "LICENSE"}
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/rodpl/comfyui-asset-manager"
+
+# Used by Comfy Registry https://comfyregistry.org
+[tool.comfy]
+PublisherId = "rodpl"
+DisplayName = "ComfyUI Asset Manager"
+Icon = ""
+includes = ["dist/"]
