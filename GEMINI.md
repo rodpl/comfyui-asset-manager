@@ -27,7 +27,7 @@ I will follow the existing coding style and conventions in the codebase.
 
 ## 4. ComfyUI Integration
 
-Details about the ComfyUI integration will be provided in the future.
+ComfyUI is using TailwindCSS and PrimeVue for UI look. Extension is written in React and must adapt CSS classes which will be loaded by main application.
 
 ## 5. General Rules
 
