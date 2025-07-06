@@ -5,6 +5,8 @@ on:
   push:
     paths:
       - 'ui/**'
+  pull_request:
+
 
 jobs:
   build:
