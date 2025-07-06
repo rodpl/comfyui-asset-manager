@@ -1,0 +1,1 @@
+-  Add version to @/ui/main.tsx file for label in `aboutPageBadges`. Simmilar solution -> https://github.com/search?q=repo%3AComfy-Org%2FComfyUI-Manager%20manager%2Fversion&type=code  
