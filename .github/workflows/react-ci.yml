@@ -34,7 +34,7 @@ jobs:
     - name: Test React extension
       run: |
         cd ui
-        npm run test -- --reporter=junit --outputFile=junit.xml
+        npm run test
 
     - name: Report test results
       uses: dorny/test-reporter@v1
