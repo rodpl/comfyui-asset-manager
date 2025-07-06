@@ -3,13 +3,13 @@ name: React CI
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'ui/**'
+    branches: [ "main" ]
+    tags: [ "v*" ]
   pull_request:
-
+    branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-test:
     permissions:
       contents: read
       checks: write
