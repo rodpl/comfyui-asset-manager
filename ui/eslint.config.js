@@ -15,18 +15,32 @@ export default tseslint.config([
   globalIgnores(['dist']),
   {
     files: ['**/*.ts', '**/*.tsx'],
+    plugins: {
+      'unused-imports': unusedImports,
+    },
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
-      prettierConfig
+      prettierConfig,
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser
+      globals: globals.browser,
     },
     rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
       'prettier/prettier': [
         'error',
         {
