@@ -1,59 +1,60 @@
-import pluginJs from '@eslint/js'
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
-import unusedImports from 'eslint-plugin-unused-imports'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
+import js from '@eslint/js';
+import prettierConfig from 'eslint-plugin-prettier/recommended';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import unusedImports from 'eslint-plugin-unused-imports';
+import { globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default [
+
+
+
+
+export default tseslint.config([
+  globalIgnores(['dist']),
   {
-    // Global ignores
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'test-results/**'],
-  },
-  {
-    // Source files
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['**/*.ts', '**/*.tsx'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
+      prettierConfig
+    ],
     languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: './tsconfig.json',
-        ecmaVersion: 2020,
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.browser,
-      },
-    },
-  },
-  {
-    // Vite config
-    files: ['vite.config.ts'],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: './tsconfig.node.json',
-        ecmaVersion: 2020,
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  // ESLint recommended configs
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  eslintPluginPrettierRecommended,
-  {
-    // Custom rules
-    plugins: {
-      'unused-imports': unusedImports,
+      ecmaVersion: 2020,
+      globals: globals.browser
     },
     rules: {
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/prefer-as-const': 'off',
-      'unused-imports/no-unused-imports': 'error',
-    },
-  },
-]
+      'prettier/prettier': [
+        'error',
+        {
+          semi: true,
+          singleQuote: true,
+          trailingComma: 'es5',
+          printWidth: 100,
+          bracketSpacing: true,
+          endOfLine: 'lf',
+          tabWidith: 2,
+          importOrder: [
+            '^@core/(.*)$',
+            '<THIRD_PARTY_MODULES>',
+            '^@/(.*)$',
+            '^[./]'
+          ],
+          importOrderSeparation: true,
+          importOrderSortSpecifiers: true,
+          overrides: [
+            {
+              files: '*.{js,cjs,mjs,ts,cts,mts,tsx,vue}',
+              options: {
+                plugins: ['@trivago/prettier-plugin-sort-imports']
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+])
