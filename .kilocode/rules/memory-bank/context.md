@@ -7,3 +7,6 @@ The project is in its initial setup phase. The basic structure for the Python ba
 - Implement the functionality for each of the three main tabs: "Local Assets", "Model Browser", and "Outputs".
 - Connect the frontend to the backend to handle asset management operations.
 - Develop the API endpoints required for the frontend to interact with the backend.
+
+## Critical Constraints
+- **CSS Framework Restriction**: Extension CANNOT use custom UI frameworks. Must use only CSS classes provided by ComfyUI or write custom CSS that doesn't conflict. This is because the extension acts as a plugin within ComfyUI's environment.

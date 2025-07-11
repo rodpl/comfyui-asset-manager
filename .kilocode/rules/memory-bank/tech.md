@@ -9,7 +9,9 @@
 - **Framework:** React
 - **Language:** TypeScript
 - **Bundler:** Vite
-- **Styling:** Standard CSS (`App.css`, `index.css`)
+- **Styling:** Standard CSS only (`App.css`, `index.css`) - **NO CUSTOM UI FRAMEWORKS ALLOWED**
+- **CSS Constraints:** Must use CSS classes provided by ComfyUI or define custom CSS that doesn't conflict
+- **ComfyUI CSS Reference:** Can use CSS from ComfyUI frontend dependencies (https://github.com/Comfy-Org/ComfyUI_frontend/blob/main/package.json)
 - **Internationalization (i18n):** `i18next` with `react-i18next`. Locale files are in `ui/public/locales/`.
 - **Dependencies:**
   - `react`, `react-dom`
