@@ -23,3 +23,4 @@ The project is a ComfyUI extension composed of a Python backend and a React fron
 - **Separation of Concerns:** The backend is responsible for server-side logic and file serving, while the frontend handles the user interface and experience. This is a standard and robust model for web applications.
 - **Static Serving:** The Python backend serves the compiled React application as static files. This is a simple and effective way to integrate a modern frontend with a Python-based backend.
 - **Component-Based UI:** The use of React promotes a modular and maintainable frontend architecture.
+- **CSS Constraint:** **CRITICAL** - No custom UI frameworks allowed. Extension must use only CSS provided by ComfyUI or custom CSS that doesn't conflict. This is because the extension acts as a plugin within ComfyUI's environment.
