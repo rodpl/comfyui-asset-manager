@@ -2,8 +2,8 @@
 
 interface ImportMeta {
   env: {
-    DEV: boolean
-    PROD: boolean
-    MODE: string
-  }
+    DEV: boolean;
+    PROD: boolean;
+    MODE: string;
+  };
 }
