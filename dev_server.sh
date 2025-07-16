@@ -13,8 +13,13 @@ PROJECT_DIR="$(pwd)"
 mkdir -p "$LINK_TARGET_DIR"
 
 echo "Creating symlink: $LINK_NAME -> $PROJECT_DIR"
-# -s for symbolic, -f for force (replace if exists)
-ln -sf "$PROJECT_DIR" "$LINK_NAME"
+# Remove existing link if it exists, then create new one
+if [ -L "$LINK_NAME" ] || [ -e "$LINK_NAME" ]; then
+    echo "Removing existing link/file: $LINK_NAME"
+    rm -f "$LINK_NAME"
+fi
+# -s for symbolic
+ln -s "$PROJECT_DIR" "$LINK_NAME"
 
 # Change to the UI directory and run the watch script
 echo "Changing to ui directory and running 'npm run watch'"
