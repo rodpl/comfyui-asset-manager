@@ -1,35 +1,35 @@
-import i18n from 'i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
-import Backend from 'i18next-http-backend'
-import { initReactI18next } from 'react-i18next'
+import i18n from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import Backend from 'i18next-http-backend';
+import { initReactI18next } from 'react-i18next';
 
 // Define fallback translations for debugging
 interface TranslationResource {
   [language: string]: {
     [namespace: string]: {
       app: {
-        title: string
-        description: string
-        noNodes: string
+        title: string;
+        description: string;
+        noNodes: string;
         nodeList: {
-          title: string
-          id: string
-          type: string
-          category: string
-          inputs: string
-          outputs: string
-        }
+          title: string;
+          id: string;
+          type: string;
+          category: string;
+          inputs: string;
+          outputs: string;
+        };
         nodeStats: {
-          title: string
-          totalNodes: string
-          uniqueNodeTypes: string
-        }
+          title: string;
+          totalNodes: string;
+          uniqueNodeTypes: string;
+        };
         footer: {
-          clickToHighlight: string
-        }
-      }
-    }
-  }
+          clickToHighlight: string;
+        };
+      };
+    };
+  };
 }
 
 const fallbackResources: TranslationResource = {
@@ -45,21 +45,20 @@ const fallbackResources: TranslationResource = {
           type: 'Type',
           category: 'Category',
           inputs: 'Inputs',
-          outputs: 'Outputs'
+          outputs: 'Outputs',
         },
         nodeStats: {
           title: 'Node Statistics',
           totalNodes: 'Total nodes',
-          uniqueNodeTypes: 'Unique node types'
+          uniqueNodeTypes: 'Unique node types',
         },
         footer: {
-          clickToHighlight:
-            'Click on any node in the list to highlight it in the workflow'
-        }
-      }
-    }
-  }
-}
+          clickToHighlight: 'Click on any node in the list to highlight it in the workflow',
+        },
+      },
+    },
+  },
+};
 
 // Initialize i18next
 void i18n
@@ -87,7 +86,7 @@ void i18n
     // Custom handling for missing keys
     saveMissing: true,
     missingKeyHandler: (lng, ns, key) => {
-      console.log(`Missing translation: [${lng}] ${ns}:${key}`)
+      console.log(`Missing translation: [${lng}] ${ns}:${key}`);
     },
 
     // Language detection configuration
@@ -95,7 +94,7 @@ void i18n
       // Order of detection methods
       order: ['navigator', 'htmlTag', 'path', 'subdomain'],
       // Don't cache detected language
-      caches: []
+      caches: [],
     },
 
     // Backend configuration
@@ -105,31 +104,29 @@ void i18n
       // Add retry logic
       requestOptions: {
         retry: 3,
-        timeout: 3000
-      }
+        timeout: 3000,
+      },
     },
 
     // React specific options
     react: {
-      useSuspense: true
+      useSuspense: true,
     },
 
     // Allow string formatting for dynamic values
     interpolation: {
-      escapeValue: false // Not needed for React as it escapes by default
-    }
-  })
+      escapeValue: false, // Not needed for React as it escapes by default
+    },
+  });
 
 // Add fallback resources only if HTTP loading fails
 i18n.on('failedLoading', (lng, ns) => {
-  console.log(
-    `Failed loading translation file for ${lng} and ${ns}, using fallback`
-  )
+  console.log(`Failed loading translation file for ${lng} and ${ns}, using fallback`);
 
   // Add the fallback resources for this language
   if (fallbackResources[lng] && fallbackResources[lng][ns]) {
-    i18n.addResourceBundle(lng, ns, fallbackResources[lng][ns], true, true)
+    i18n.addResourceBundle(lng, ns, fallbackResources[lng][ns], true, true);
   }
-})
+});
 
-export default i18n
+export default i18n;

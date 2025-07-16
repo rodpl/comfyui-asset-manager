@@ -9,7 +9,7 @@ __all__ = ["NODE_CLASS_MAPPINGS"]
 
 # Define the path to our extension
 workspace_path = os.path.dirname(__file__)
-dist_path = os.path.join(workspace_path, "dist/example_ext")
+dist_path = os.path.join(workspace_path, "dist/asset_manager")
 dist_locales_path = os.path.join(workspace_path, "dist/locales")
 
 # Print the current paths for debugging
@@ -22,7 +22,7 @@ print(f"Locales exist: {os.path.exists(dist_locales_path)}")
 if os.path.exists(dist_path):
     # Add the routes for the extension
     server.PromptServer.instance.app.add_routes([
-        web.static("/example_ext/", dist_path),
+        web.static("/asset_manager/", dist_path),
     ])
 
     # Register the locale files route
