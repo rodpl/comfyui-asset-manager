@@ -1,45 +1,137 @@
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import './App.css';
 
-const App = () => {
-  const [activeTab, setActiveTab] = useState('local');
+// Define tab types for better type safety
+type TabId = 'local' | 'browse' | 'outputs';
 
-  const renderContent = () => {
+interface Tab {
+  id: TabId;
+  labelKey: string;
+  icon?: string;
+}
+
+// Tab configuration
+const TABS: Tab[] = [
+  { id: 'local', labelKey: 'tabs.localAssets', icon: 'pi pi-folder' },
+  { id: 'browse', labelKey: 'tabs.modelBrowser', icon: 'pi pi-search' },
+  { id: 'outputs', labelKey: 'tabs.outputs', icon: 'pi pi-images' },
+];
+
+// Individual tab content components
+const LocalAssetsTab: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="tab-panel">
+      <div className="tab-panel-header">
+        <h3>{t('tabs.localAssets')}</h3>
+        <p>{t('tabs.localAssetsDescription')}</p>
+      </div>
+      <div className="tab-panel-content">
+        <div className="placeholder-content">
+          <i className="pi pi-folder" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
+          <p>{t('content.localAssets.placeholder')}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ModelBrowserTab: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="tab-panel">
+      <div className="tab-panel-header">
+        <h3>{t('tabs.modelBrowser')}</h3>
+        <p>{t('tabs.modelBrowserDescription')}</p>
+      </div>
+      <div className="tab-panel-content">
+        <div className="placeholder-content">
+          <i className="pi pi-search" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
+          <p>{t('content.modelBrowser.placeholder')}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const OutputsTab: React.FC = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="tab-panel">
+      <div className="tab-panel-header">
+        <h3>{t('tabs.outputs')}</h3>
+        <p>{t('tabs.outputsDescription')}</p>
+      </div>
+      <div className="tab-panel-content">
+        <div className="placeholder-content">
+          <i className="pi pi-images" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
+          <p>{t('content.outputs.placeholder')}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main App component
+const App: React.FC = () => {
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<TabId>('local');
+
+  // Memoized tab change handler
+  const handleTabChange = useCallback((tabId: TabId) => {
+    setActiveTab(tabId);
+  }, []);
+
+  // Render tab content based on active tab
+  const renderTabContent = useCallback(() => {
     switch (activeTab) {
       case 'local':
-        return <div>Local Assets Content</div>;
+        return <LocalAssetsTab />;
       case 'browse':
-        return <div>Model Browser Content</div>;
+        return <ModelBrowserTab />;
       case 'outputs':
-        return <div>Outputs Content</div>;
+        return <OutputsTab />;
       default:
         return null;
     }
-  };
+  }, [activeTab]);
 
   return (
-    <div className="asset-manager">
-      <div className="tabs">
-        <button
-          onClick={() => setActiveTab('local')}
-          className={activeTab === 'local' ? 'active' : ''}
-        >
-          Local Assets
-        </button>
-        <button
-          onClick={() => setActiveTab('browse')}
-          className={activeTab === 'browse' ? 'active' : ''}
-        >
-          Model Browser
-        </button>
-        <button
-          onClick={() => setActiveTab('outputs')}
-          className={activeTab === 'outputs' ? 'active' : ''}
-        >
-          Outputs
-        </button>
-      </div>
-      <div className="tab-content">{renderContent()}</div>
+    <div className="asset-manager-container">
+      <header className="asset-manager-header">
+        <h2>{t('app.title')}</h2>
+        <p className="app-description">{t('app.description')}</p>
+      </header>
+
+      <nav className="tab-navigation" role="tablist">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`tabpanel-${tab.id}`}
+            className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => handleTabChange(tab.id)}
+          >
+            {tab.icon && <i className={tab.icon} aria-hidden="true"></i>}
+            <span>{t(tab.labelKey)}</span>
+          </button>
+        ))}
+      </nav>
+
+      <main 
+        className="tab-content"
+        role="tabpanel"
+        id={`tabpanel-${activeTab}`}
+        aria-labelledby={`tab-${activeTab}`}
+      >
+        {renderTabContent()}
+      </main>
     </div>
   );
 };
