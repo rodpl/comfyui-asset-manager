@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LocalAssetsTab, ModelBrowserTab, OutputsTab } from './features';
 import './App.css';
 
 // Define tab types for better type safety
@@ -17,64 +18,6 @@ const TABS: Tab[] = [
   { id: 'browse', labelKey: 'tabs.modelBrowser', icon: 'pi pi-search' },
   { id: 'outputs', labelKey: 'tabs.outputs', icon: 'pi pi-images' },
 ];
-
-// Individual tab content components
-const LocalAssetsTab: React.FC = () => {
-  const { t } = useTranslation();
-  
-  return (
-    <div className="tab-panel">
-      <div className="tab-panel-header">
-        <h3>{t('tabs.localAssets')}</h3>
-        <p>{t('tabs.localAssetsDescription')}</p>
-      </div>
-      <div className="tab-panel-content">
-        <div className="placeholder-content">
-          <i className="pi pi-folder" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
-          <p>{t('content.localAssets.placeholder')}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ModelBrowserTab: React.FC = () => {
-  const { t } = useTranslation();
-  
-  return (
-    <div className="tab-panel">
-      <div className="tab-panel-header">
-        <h3>{t('tabs.modelBrowser')}</h3>
-        <p>{t('tabs.modelBrowserDescription')}</p>
-      </div>
-      <div className="tab-panel-content">
-        <div className="placeholder-content">
-          <i className="pi pi-search" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
-          <p>{t('content.modelBrowser.placeholder')}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const OutputsTab: React.FC = () => {
-  const { t } = useTranslation();
-  
-  return (
-    <div className="tab-panel">
-      <div className="tab-panel-header">
-        <h3>{t('tabs.outputs')}</h3>
-        <p>{t('tabs.outputsDescription')}</p>
-      </div>
-      <div className="tab-panel-content">
-        <div className="placeholder-content">
-          <i className="pi pi-images" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
-          <p>{t('content.outputs.placeholder')}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Main App component
 const App: React.FC = () => {
@@ -124,7 +67,7 @@ const App: React.FC = () => {
         ))}
       </nav>
 
-      <main 
+      <main
         className="tab-content"
         role="tabpanel"
         id={`tabpanel-${activeTab}`}
