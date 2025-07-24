@@ -1,24 +1,25 @@
 {
   "app": {
-    "title": "React 示例扩展",
-    "description": "显示当前工作流中节点的统计信息",
-    "noNodes": "工作流中没有节点",
-    "nodeList": {
-      "title": "节点列表",
-      "id": "ID",
-      "type": "类型",
-      "category": "类别",
-      "inputs": "输入",
-      "outputs": "输出"
-    },
-    "nodeStats": {
-      "title": "节点统计",
-      "totalNodes": "节点总数",
-      "uniqueNodeTypes": "唯一节点类型"
-    },
-    "footer": {
-      "clickToHighlight": "单击列表中的任何节点以在工作流中突出显示它"
-    }
+    "title": "资产管理器",
+    "description": "ComfyUI 综合资产管理 - 组织本地资产、浏览模型和管理输出"
   },
-  "Click on any node in the list to highlight it in the workflow": "单击列表中的任何节点以在工作流中突出显示它"
+  "tabs": {
+    "localAssets": "本地资产",
+    "localAssetsDescription": "管理和组织您的本地 ComfyUI 资产，包括模型、检查点和自定义节点",
+    "modelBrowser": "模型浏览器",
+    "modelBrowserDescription": "从 CivitAI、HuggingFace 和其他平台浏览和下载模型",
+    "outputs": "输出",
+    "outputsDescription": "查看和管理您的 ComfyUI 生成的图像和输出"
+  },
+  "content": {
+    "localAssets": {
+      "placeholder": "本地资产管理功能将在此处实现。您将能够组织模型、检查点和其他资产。"
+    },
+    "modelBrowser": {
+      "placeholder": "模型浏览器功能将在此处实现。从各种平台浏览和下载模型。"
+    },
+    "outputs": {
+      "placeholder": "输出管理功能将在此处实现。查看和组织您生成的图像。"
+    }
+  }
 }

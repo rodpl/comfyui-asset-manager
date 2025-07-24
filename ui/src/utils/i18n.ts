@@ -10,22 +10,24 @@ interface TranslationResource {
       app: {
         title: string;
         description: string;
-        noNodes: string;
-        nodeList: {
-          title: string;
-          id: string;
-          type: string;
-          category: string;
-          inputs: string;
-          outputs: string;
+      };
+      tabs: {
+        localAssets: string;
+        localAssetsDescription: string;
+        modelBrowser: string;
+        modelBrowserDescription: string;
+        outputs: string;
+        outputsDescription: string;
+      };
+      content: {
+        localAssets: {
+          placeholder: string;
         };
-        nodeStats: {
-          title: string;
-          totalNodes: string;
-          uniqueNodeTypes: string;
+        modelBrowser: {
+          placeholder: string;
         };
-        footer: {
-          clickToHighlight: string;
+        outputs: {
+          placeholder: string;
         };
       };
     };
@@ -36,24 +38,32 @@ const fallbackResources: TranslationResource = {
   en: {
     main: {
       app: {
-        title: 'React Example Extension (Fallback)',
-        description: 'Shows statistics about nodes in the current workflow',
-        noNodes: 'No nodes in the workflow',
-        nodeList: {
-          title: 'Node List',
-          id: 'ID',
-          type: 'Type',
-          category: 'Category',
-          inputs: 'Inputs',
-          outputs: 'Outputs',
+        title: 'Asset Manager (Fallback)',
+        description:
+          'Comprehensive asset management for ComfyUI - organize local assets, browse models, and manage outputs',
+      },
+      tabs: {
+        localAssets: 'Local Assets',
+        localAssetsDescription:
+          'Manage and organize your local ComfyUI assets including models, checkpoints, and custom nodes',
+        modelBrowser: 'Model Browser',
+        modelBrowserDescription:
+          'Browse and download models from CivitAI, HuggingFace, and other platforms',
+        outputs: 'Outputs',
+        outputsDescription: 'View and manage your ComfyUI generated images and outputs',
+      },
+      content: {
+        localAssets: {
+          placeholder:
+            "Local assets management functionality will be implemented here. You'll be able to organize models, checkpoints, and other assets.",
         },
-        nodeStats: {
-          title: 'Node Statistics',
-          totalNodes: 'Total nodes',
-          uniqueNodeTypes: 'Unique node types',
+        modelBrowser: {
+          placeholder:
+            'Model browser functionality will be implemented here. Browse and download models from various platforms.',
         },
-        footer: {
-          clickToHighlight: 'Click on any node in the list to highlight it in the workflow',
+        outputs: {
+          placeholder:
+            'Output management functionality will be implemented here. View and organize your generated images.',
         },
       },
     },
@@ -73,7 +83,7 @@ void i18n
     // Always enable debug mode to see what's happening
     debug: true,
 
-    // Fallback language
+    // Fallback language - English is the primary fallback
     fallbackLng: 'en',
 
     // Namespace for translations
