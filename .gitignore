@@ -14,3 +14,4 @@ node.zip
 .vscode/
 .claude/
 /ui/test-results/
+.coverage
