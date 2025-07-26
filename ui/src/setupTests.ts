@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
 // Mock window.app for ComfyUI integration testing
-global.window.app = {
+globalThis.window.app = {
   graph: {
     _nodes: [],
     setDirtyCanvas: vi.fn(),
