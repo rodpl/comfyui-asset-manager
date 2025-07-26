@@ -57,10 +57,105 @@ Think of it as bringing the best parts of Stability Matrix directly into ComfyUI
 
 ## Installation
 
-1. Download the extension from the ComfyUI Registry or GitHub
-2. Place it in your ComfyUI `custom_nodes` directory
-3. Restart ComfyUI
-4. Find the new "Asset Manager" tab in your ComfyUI sidebar
+### Option 1: ComfyUI Manager (Recommended)
+1. Install [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager) if you haven't already
+2. Open ComfyUI Manager in your ComfyUI interface
+3. Search for "ComfyUI Asset Manager"
+4. Click "Install" and restart ComfyUI
+
+### Option 2: Manual Installation
+1. Clone or download this repository
+2. Place the entire folder in your ComfyUI `custom_nodes` directory
+3. Follow the setup instructions below
+4. Restart ComfyUI
+
+## Setup
+
+### Prerequisites
+- **Python 3.8+** (usually comes with ComfyUI)
+- **Node.js 18+** and **pnpm** (for frontend development)
+- **Poetry** (for Python dependency management)
+
+### Quick Setup
+Run the provided setup script:
+```bash
+# Make the script executable (Linux/Mac)
+chmod +x setup.sh
+
+# Run setup
+./setup.sh
+```
+
+### Manual Setup
+
+#### 1. Python Backend Setup
+```bash
+# Install Poetry if you don't have it
+pip install poetry
+
+# Install Python dependencies
+poetry install --no-root
+```
+
+#### 2. Frontend Setup
+```bash
+# Install pnpm if you don't have it
+npm install -g pnpm
+
+# Navigate to frontend directory and install dependencies
+cd ui
+pnpm install
+
+# Build the frontend for production
+pnpm run build
+
+# Return to root directory
+cd ..
+```
+
+### Development Setup
+
+If you plan to contribute or modify the extension:
+
+```bash
+# Frontend development with hot reload
+cd ui
+pnpm run dev
+
+# Or watch mode for automatic rebuilding
+pnpm run watch
+
+# Run tests
+pnpm run test
+
+# Lint and format code
+pnpm run lint
+pnpm run format
+```
+
+### Verification
+
+After setup, restart ComfyUI and you should see:
+1. A new "Asset Manager" tab in your ComfyUI sidebar (with a server icon)
+2. No error messages in the ComfyUI console
+3. The extension should load with three tabs: Local Assets, Model Browser, and Outputs
+
+### Troubleshooting
+
+**Extension not appearing:**
+- Ensure the folder is in the correct `custom_nodes` directory
+- Check ComfyUI console for error messages
+- Verify all dependencies are installed correctly
+
+**Build errors:**
+- Make sure you have Node.js 18+ and pnpm installed
+- Try deleting `ui/node_modules` and running `pnpm install` again
+- Check that the `dist/` directory was created after building
+
+**Python errors:**
+- Ensure Poetry is installed and working
+- Try running `poetry install --no-root` again
+- Check that your Python version is 3.8 or higher
 
 ## Getting Started
 
