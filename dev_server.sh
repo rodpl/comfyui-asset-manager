@@ -22,6 +22,6 @@ fi
 ln -s "$PROJECT_DIR" "$LINK_NAME"
 
 # Change to the UI directory and run the watch script
-echo "Changing to ui directory and running 'npm run watch'"
+echo "Changing to ui directory and running 'pnpm run watch'"
 cd ui
-npm run watch
+pnpm run watch
