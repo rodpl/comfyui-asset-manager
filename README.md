@@ -1,6 +1,25 @@
 # ComfyUI Asset Manager
 
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/rodpl/comfyui-asset-manager)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![ComfyUI](https://img.shields.io/badge/ComfyUI-Extension-orange.svg)](https://github.com/comfyanonymous/ComfyUI)
+
+> **⚠️ Early Development**: This extension is currently in early development (v0.1.0). Features are being actively developed and may change.
+
 A powerful ComfyUI extension that brings comprehensive asset management directly into your ComfyUI interface. Inspired by Stability Matrix, this extension simplifies how you organize, discover, and manage your AI models and outputs.
+
+**Repository**: [https://github.com/rodpl/comfyui-asset-manager](https://github.com/rodpl/comfyui-asset-manager)
+
+## Table of Contents
+
+- [What It Does](#what-it-does)
+- [Key Features](#key-features)
+- [Why Use ComfyUI Asset Manager?](#why-use-comfyui-asset-manager)
+- [Installation](#installation)
+- [Getting Started](#getting-started)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## What It Does
 
@@ -48,12 +67,6 @@ ComfyUI Asset Manager transforms the way you handle assets in ComfyUI by providi
 - **Content Creators** who generate lots of outputs and need easy management
 - **Teams** who share and collaborate on AI projects
 - **Anyone** who wants a cleaner, more efficient ComfyUI experience
-
-## Experience
-
-The extension integrates seamlessly into ComfyUI's sidebar, providing a native feel that doesn't disrupt your existing workflow. The intuitive tabbed interface makes it easy to switch between managing local assets, discovering new models, and organizing your outputs.
-
-Think of it as bringing the best parts of Stability Matrix directly into ComfyUI - but as a lightweight, integrated extension rather than a separate application.
 
 ## Installation
 
@@ -113,6 +126,23 @@ pnpm run build
 cd ..
 ```
 
+## Getting Started
+
+Once installed, you'll see a new "Asset Manager" tab in your ComfyUI sidebar with three main sections:
+
+1. **Local Assets** - Start here to see and organize your existing models
+2. **Model Browser** - Discover and download new models from CivitAI and HuggingFace
+3. **Outputs** - View and manage your generated images and outputs
+
+The extension integrates seamlessly into ComfyUI's sidebar, providing a native feel that doesn't disrupt your existing workflow. The intuitive tabbed interface makes it easy to switch between managing local assets, discovering new models, and organizing your outputs.
+
+## Development
+
+### Prerequisites for Development
+- **Python 3.8+** (usually comes with ComfyUI)
+- **Node.js 18+** and **pnpm** (for frontend development)
+- **Poetry** (for Python dependency management)
+
 ### Development Setup
 
 If you plan to contribute or modify the extension:
@@ -157,17 +187,18 @@ After setup, restart ComfyUI and you should see:
 - Try running `poetry install --no-root` again
 - Check that your Python version is 3.8 or higher
 
-## Getting Started
-
-Once installed, you'll see a new "Asset Manager" tab in your ComfyUI sidebar with three main sections:
-
-1. **Local Assets** - Start here to see and organize your existing models
-2. **Model Browser** - Discover and download new models from CivitAI and HuggingFace
-3. **Outputs** - View and manage your generated images and outputs
-
 ## Contributing
 
 We welcome contributions! Whether it's bug reports, feature requests, or code contributions, please feel free to get involved.
+
+### How to Contribute
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes following the development setup above
+4. Run tests and linting (`pnpm run test && pnpm run lint`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## License
 
@@ -177,6 +208,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Inspired by the excellent asset management features of [Stability Matrix](https://github.com/LykosAI/StabilityMatrix)
 - Built for the amazing [ComfyUI](https://github.com/comfyanonymous/ComfyUI) community
+- **Author**: [rodpl](https://github.com/rodpl)
 
 ---
 
