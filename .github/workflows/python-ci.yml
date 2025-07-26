@@ -88,7 +88,7 @@ jobs:
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Python Tests (Python 3.12)
+          name: Python Tests
           path: test-results/pytest.xml
           reporter: java-junit
 
