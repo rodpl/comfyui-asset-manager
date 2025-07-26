@@ -155,13 +155,49 @@ pnpm run dev
 # Or watch mode for automatic rebuilding
 pnpm run watch
 
-# Run tests
+# Run frontend tests
 pnpm run test
 
-# Lint and format code
+# Lint and format frontend code
 pnpm run lint
 pnpm run format
 ```
+
+### Python Backend Testing
+
+The Python backend uses pytest for testing with Poetry for dependency management:
+
+```bash
+# Install development dependencies
+poetry install --with dev
+
+# Run all tests
+poetry run pytest
+
+# Run tests with verbose output
+poetry run pytest -v
+
+# Run specific test file
+poetry run pytest tests/test_domain/test_entities/test_model.py
+
+# Run tests with coverage report
+poetry run pytest --cov=src --cov-report=html
+
+# Run tests matching a pattern
+poetry run pytest -k "test_model"
+
+# Run only unit tests (when marked)
+poetry run pytest -m unit
+
+# Run only integration tests (when marked)
+poetry run pytest -m integration
+```
+
+The test configuration is defined in `pyproject.toml` and includes:
+- Automatic test discovery in the `tests/` directory
+- Code coverage reporting with 70% minimum coverage
+- HTML coverage reports generated in `htmlcov/`
+- Support for test markers (unit, integration, slow)
 
 ### Verification
 
