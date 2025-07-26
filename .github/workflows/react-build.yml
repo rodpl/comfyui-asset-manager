@@ -26,12 +26,12 @@ jobs:
     - name: Install dependencies
       run: |
         cd ui
-        npm install
+        pnpm install
 
     - name: Build React extension
       run: |
         cd ui
-        npm run build
+        pnpm run build
 
     - name: Publish Custom Node
       uses: Comfy-Org/publish-node-action@main

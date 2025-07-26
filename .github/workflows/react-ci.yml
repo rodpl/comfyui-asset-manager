@@ -3,10 +3,10 @@ name: React CI
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
-    tags: [ "v*" ]
+    branches: ["main"]
+    tags: ["v*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-test:
@@ -20,32 +20,37 @@ jobs:
         node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Install dependencies
-      run: |
-        cd ui
-        npm install
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
 
-    - name: Build React extension
-      run: |
-        cd ui
-        npm run build
+      - name: Install dependencies
+        run: |
+          cd ui
+          pnpm install
 
-    - name: Test React extension
-      run: |
-        cd ui
-        npm run test
+      - name: Build React extension
+        run: |
+          cd ui
+          pnpm run build
 
-    - name: Report test results
-      uses: dorny/test-reporter@v1
-      if: always()
-      with:
-        name: Vitest Tests
-        path: ui/test-results/junit.xml
-        reporter: jest-junit
+      - name: Test React extension
+        run: |
+          cd ui
+          pnpm run test
+
+      - name: Report test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Vitest Tests
+          path: ui/test-results/junit.xml
+          reporter: jest-junit
