@@ -1,0 +1,1 @@
+# Asset Manager - Hexagonal Architecture Implementation
