@@ -24,7 +24,7 @@ authors = ["rodpl"]
 packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
