@@ -3,8 +3,15 @@ import type { ComfyApp } from '@comfyorg/comfyui-frontend-types';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Ensure window exists in the global scope for testing
+if (typeof globalThis.window === 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).window = {};
+}
+
 // Mock window.app for ComfyUI integration testing
-globalThis.window.app = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis.window as any).app = {
   graph: {
     _nodes: [],
     setDirtyCanvas: vi.fn(),
