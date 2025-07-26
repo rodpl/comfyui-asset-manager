@@ -30,17 +30,17 @@ jobs:
     - name: Install dependencies
       run: |
         cd ui
-        npm install
+        pnpm install
 
     - name: Build React extension
       run: |
         cd ui
-        npm run build
+        pnpm run build
 
     - name: Test React extension
       run: |
         cd ui
-        npm run test
+        pnpm run test
 
     - name: Report test results
       uses: dorny/test-reporter@v1
