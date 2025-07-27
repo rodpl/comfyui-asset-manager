@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FolderNavigation from './FolderNavigation';
-import { ModelFolder, ModelType } from './types';
+import ModelGrid from './components/ModelGrid';
+import { ModelFolder, ModelType, ModelInfo } from './types';
 import './LocalAssetsTab.css';
 
 // Mock data for demonstration
@@ -50,15 +51,139 @@ const mockFolders: ModelFolder[] = [
   },
 ];
 
+// Mock model data for demonstration
+const mockModels: Record<string, ModelInfo[]> = {
+  checkpoints: [
+    {
+      id: '1',
+      name: 'Realistic Vision V5.1',
+      filePath: '/models/checkpoints/realisticVisionV51.safetensors',
+      fileSize: 2147483648, // 2GB
+      createdAt: new Date('2024-01-01'),
+      modifiedAt: new Date('2024-01-15'),
+      modelType: ModelType.CHECKPOINT,
+      hash: 'abc123',
+      folder: 'checkpoints',
+      thumbnail:
+        'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/78fd2a0a-42b6-42b0-9c7c-9f4d5a5c5c5c/width=450/00001-28328.jpeg',
+    },
+    {
+      id: '2',
+      name: 'DreamShaper XL',
+      filePath: '/models/checkpoints/dreamshaperXL.safetensors',
+      fileSize: 6442450944, // 6GB
+      createdAt: new Date('2024-01-02'),
+      modifiedAt: new Date('2024-01-16'),
+      modelType: ModelType.CHECKPOINT,
+      hash: 'def456',
+      folder: 'checkpoints',
+    },
+  ],
+  loras: [
+    {
+      id: '3',
+      name: 'Detail Tweaker LoRA',
+      filePath: '/models/loras/detail_tweaker.safetensors',
+      fileSize: 134217728, // 128MB
+      createdAt: new Date('2024-01-03'),
+      modifiedAt: new Date('2024-01-17'),
+      modelType: ModelType.LORA,
+      hash: 'ghi789',
+      folder: 'loras',
+    },
+    {
+      id: '4',
+      name: 'Style Enhancement LoRA',
+      filePath: '/models/loras/style_enhancement.safetensors',
+      fileSize: 67108864, // 64MB
+      createdAt: new Date('2024-01-04'),
+      modifiedAt: new Date('2024-01-18'),
+      modelType: ModelType.LORA,
+      hash: 'jkl012',
+      folder: 'loras',
+    },
+  ],
+  vae: [
+    {
+      id: '5',
+      name: 'VAE-ft-mse-840000-ema-pruned',
+      filePath: '/models/vae/vae-ft-mse-840000-ema-pruned.safetensors',
+      fileSize: 335544320, // 320MB
+      createdAt: new Date('2024-01-05'),
+      modifiedAt: new Date('2024-01-19'),
+      modelType: ModelType.VAE,
+      hash: 'mno345',
+      folder: 'vae',
+    },
+  ],
+  embeddings: [
+    {
+      id: '6',
+      name: 'BadDream Negative Embedding',
+      filePath: '/models/embeddings/baddream.pt',
+      fileSize: 25600, // 25KB
+      createdAt: new Date('2024-01-06'),
+      modifiedAt: new Date('2024-01-20'),
+      modelType: ModelType.EMBEDDING,
+      hash: 'pqr678',
+      folder: 'embeddings',
+    },
+  ],
+  controlnet: [
+    {
+      id: '7',
+      name: 'ControlNet Canny',
+      filePath: '/models/controlnet/control_canny.safetensors',
+      fileSize: 1431655765, // 1.33GB
+      createdAt: new Date('2024-01-07'),
+      modifiedAt: new Date('2024-01-21'),
+      modelType: ModelType.CONTROLNET,
+      hash: 'stu901',
+      folder: 'controlnet',
+    },
+  ],
+  upscaler: [
+    {
+      id: '8',
+      name: 'Real-ESRGAN 4x+',
+      filePath: '/models/upscaler/RealESRGAN_x4plus.pth',
+      fileSize: 67108864, // 64MB
+      createdAt: new Date('2024-01-08'),
+      modifiedAt: new Date('2024-01-22'),
+      modelType: ModelType.UPSCALER,
+      hash: 'vwx234',
+      folder: 'upscaler',
+    },
+  ],
+};
+
 const LocalAssetsTab: React.FC = () => {
   const { t } = useTranslation();
   const [selectedFolder, setSelectedFolder] = useState<string>('checkpoints');
   const [loading] = useState<boolean>(false);
+  const [modelsLoading, setModelsLoading] = useState<boolean>(false);
 
   const handleFolderSelect = (folderId: string) => {
     setSelectedFolder(folderId);
-    console.log('Selected folder:', folderId);
+    setModelsLoading(true);
+
+    // Simulate loading delay
+    setTimeout(() => {
+      setModelsLoading(false);
+    }, 500);
   };
+
+  const handleModelSelect = (model: ModelInfo) => {
+    console.log('Selected model:', model);
+    // TODO: Open model detail modal
+  };
+
+  const handleModelDrag = (model: ModelInfo) => {
+    console.log('Dragging model:', model);
+    // TODO: Handle drag to ComfyUI workflow
+  };
+
+  const currentModels = mockModels[selectedFolder] || [];
 
   return (
     <div className="tab-panel">
@@ -76,14 +201,12 @@ const LocalAssetsTab: React.FC = () => {
               loading={loading}
             />
             <div className="local-assets-main">
-              <div className="placeholder-content">
-                <i className="pi pi-folder" style={{ fontSize: '3rem', opacity: 0.5 }}></i>
-                <p>
-                  {selectedFolder
-                    ? `Models for ${mockFolders.find((f) => f.id === selectedFolder)?.name || selectedFolder} will be displayed here`
-                    : t('content.localAssets.placeholder')}
-                </p>
-              </div>
+              <ModelGrid
+                models={currentModels}
+                loading={modelsLoading}
+                onModelSelect={handleModelSelect}
+                onModelDrag={handleModelDrag}
+              />
             </div>
           </div>
         </div>
