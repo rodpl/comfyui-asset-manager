@@ -3,7 +3,7 @@ name = "comfyui-asset-manager"
 description = "ComfyUI Asset Manager for managing assets in ComfyUI"
 version = "0.1.0"
 license = { file = "LICENSE" }
-dependencies = []
+dependencies = ["aiohttp (>=3.12.14,<4.0.0)"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0.0", "pytest-cov>=4.0.0", "pytest-asyncio>=0.21.0"]
@@ -36,6 +36,7 @@ pytest-asyncio = "^0.21.0"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+asyncio_mode = "auto"
 addopts = [
     "--strict-markers",
     "--strict-config",
