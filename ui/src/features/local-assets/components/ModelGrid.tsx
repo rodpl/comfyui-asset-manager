@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ModelInfo, ModelType } from '../types';
+import { highlightSearchTerms } from '../utils/searchUtils';
 import './ModelGrid.css';
 
 interface ModelGridProps {
@@ -8,15 +9,17 @@ interface ModelGridProps {
   loading: boolean;
   onModelSelect: (model: ModelInfo) => void;
   onModelDrag?: (model: ModelInfo) => void;
+  searchQuery?: string;
 }
 
 interface ModelCardProps {
   model: ModelInfo;
   onSelect: (model: ModelInfo) => void;
   onDragStart?: (model: ModelInfo) => void;
+  searchQuery?: string;
 }
 
-const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart }) => {
+const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, searchQuery }) => {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
@@ -111,7 +114,11 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart }) =
       <div className="model-card-content p-card-body">
         <div className="model-card-header">
           <h4 className="model-name p-card-title" title={model.name}>
-            {model.name}
+            {searchQuery ? (
+              <span dangerouslySetInnerHTML={{ __html: highlightSearchTerms(model.name, searchQuery) }} />
+            ) : (
+              model.name
+            )}
           </h4>
           <span className="model-type-badge">{model.modelType.toUpperCase()}</span>
         </div>
@@ -148,7 +155,7 @@ const ModelGridSkeleton: React.FC<{ count?: number }> = ({ count = 12 }) => {
   );
 };
 
-const ModelGrid: React.FC<ModelGridProps> = ({ models, loading, onModelSelect, onModelDrag }) => {
+const ModelGrid: React.FC<ModelGridProps> = ({ models, loading, onModelSelect, onModelDrag, searchQuery }) => {
   const { t } = useTranslation();
 
   if (loading) {
@@ -179,6 +186,7 @@ const ModelGrid: React.FC<ModelGridProps> = ({ models, loading, onModelSelect, o
           model={model}
           onSelect={onModelSelect}
           onDragStart={onModelDrag}
+          searchQuery={searchQuery}
         />
       ))}
     </div>

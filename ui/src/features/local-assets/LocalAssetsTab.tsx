@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import FolderNavigation from './FolderNavigation';
-import ModelGrid from './components/ModelGrid';
-import { ModelFolder, ModelType, ModelInfo } from './types';
+import { ModelGrid, SearchFilterBar, SearchEmptyState } from './components';
+import { ModelFolder, ModelType, ModelInfo, FilterOptions } from './types';
+import { filterModels } from './utils/searchUtils';
 import './LocalAssetsTab.css';
 
 // Mock data for demonstration
@@ -162,6 +163,14 @@ const LocalAssetsTab: React.FC = () => {
   const [selectedFolder, setSelectedFolder] = useState<string>('checkpoints');
   const [loading] = useState<boolean>(false);
   const [modelsLoading, setModelsLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filters, setFilters] = useState<FilterOptions>({
+    modelTypes: [],
+    fileSizeRange: undefined,
+    dateRange: undefined,
+    hasMetadata: undefined,
+    hasThumbnail: undefined,
+  });
 
   const handleFolderSelect = (folderId: string) => {
     setSelectedFolder(folderId);
@@ -183,7 +192,44 @@ const LocalAssetsTab: React.FC = () => {
     // TODO: Handle drag to ComfyUI workflow
   };
 
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      modelTypes: [],
+      fileSizeRange: undefined,
+      dateRange: undefined,
+      hasMetadata: undefined,
+      hasThumbnail: undefined,
+    });
+  };
+
   const currentModels = mockModels[selectedFolder] || [];
+
+  // Apply search and filters
+  const filteredModels = useMemo(() => {
+    return filterModels(currentModels, searchQuery, filters);
+  }, [currentModels, searchQuery, filters]);
+
+  const hasActiveFilters =
+    filters.modelTypes.length > 0 ||
+    filters.fileSizeRange ||
+    filters.dateRange ||
+    filters.hasMetadata !== undefined ||
+    filters.hasThumbnail !== undefined;
+
+  const showEmptyState =
+    !modelsLoading && filteredModels.length === 0 && (searchQuery || hasActiveFilters);
 
   return (
     <div className="tab-panel">
@@ -201,12 +247,30 @@ const LocalAssetsTab: React.FC = () => {
               loading={loading}
             />
             <div className="local-assets-main">
-              <ModelGrid
-                models={currentModels}
+              <SearchFilterBar
+                searchQuery={searchQuery}
+                onSearchChange={handleSearchChange}
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                totalResults={filteredModels.length}
                 loading={modelsLoading}
-                onModelSelect={handleModelSelect}
-                onModelDrag={handleModelDrag}
               />
+              {showEmptyState ? (
+                <SearchEmptyState
+                  searchQuery={searchQuery}
+                  hasFilters={Boolean(hasActiveFilters)}
+                  onClearSearch={handleClearSearch}
+                  onClearFilters={handleClearFilters}
+                />
+              ) : (
+                <ModelGrid
+                  models={filteredModels}
+                  loading={modelsLoading}
+                  onModelSelect={handleModelSelect}
+                  onModelDrag={handleModelDrag}
+                  searchQuery={searchQuery}
+                />
+              )}
             </div>
           </div>
         </div>

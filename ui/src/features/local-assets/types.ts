@@ -36,3 +36,26 @@ export interface FolderNavigationProps {
   onFolderSelect: (folderId: string) => void;
   loading?: boolean;
 }
+
+export interface FilterOptions {
+  modelTypes: ModelType[];
+  fileSizeRange?: {
+    min: number;
+    max: number;
+  };
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  hasMetadata?: boolean;
+  hasThumbnail?: boolean;
+}
+
+export interface SearchFilterBarProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  filters: FilterOptions;
+  onFilterChange: (filters: FilterOptions) => void;
+  totalResults?: number;
+  loading?: boolean;
+}
