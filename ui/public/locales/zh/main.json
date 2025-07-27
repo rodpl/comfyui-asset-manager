@@ -24,14 +24,6 @@
     "controlnet": "ControlNet",
     "upscaler": "放大器"
   },
-  "modelGrid": {
-    "modified": "修改时间",
-    "ariaLabel": "模型网格",
-    "empty": {
-      "title": "未找到模型",
-      "description": "在所选文件夹中未找到模型。请尝试选择其他文件夹或检查您的 ComfyUI 模型目录。"
-    }
-  },
   "content": {
     "localAssets": {
       "placeholder": "本地资产管理功能将在此处实现。您将能够组织模型、检查点和其他资产。"
