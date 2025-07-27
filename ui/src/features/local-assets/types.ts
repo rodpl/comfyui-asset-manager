@@ -6,7 +6,7 @@ export enum ModelType {
   VAE = 'vae',
   EMBEDDING = 'embedding',
   CONTROLNET = 'controlnet',
-  UPSCALER = 'upscaler'
+  UPSCALER = 'upscaler',
 }
 
 export interface ModelFolder {

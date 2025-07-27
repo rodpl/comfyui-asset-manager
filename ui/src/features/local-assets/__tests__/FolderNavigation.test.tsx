@@ -169,7 +169,7 @@ describe('FolderNavigation', () => {
     it('displays empty state when folders array is undefined', () => {
       renderWithI18n(
         <FolderNavigation
-          folders={undefined as unknown}
+          folders={undefined as unknown as ModelFolder[]}
           selectedFolder=""
           onFolderSelect={mockOnFolderSelect}
         />
