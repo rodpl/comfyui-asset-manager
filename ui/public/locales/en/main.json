@@ -34,5 +34,13 @@
     "outputs": {
       "placeholder": "Output management functionality will be implemented here. View and organize your generated images."
     }
+  },
+  "modelGrid": {
+    "modified": "Modified",
+    "ariaLabel": "Model grid",
+    "empty": {
+      "title": "No Models Found",
+      "description": "No models were found in the selected folder. Try selecting a different folder or check your ComfyUI model directories."
+    }
   }
 }

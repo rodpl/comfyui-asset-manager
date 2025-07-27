@@ -34,5 +34,13 @@
     "outputs": {
       "placeholder": "输出管理功能将在此处实现。查看和组织您生成的图像。"
     }
+  },
+  "modelGrid": {
+    "modified": "修改时间",
+    "ariaLabel": "模型网格",
+    "empty": {
+      "title": "未找到模型",
+      "description": "在所选文件夹中未找到模型。请尝试选择其他文件夹或检查您的 ComfyUI 模型目录。"
+    }
   }
 }
