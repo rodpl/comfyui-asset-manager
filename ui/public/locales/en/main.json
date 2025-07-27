@@ -63,5 +63,52 @@
       "tryBroaderTerms": "Try broader search terms",
       "clearFilters": "Clear active filters"
     }
+  },
+  "modelDetail": {
+    "close": "Close",
+    "tabs": {
+      "details": "Details",
+      "metadata": "Metadata",
+      "usage": "Usage"
+    },
+    "basicInfo": "Basic Information",
+    "fileName": "File Name",
+    "filePath": "File Path",
+    "fileSize": "File Size",
+    "modelType": "Model Type",
+    "hash": "Hash",
+    "created": "Created",
+    "modified": "Modified",
+    "copyName": "Copy name",
+    "copyPath": "Copy file path",
+    "copyHash": "Copy hash",
+    "civitaiInfo": "CivitAI Information",
+    "huggingfaceInfo": "HuggingFace Information",
+    "downloads": "downloads",
+    "likes": "likes",
+    "userMetadata": "User Metadata",
+    "description": "Description",
+    "rating": "Rating",
+    "userTags": "Tags",
+    "noUserMetadata": "No user metadata available. You can add custom tags, descriptions, and ratings to organize your models.",
+    "technicalDetails": "Technical Details",
+    "fileFormat": "File Format",
+    "compatibility": {
+      "checkpoint": "Compatible with checkpoint loader nodes",
+      "lora": "Compatible with LoRA loader nodes",
+      "vae": "Compatible with VAE loader and encode/decode nodes",
+      "embedding": "Compatible with text encoding nodes",
+      "controlnet": "Compatible with ControlNet nodes",
+      "upscaler": "Compatible with upscale model nodes"
+    },
+    "quickActions": "Quick Actions",
+    "addToWorkflow": "Add to Workflow",
+    "copyForWorkflow": "Copy Path",
+    "usageInstructions": "Usage Instructions",
+    "dragAndDrop": "Drag and Drop",
+    "dragAndDropDescription": "Drag this model from the grid directly onto compatible ComfyUI nodes in your workflow.",
+    "manualLoad": "Manual Loading",
+    "manualLoadDescription": "Use the file path below to manually load this model in ComfyUI nodes:",
+    "compatibleNodes": "Compatible Nodes"
   }
 }

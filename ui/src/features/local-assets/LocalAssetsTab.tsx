@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import FolderNavigation from './FolderNavigation';
-import { ModelGrid, SearchFilterBar, SearchEmptyState } from './components';
-import { ModelFolder, ModelType, ModelInfo, FilterOptions } from './types';
+import { ModelGrid, SearchFilterBar, SearchEmptyState, ModelDetailModal } from './components';
+import { ModelFolder, ModelType, ModelInfo, FilterOptions, EnrichedModelInfo } from './types';
 import { filterModels } from './utils/searchUtils';
 import './LocalAssetsTab.css';
 
@@ -52,8 +52,8 @@ const mockFolders: ModelFolder[] = [
   },
 ];
 
-// Mock model data for demonstration
-const mockModels: Record<string, ModelInfo[]> = {
+// Mock enriched model data for demonstration
+const mockEnrichedModels: Record<string, EnrichedModelInfo[]> = {
   checkpoints: [
     {
       id: '1',
@@ -63,10 +63,27 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-01'),
       modifiedAt: new Date('2024-01-15'),
       modelType: ModelType.CHECKPOINT,
-      hash: 'abc123',
+      hash: 'abc123def456ghi789',
       folder: 'checkpoints',
       thumbnail:
         'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/78fd2a0a-42b6-42b0-9c7c-9f4d5a5c5c5c/width=450/00001-28328.jpeg',
+      externalMetadata: {
+        civitai: {
+          modelId: 4201,
+          name: 'Realistic Vision V5.1',
+          description: 'Realistic Vision V5.1 is a photorealistic model that produces high-quality, detailed images with excellent lighting and composition. Perfect for portrait photography, landscapes, and realistic scenes.',
+          tags: ['photorealistic', 'portrait', 'photography', 'realistic', 'detailed'],
+          images: ['https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/78fd2a0a-42b6-42b0-9c7c-9f4d5a5c5c5c/width=450/00001-28328.jpeg'],
+          downloadCount: 125000,
+          rating: 4.8,
+          creator: 'SG_161222'
+        }
+      },
+      userMetadata: {
+        tags: ['favorite', 'portraits', 'main-checkpoint'],
+        description: 'My go-to checkpoint for realistic portraits and photography-style images.',
+        rating: 5
+      }
     },
     {
       id: '2',
@@ -76,8 +93,18 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-02'),
       modifiedAt: new Date('2024-01-16'),
       modelType: ModelType.CHECKPOINT,
-      hash: 'def456',
+      hash: 'def456ghi789jkl012',
       folder: 'checkpoints',
+      externalMetadata: {
+        huggingface: {
+          modelId: 'Lykon/DreamShaper',
+          description: 'DreamShaper is a general purpose SD model that aims at doing everything well, photos, art, anime, manga. It\'s designed to match Midjourney and DALL-E.',
+          tags: ['stable-diffusion', 'text-to-image', 'art', 'anime', 'photography'],
+          downloads: 89000,
+          likes: 1200,
+          library: 'diffusers'
+        }
+      }
     },
   ],
   loras: [
@@ -89,8 +116,13 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-03'),
       modifiedAt: new Date('2024-01-17'),
       modelType: ModelType.LORA,
-      hash: 'ghi789',
+      hash: 'ghi789jkl012mno345',
       folder: 'loras',
+      userMetadata: {
+        tags: ['enhancement', 'detail'],
+        description: 'Enhances fine details in generated images.',
+        rating: 4
+      }
     },
     {
       id: '4',
@@ -100,7 +132,7 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-04'),
       modifiedAt: new Date('2024-01-18'),
       modelType: ModelType.LORA,
-      hash: 'jkl012',
+      hash: 'jkl012mno345pqr678',
       folder: 'loras',
     },
   ],
@@ -113,7 +145,7 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-05'),
       modifiedAt: new Date('2024-01-19'),
       modelType: ModelType.VAE,
-      hash: 'mno345',
+      hash: 'mno345pqr678stu901',
       folder: 'vae',
     },
   ],
@@ -126,7 +158,7 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-06'),
       modifiedAt: new Date('2024-01-20'),
       modelType: ModelType.EMBEDDING,
-      hash: 'pqr678',
+      hash: 'pqr678stu901vwx234',
       folder: 'embeddings',
     },
   ],
@@ -139,7 +171,7 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-07'),
       modifiedAt: new Date('2024-01-21'),
       modelType: ModelType.CONTROLNET,
-      hash: 'stu901',
+      hash: 'stu901vwx234yza567',
       folder: 'controlnet',
     },
   ],
@@ -152,7 +184,7 @@ const mockModels: Record<string, ModelInfo[]> = {
       createdAt: new Date('2024-01-08'),
       modifiedAt: new Date('2024-01-22'),
       modelType: ModelType.UPSCALER,
-      hash: 'vwx234',
+      hash: 'vwx234yza567bcd890',
       folder: 'upscaler',
     },
   ],
@@ -164,6 +196,8 @@ const LocalAssetsTab: React.FC = () => {
   const [loading] = useState<boolean>(false);
   const [modelsLoading, setModelsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedModel, setSelectedModel] = useState<EnrichedModelInfo | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterOptions>({
     modelTypes: [],
     fileSizeRange: undefined,
@@ -183,8 +217,24 @@ const LocalAssetsTab: React.FC = () => {
   };
 
   const handleModelSelect = (model: ModelInfo) => {
-    console.log('Selected model:', model);
-    // TODO: Open model detail modal
+    // Find the enriched model data
+    const enrichedModel = mockEnrichedModels[selectedFolder]?.find(m => m.id === model.id);
+    if (enrichedModel) {
+      setSelectedModel(enrichedModel);
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedModel(null);
+  };
+
+  const handleAddToWorkflow = (model: EnrichedModelInfo) => {
+    console.log('Adding model to workflow:', model);
+    // TODO: Implement ComfyUI workflow integration
+    // This would typically involve communicating with ComfyUI's API
+    // to add the model to the current workflow
   };
 
   const handleModelDrag = (model: ModelInfo) => {
@@ -214,7 +264,7 @@ const LocalAssetsTab: React.FC = () => {
     });
   };
 
-  const currentModels = mockModels[selectedFolder] || [];
+  const currentModels = mockEnrichedModels[selectedFolder] || [];
 
   // Apply search and filters
   const filteredModels = useMemo(() => {
@@ -275,6 +325,15 @@ const LocalAssetsTab: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {selectedModel && (
+        <ModelDetailModal
+          model={selectedModel}
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          onAddToWorkflow={handleAddToWorkflow}
+        />
+      )}
     </div>
   );
 };
