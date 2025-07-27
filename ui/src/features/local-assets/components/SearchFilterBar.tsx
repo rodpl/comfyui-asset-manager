@@ -14,7 +14,7 @@ const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
   const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounced search implementation
   useEffect(() => {
