@@ -13,7 +13,7 @@ dist_path = os.path.join(workspace_path, "dist/asset_manager")
 dist_locales_path = os.path.join(workspace_path, "dist/locales")
 
 # Print the current paths for debugging
-print(f"ComfyUI_example_frontend_extension workspace path: {workspace_path}")
+print(f"ComfyUI Asset Manager workspace path: {workspace_path}")
 print(f"Dist path: {dist_path}")
 print(f"Dist locales path: {dist_locales_path}")
 print(f"Locales exist: {os.path.exists(dist_locales_path)}")
@@ -34,8 +34,16 @@ if os.path.exists(dist_path):
     else:
         print("WARNING: Locale directory not found!")
 
-    # Also register the standard ComfyUI extension web directory
+    # Initialize and register the asset manager API
+    try:
+        from src.main import register_with_comfyui
+        register_with_comfyui(server.PromptServer.instance.app)
+        print("Asset Manager API registered successfully")
+    except Exception as e:
+        print(f"WARNING: Failed to register Asset Manager API: {e}")
+        # Continue without API functionality
 
+    # Also register the standard ComfyUI extension web directory
     project_name = os.path.basename(workspace_path)
 
     try:
@@ -50,4 +58,4 @@ if os.path.exists(dist_path):
 
     nodes.EXTENSION_WEB_DIRS[project_name] = os.path.join(workspace_path, "dist")
 else:
-    print("ComfyUI Example React Extension: Web directory not found")
+    print("ComfyUI Asset Manager: Web directory not found")
