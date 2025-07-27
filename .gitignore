@@ -15,3 +15,5 @@ node.zip
 .claude/
 /ui/test-results/
 .coverage
+coverage.xml
+test-results/

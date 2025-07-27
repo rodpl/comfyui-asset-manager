@@ -1,0 +1,175 @@
+name: Python CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    permissions:
+      contents: read
+      checks: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-3.12-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --with dev --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --with dev --no-interaction
+
+      - name: Lint with ruff (if available)
+        run: |
+          if poetry run which ruff > /dev/null 2>&1; then
+            echo "Running ruff linter..."
+            poetry run ruff check src/ tests/
+          else
+            echo "Ruff not available, skipping linting"
+          fi
+        continue-on-error: true
+
+      - name: Type check with mypy (if available)
+        run: |
+          if poetry run which mypy > /dev/null 2>&1; then
+            echo "Running mypy type checker..."
+            poetry run mypy src/
+          else
+            echo "MyPy not available, skipping type checking"
+          fi
+        continue-on-error: true
+
+      - name: Test with pytest
+        run: |
+          poetry run pytest \
+            --verbose \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-report=term-missing \
+            --junit-xml=test-results/pytest.xml \
+            --cov-fail-under=70
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: python
+          name: python-coverage
+          fail_ci_if_error: false
+
+      - name: Report test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Python Tests
+          path: test-results/pytest.xml
+          reporter: java-junit
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-report
+          path: htmlcov/
+
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction
+
+      - name: Check code formatting with black (if available)
+        run: |
+          if poetry run which black > /dev/null 2>&1; then
+            echo "Checking code formatting with black..."
+            poetry run black --check --diff src/ tests/
+          else
+            echo "Black not available, skipping format check"
+          fi
+
+      - name: Check import sorting with isort (if available)
+        run: |
+          if poetry run which isort > /dev/null 2>&1; then
+            echo "Checking import sorting with isort..."
+            poetry run isort --check-only --diff src/ tests/
+          else
+            echo "isort not available, skipping import sort check"
+          fi
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction
+
+      - name: Security check with bandit (if available)
+        run: |
+          if poetry run which bandit > /dev/null 2>&1; then
+            echo "Running security check with bandit..."
+            poetry run bandit -r src/ -f json -o bandit-report.json || true
+            poetry run bandit -r src/
+          else
+            echo "Bandit not available, skipping security check"
+          fi
+        continue-on-error: true
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-security-report
+          path: bandit-report.json
