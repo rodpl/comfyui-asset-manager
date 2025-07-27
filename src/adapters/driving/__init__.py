@@ -4,4 +4,6 @@ These adapters translate external requests (HTTP, CLI, etc.)
 into domain operations using the driving ports.
 """
 
-# Driving adapters will be imported here as they are implemented
+from .web_api_adapter import WebAPIAdapter
+
+__all__ = ["WebAPIAdapter"]
