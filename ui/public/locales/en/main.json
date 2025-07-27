@@ -42,5 +42,26 @@
       "title": "No Models Found",
       "description": "No models were found in the selected folder. Try selecting a different folder or check your ComfyUI model directories."
     }
+  },
+  "search": {
+    "placeholder": "Search models by name, tags, or metadata...",
+    "clear": "Clear search",
+    "filters": "Filters",
+    "toggleFilters": "Toggle filters",
+    "resultsCount": "{{count}} result",
+    "resultsCount_plural": "{{count}} results",
+    "modelTypes": "Model Types",
+    "metadata": "Metadata",
+    "hasMetadata": "Has external metadata",
+    "hasThumbnail": "Has thumbnail",
+    "clearFilters": "Clear all filters",
+    "noResults": {
+      "title": "No Results Found",
+      "description": "No models match your search criteria. Try adjusting your search terms or filters.",
+      "suggestions": "Suggestions:",
+      "checkSpelling": "Check your spelling",
+      "tryBroaderTerms": "Try broader search terms",
+      "clearFilters": "Clear active filters"
+    }
   }
 }

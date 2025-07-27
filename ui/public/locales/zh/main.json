@@ -42,5 +42,25 @@
       "title": "未找到模型",
       "description": "在所选文件夹中未找到模型。请尝试选择其他文件夹或检查您的 ComfyUI 模型目录。"
     }
+  },
+  "search": {
+    "placeholder": "按名称、标签或元数据搜索模型...",
+    "clear": "清除搜索",
+    "filters": "筛选器",
+    "toggleFilters": "切换筛选器",
+    "resultsCount": "{{count}} 个结果",
+    "modelTypes": "模型类型",
+    "metadata": "元数据",
+    "hasMetadata": "有外部元数据",
+    "hasThumbnail": "有缩略图",
+    "clearFilters": "清除所有筛选器",
+    "noResults": {
+      "title": "未找到结果",
+      "description": "没有模型符合您的搜索条件。请尝试调整搜索词或筛选器。",
+      "suggestions": "建议：",
+      "checkSpelling": "检查拼写",
+      "tryBroaderTerms": "尝试更宽泛的搜索词",
+      "clearFilters": "清除活动筛选器"
+    }
   }
 }
