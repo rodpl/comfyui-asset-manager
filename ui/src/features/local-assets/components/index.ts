@@ -1,1 +1,1 @@
-export { default as ModelGrid, type ModelInfo, ModelType } from './ModelGrid';
+export { default as ModelGrid } from './ModelGrid';

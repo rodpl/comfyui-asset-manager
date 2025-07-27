@@ -1,28 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ModelInfo, ModelType } from '../types';
 import './ModelGrid.css';
-
-export interface ModelInfo {
-  id: string;
-  name: string;
-  filePath: string;
-  fileSize: number;
-  createdAt: Date;
-  modifiedAt: Date;
-  modelType: ModelType;
-  hash: string;
-  thumbnail?: string;
-  folder: string;
-}
-
-export enum ModelType {
-  CHECKPOINT = 'checkpoint',
-  LORA = 'lora',
-  VAE = 'vae',
-  EMBEDDING = 'embedding',
-  CONTROLNET = 'controlnet',
-  UPSCALER = 'upscaler',
-}
 
 interface ModelGridProps {
   models: ModelInfo[];

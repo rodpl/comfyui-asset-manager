@@ -3,7 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../../../utils/i18n';
-import ModelGrid, { ModelInfo, ModelType } from '../ModelGrid';
+import ModelGrid from '../ModelGrid';
+import { ModelInfo, ModelType } from '../../types';
 
 // Mock i18n for tests
 vi.mock('react-i18next', async () => {
