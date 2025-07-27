@@ -17,3 +17,6 @@ node.zip
 .coverage
 coverage.xml
 test-results/
+
+# Private kiro repository (use as submodule)
+.kiro/
