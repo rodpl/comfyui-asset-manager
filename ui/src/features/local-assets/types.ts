@@ -59,3 +59,42 @@ export interface SearchFilterBarProps {
   totalResults?: number;
   loading?: boolean;
 }
+
+export interface CivitAIMetadata {
+  modelId: number;
+  name: string;
+  description: string;
+  tags: string[];
+  images: string[];
+  downloadCount: number;
+  rating: number;
+  creator: string;
+}
+
+export interface HuggingFaceMetadata {
+  modelId: string;
+  description: string;
+  tags: string[];
+  downloads: number;
+  likes: number;
+  library: string;
+}
+
+export interface EnrichedModelInfo extends ModelInfo {
+  externalMetadata?: {
+    civitai?: CivitAIMetadata;
+    huggingface?: HuggingFaceMetadata;
+  };
+  userMetadata?: {
+    tags: string[];
+    description: string;
+    rating: number;
+  };
+}
+
+export interface ModelDetailModalProps {
+  model: EnrichedModelInfo;
+  isOpen: boolean;
+  onClose: () => void;
+  onAddToWorkflow: (model: ModelInfo) => void;
+}

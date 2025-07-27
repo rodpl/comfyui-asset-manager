@@ -62,5 +62,52 @@
       "tryBroaderTerms": "尝试更宽泛的搜索词",
       "clearFilters": "清除活动筛选器"
     }
+  },
+  "modelDetail": {
+    "close": "关闭",
+    "tabs": {
+      "details": "详情",
+      "metadata": "元数据",
+      "usage": "使用"
+    },
+    "basicInfo": "基本信息",
+    "fileName": "文件名",
+    "filePath": "文件路径",
+    "fileSize": "文件大小",
+    "modelType": "模型类型",
+    "hash": "哈希值",
+    "created": "创建时间",
+    "modified": "修改时间",
+    "copyName": "复制名称",
+    "copyPath": "复制文件路径",
+    "copyHash": "复制哈希值",
+    "civitaiInfo": "CivitAI 信息",
+    "huggingfaceInfo": "HuggingFace 信息",
+    "downloads": "下载",
+    "likes": "点赞",
+    "userMetadata": "用户元数据",
+    "description": "描述",
+    "rating": "评分",
+    "userTags": "标签",
+    "noUserMetadata": "没有用户元数据。您可以添加自定义标签、描述和评分来组织您的模型。",
+    "technicalDetails": "技术详情",
+    "fileFormat": "文件格式",
+    "compatibility": {
+      "checkpoint": "兼容检查点加载器节点",
+      "lora": "兼容 LoRA 加载器节点",
+      "vae": "兼容 VAE 加载器和编码/解码节点",
+      "embedding": "兼容文本编码节点",
+      "controlnet": "兼容 ControlNet 节点",
+      "upscaler": "兼容放大模型节点"
+    },
+    "quickActions": "快速操作",
+    "addToWorkflow": "添加到工作流",
+    "copyForWorkflow": "复制路径",
+    "usageInstructions": "使用说明",
+    "dragAndDrop": "拖放",
+    "dragAndDropDescription": "将此模型从网格直接拖放到工作流中的兼容 ComfyUI 节点上。",
+    "manualLoad": "手动加载",
+    "manualLoadDescription": "使用下面的文件路径在 ComfyUI 节点中手动加载此模型：",
+    "compatibleNodes": "兼容节点"
   }
 }
