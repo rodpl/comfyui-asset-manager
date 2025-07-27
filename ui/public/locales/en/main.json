@@ -11,6 +11,19 @@
     "outputs": "Outputs",
     "outputsDescription": "View and manage your ComfyUI generated images and outputs"
   },
+  "folders": {
+    "title": "Folders",
+    "count": "{{count}} folders",
+    "loading": "Loading folders...",
+    "empty": "No folders found",
+    "modelCount": "{{count}} models",
+    "checkpoint": "Checkpoints",
+    "lora": "LoRAs",
+    "vae": "VAE",
+    "embedding": "Embeddings",
+    "controlnet": "ControlNet",
+    "upscaler": "Upscalers"
+  },
   "content": {
     "localAssets": {
       "placeholder": "Local assets management functionality will be implemented here. You'll be able to organize models, checkpoints, and other assets."
