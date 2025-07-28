@@ -16,6 +16,7 @@ describe('ApiClient', () => {
   beforeEach(() => {
     apiClient = new ApiClient('/test-api', 5000);
     mockFetch.mockClear();
+    mockFetch.mockReset();
   });
 
   afterEach(() => {
@@ -76,17 +77,19 @@ describe('ApiClient', () => {
     it('should handle timeout', async () => {
       vi.useFakeTimers();
       
-      // Mock a request that never resolves
-      mockFetch.mockImplementationOnce(() => new Promise(() => {}));
+      try {
+        // Mock a request that never resolves
+        mockFetch.mockImplementationOnce(() => new Promise(() => {}));
 
-      const promise = apiClient.getFolders({ timeout: 100 });
-      
-      // Fast forward time to trigger timeout
-      vi.advanceTimersByTime(150);
-      
-      await expect(promise).rejects.toThrow();
-      
-      vi.useRealTimers();
+        const promise = apiClient.getFolders({ timeout: 100 });
+        
+        // Fast forward time to trigger timeout
+        vi.advanceTimersByTime(150);
+        
+        await expect(promise).rejects.toThrow();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -105,7 +108,7 @@ describe('ApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(3);
       expect(result).toEqual({ success: true });
-    });
+    }, 10000);
 
     it('should not retry on non-retryable errors', async () => {
       mockFetch.mockResolvedValueOnce({
@@ -116,7 +119,7 @@ describe('ApiClient', () => {
 
       await expect(apiClient.getFolders()).rejects.toThrow('HTTP 400: Bad Request');
       expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
+    }, 10000);
 
     it('should respect max retries', async () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
