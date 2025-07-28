@@ -304,9 +304,10 @@ describe('AssetManagerContext', () => {
         screen.getByTestId('load-folders').click();
       });
 
+      // Wait for error to be set (with longer timeout due to setTimeout in handleError)
       await waitFor(() => {
         expect(screen.getByTestId('error-folders')).toHaveTextContent('Test error');
-      });
+      }, { timeout: 2000 });
 
       // Then clear errors
       await act(async () => {

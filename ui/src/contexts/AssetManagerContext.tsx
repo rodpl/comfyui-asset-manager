@@ -274,8 +274,11 @@ export const AssetManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       errorMessage = error.message;
     }
 
-    dispatch({ type: 'SET_ERROR', payload: { key: errorKey, value: errorMessage } });
     console.error(`Asset Manager Error (${errorKey}):`, error);
+    // Use setTimeout to ensure error is set after any clearing that might happen
+    setTimeout(() => {
+      dispatch({ type: 'SET_ERROR', payload: { key: errorKey, value: errorMessage } });
+    }, 0);
   }, []);
 
   // Load folders
