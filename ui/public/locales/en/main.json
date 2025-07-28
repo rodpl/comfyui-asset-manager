@@ -91,6 +91,9 @@
     "rating": "Rating",
     "userTags": "Tags",
     "noUserMetadata": "No user metadata available. You can add custom tags, descriptions, and ratings to organize your models.",
+    "edit": "Edit",
+    "editMetadata": "Edit metadata",
+    "addMetadata": "Add Metadata",
     "technicalDetails": "Technical Details",
     "fileFormat": "File Format",
     "compatibility": {
@@ -118,7 +121,30 @@
     "errors": {
       "modelSelectFailed": "Failed to select model. Please try again.",
       "workflowAddFailed": "Failed to add model to workflow. Please try again.",
+      "metadataUpdateFailed": "Failed to update model metadata. Please try again.",
       "dismiss": "Dismiss error"
     }
+  },
+  "metadataEditor": {
+    "tags": "Tags",
+    "addTag": "Add tag...",
+    "removeTag": "Remove {{tag}}",
+    "description": "Description",
+    "descriptionPlaceholder": "Add a description for this model...",
+    "rating": "Rating",
+    "ratingStar": "{{star}} star",
+    "clearRating": "Clear rating",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "bulkMetadata": {
+    "title": "Bulk Edit Metadata",
+    "close": "Close",
+    "selectedModels": "{{count}} model selected",
+    "selectedModels_plural": "{{count}} models selected",
+    "warning": "Changes will be applied to all selected models",
+    "selectedModelsTitle": "Selected Models",
+    "moreModels": "and {{count}} more...",
+    "metadataToApply": "Metadata to Apply"
   }
 }

@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EnrichedModelInfo, ModelType } from '../types';
+import MetadataEditor from './MetadataEditor';
 import './ModelDetailModal.css';
 
 interface ModelDetailModalProps {
@@ -8,6 +9,7 @@ interface ModelDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddToWorkflow: (model: EnrichedModelInfo) => void;
+  onUpdateMetadata?: (modelId: string, metadata: any) => Promise<void>;
 }
 
 type TabType = 'details' | 'metadata' | 'usage';
@@ -17,10 +19,14 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
   isOpen,
   onClose,
   onAddToWorkflow,
+  onUpdateMetadata,
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('details');
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
+  const [isEditingMetadata, setIsEditingMetadata] = useState(false);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [metadataLoading, setMetadataLoading] = useState(false);
 
   const formatFileSize = useCallback((bytes: number): string => {
     const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -70,9 +76,55 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onClose();
+      if (isEditingMetadata) {
+        setIsEditingMetadata(false);
+      } else {
+        onClose();
+      }
     }
-  }, [onClose]);
+  }, [onClose, isEditingMetadata]);
+
+  // Fetch available tags when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchAvailableTags();
+    }
+  }, [isOpen]);
+
+  const fetchAvailableTags = async () => {
+    try {
+      const response = await fetch('/asset_manager/tags');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setAvailableTags(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch available tags:', error);
+    }
+  };
+
+  const handleMetadataSave = useCallback(async (metadata: { tags: string[]; description: string; rating: number }) => {
+    if (!onUpdateMetadata) return;
+    
+    setMetadataLoading(true);
+    try {
+      await onUpdateMetadata(model.id, metadata);
+      setIsEditingMetadata(false);
+      // Refresh available tags after saving
+      await fetchAvailableTags();
+    } catch (error) {
+      console.error('Failed to update metadata:', error);
+      // TODO: Show error message to user
+    } finally {
+      setMetadataLoading(false);
+    }
+  }, [model.id, onUpdateMetadata]);
+
+  const handleMetadataCancel = useCallback(() => {
+    setIsEditingMetadata(false);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -284,46 +336,80 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
             {activeTab === 'metadata' && (
               <div className="metadata-tab">
                 <div className="info-section">
-                  <h3>{t('modelDetail.userMetadata')}</h3>
-                  {model.userMetadata ? (
-                    <div className="user-metadata">
-                      {model.userMetadata.description && (
-                        <div className="metadata-item">
-                          <label>{t('modelDetail.description')}:</label>
-                          <p>{model.userMetadata.description}</p>
-                        </div>
-                      )}
-                      
-                      {model.userMetadata.rating > 0 && (
-                        <div className="metadata-item">
-                          <label>{t('modelDetail.rating')}:</label>
-                          <div className="rating">
-                            {Array.from({ length: 5 }, (_, i) => (
-                              <i
-                                key={i}
-                                className={`pi pi-star${i < model.userMetadata!.rating ? ' filled' : ''}`}
-                              ></i>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {model.userMetadata.tags.length > 0 && (
-                        <div className="metadata-item">
-                          <label>{t('modelDetail.userTags')}:</label>
-                          <div className="tags">
-                            {model.userMetadata.tags.map((tag, index) => (
-                              <span key={index} className="tag user-tag">{tag}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                  <div className="section-header">
+                    <h3>{t('modelDetail.userMetadata')}</h3>
+                    {onUpdateMetadata && !isEditingMetadata && (
+                      <button
+                        className="edit-metadata-button"
+                        onClick={() => setIsEditingMetadata(true)}
+                        aria-label={t('modelDetail.editMetadata')}
+                      >
+                        <i className="pi pi-pencil"></i>
+                        {t('modelDetail.edit')}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {isEditingMetadata ? (
+                    <MetadataEditor
+                      initialMetadata={model.userMetadata}
+                      availableTags={availableTags}
+                      onSave={handleMetadataSave}
+                      onCancel={handleMetadataCancel}
+                      loading={metadataLoading}
+                    />
                   ) : (
-                    <div className="no-metadata">
-                      <i className="pi pi-info-circle"></i>
-                      <p>{t('modelDetail.noUserMetadata')}</p>
-                    </div>
+                    <>
+                      {model.userMetadata ? (
+                        <div className="user-metadata">
+                          {model.userMetadata.description && (
+                            <div className="metadata-item">
+                              <label>{t('modelDetail.description')}:</label>
+                              <p>{model.userMetadata.description}</p>
+                            </div>
+                          )}
+                          
+                          {model.userMetadata.rating > 0 && (
+                            <div className="metadata-item">
+                              <label>{t('modelDetail.rating')}:</label>
+                              <div className="rating">
+                                {Array.from({ length: 5 }, (_, i) => (
+                                  <i
+                                    key={i}
+                                    className={`pi pi-star${i < model.userMetadata!.rating ? ' filled' : ''}`}
+                                  ></i>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {model.userMetadata.tags.length > 0 && (
+                            <div className="metadata-item">
+                              <label>{t('modelDetail.userTags')}:</label>
+                              <div className="tags">
+                                {model.userMetadata.tags.map((tag, index) => (
+                                  <span key={index} className="tag user-tag">{tag}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="no-metadata">
+                          <i className="pi pi-info-circle"></i>
+                          <p>{t('modelDetail.noUserMetadata')}</p>
+                          {onUpdateMetadata && (
+                            <button
+                              className="add-metadata-button"
+                              onClick={() => setIsEditingMetadata(true)}
+                            >
+                              <i className="pi pi-plus"></i>
+                              {t('modelDetail.addMetadata')}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
 

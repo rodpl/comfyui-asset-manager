@@ -70,3 +70,12 @@ class ModelRepositoryPort(ABC):
             True if model was deleted, False if not found
         """
         pass
+    
+    @abstractmethod
+    def get_all_user_tags(self) -> List[str]:
+        """Get all unique user tags across all models.
+        
+        Returns:
+            List of unique user tags
+        """
+        pass

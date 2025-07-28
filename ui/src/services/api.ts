@@ -364,6 +364,28 @@ export class ApiClient {
   }
 
   /**
+   * Bulk update metadata for multiple models
+   */
+  async bulkUpdateMetadata(
+    modelIds: string[],
+    metadata: { tags?: string[]; description?: string; rating?: number },
+    options?: RequestOptions
+  ): Promise<EnrichedModelInfo[]> {
+    return this.request<EnrichedModelInfo[]>('/models/bulk-metadata', {
+      method: 'POST',
+      body: JSON.stringify({ model_ids: modelIds, metadata }),
+      ...options,
+    });
+  }
+
+  /**
+   * Get all user tags for autocomplete
+   */
+  async getAllUserTags(options?: RequestOptions): Promise<string[]> {
+    return this.get<string[]>('/tags', options);
+  }
+
+  /**
    * Health check endpoint
    */
   async healthCheck(options?: RequestOptions): Promise<{ status: string; timestamp: string }> {

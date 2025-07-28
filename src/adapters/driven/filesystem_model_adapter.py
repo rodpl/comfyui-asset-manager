@@ -339,3 +339,21 @@ class FileSystemModelAdapter(ModelRepositoryPort):
             self._refresh_models_cache()
         
         return [model for model in self._models_cache.values() if model.model_type == model_type]
+    
+    def get_all_user_tags(self) -> List[str]:
+        """Get all unique user tags across all models.
+        
+        Returns:
+            List of unique user tags
+        """
+        # Refresh cache if needed
+        if not self._is_cache_valid():
+            self._refresh_models_cache()
+        
+        all_tags = set()
+        
+        for model in self._models_cache.values():
+            user_tags = model.user_metadata.get('tags', [])
+            all_tags.update(user_tags)
+        
+        return sorted(list(all_tags))

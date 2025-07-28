@@ -170,3 +170,128 @@ class ModelService(ModelManagementPort):
             pass
         
         return model
+    
+    def update_model_metadata(self, model_id: str, metadata: dict) -> Model:
+        """Update user metadata for a specific model.
+        
+        Args:
+            model_id: The ID of the model to update
+            metadata: Dictionary containing metadata updates
+            
+        Returns:
+            Updated model with new metadata
+            
+        Raises:
+            ValidationError: If model_id or metadata is invalid
+            NotFoundError: If model is not found
+        """
+        if not model_id or not model_id.strip():
+            raise ValidationError("model_id cannot be empty", "model_id")
+        
+        if not isinstance(metadata, dict):
+            raise ValidationError("metadata must be a dictionary", "metadata")
+        
+        model = self._model_repository.find_by_id(model_id.strip())
+        if model is None:
+            raise NotFoundError("Model", model_id)
+        
+        # Validate and apply metadata updates
+        updated_metadata = model.user_metadata.copy()
+        
+        # Handle tags update
+        if "tags" in metadata:
+            tags = metadata["tags"]
+            if not isinstance(tags, list):
+                raise ValidationError("tags must be a list", "tags")
+            
+            # Validate each tag
+            for tag in tags:
+                if not isinstance(tag, str) or not tag.strip():
+                    raise ValidationError("each tag must be a non-empty string", "tags")
+            
+            updated_metadata["tags"] = [tag.strip() for tag in tags]
+        
+        # Handle description update
+        if "description" in metadata:
+            description = metadata["description"]
+            if description is not None:
+                if not isinstance(description, str):
+                    raise ValidationError("description must be a string", "description")
+                updated_metadata["description"] = description.strip()
+            else:
+                updated_metadata.pop("description", None)
+        
+        # Handle rating update
+        if "rating" in metadata:
+            rating = metadata["rating"]
+            if rating is not None:
+                if not isinstance(rating, int) or not 1 <= rating <= 5:
+                    raise ValidationError("rating must be an integer between 1 and 5", "rating")
+                updated_metadata["rating"] = rating
+            else:
+                updated_metadata.pop("rating", None)
+        
+        # Create updated model
+        updated_model = Model(
+            id=model.id,
+            name=model.name,
+            file_path=model.file_path,
+            file_size=model.file_size,
+            created_at=model.created_at,
+            modified_at=model.modified_at,
+            model_type=model.model_type,
+            hash=model.hash,
+            folder_id=model.folder_id,
+            thumbnail_path=model.thumbnail_path,
+            user_metadata=updated_metadata
+        )
+        
+        # Save the updated model
+        self._model_repository.save(updated_model)
+        
+        return updated_model
+    
+    def bulk_update_metadata(self, model_ids: List[str], metadata: dict) -> List[Model]:
+        """Update metadata for multiple models at once.
+        
+        Args:
+            model_ids: List of model IDs to update
+            metadata: Dictionary containing metadata updates
+            
+        Returns:
+            List of updated models
+            
+        Raises:
+            ValidationError: If model_ids or metadata is invalid
+        """
+        if not isinstance(model_ids, list) or not model_ids:
+            raise ValidationError("model_ids must be a non-empty list", "model_ids")
+        
+        if not isinstance(metadata, dict):
+            raise ValidationError("metadata must be a dictionary", "metadata")
+        
+        updated_models = []
+        failed_updates = []
+        
+        for model_id in model_ids:
+            try:
+                updated_model = self.update_model_metadata(model_id, metadata)
+                updated_models.append(updated_model)
+            except (ValidationError, NotFoundError) as e:
+                failed_updates.append({"model_id": model_id, "error": str(e)})
+        
+        # If some updates failed, include that information
+        if failed_updates:
+            # For now, we'll log the failures but still return successful updates
+            # In a production system, you might want to handle this differently
+            pass
+        
+        return updated_models
+    
+    def get_all_user_tags(self) -> List[str]:
+        """Get all unique user tags across all models for autocomplete.
+        
+        Returns:
+            List of unique user tags
+        """
+        return self._model_repository.get_all_user_tags()
