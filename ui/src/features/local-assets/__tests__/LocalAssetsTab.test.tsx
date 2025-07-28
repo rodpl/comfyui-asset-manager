@@ -11,7 +11,7 @@ vi.mock('react-i18next', async () => {
   return {
     ...actual,
     useTranslation: () => ({
-      t: (key: string, options?: any) => {
+      t: (key: string, options?: Record<string, number | string>) => {
         const translations: Record<string, string> = {
           'tabs.localAssets': 'Local Assets',
           'tabs.localAssetsDescription': 'Manage and organize your local ComfyUI assets',
@@ -381,7 +381,9 @@ describe('LocalAssetsTab Integration', () => {
     it('should support keyboard navigation for model cards', async () => {
       renderLocalAssetsTab();
 
-      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card') as HTMLElement;
+      const modelCard = screen
+        .getByText('Realistic Vision V5.1')
+        .closest('.model-card') as HTMLElement;
       expect(modelCard).toHaveAttribute('tabindex', '0');
       expect(modelCard).toHaveAttribute('role', 'button');
 
@@ -393,7 +395,9 @@ describe('LocalAssetsTab Integration', () => {
     it('should support Space key for model selection', async () => {
       renderLocalAssetsTab();
 
-      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card') as HTMLElement;
+      const modelCard = screen
+        .getByText('Realistic Vision V5.1')
+        .closest('.model-card') as HTMLElement;
 
       // Test that the card has proper keyboard event handling
       expect(modelCard).toHaveAttribute('tabindex', '0');
@@ -411,7 +415,9 @@ describe('LocalAssetsTab Integration', () => {
     it('should handle drag start for models', async () => {
       renderLocalAssetsTab();
 
-      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card') as HTMLElement;
+      const modelCard = screen
+        .getByText('Realistic Vision V5.1')
+        .closest('.model-card') as HTMLElement;
 
       // Mock drag event
       const mockDataTransfer = {
