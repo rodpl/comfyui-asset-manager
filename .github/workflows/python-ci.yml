@@ -85,7 +85,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Report test results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2.1.1
         if: always()
         with:
           name: Python Tests
