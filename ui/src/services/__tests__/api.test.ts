@@ -90,7 +90,7 @@ describe('ApiClient', () => {
       } finally {
         vi.useRealTimers();
       }
-    });
+    }, 1000);
   });
 
   describe('retry logic', () => {
@@ -108,7 +108,7 @@ describe('ApiClient', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(3);
       expect(result).toEqual({ success: true });
-    }, 10000);
+    }, 1000);
 
     it('should not retry on non-retryable errors', async () => {
       mockFetch.mockResolvedValueOnce({
@@ -119,7 +119,7 @@ describe('ApiClient', () => {
 
       await expect(apiClient.getFolders()).rejects.toThrow('HTTP 400: Bad Request');
       expect(mockFetch).toHaveBeenCalledTimes(1);
-    }, 10000);
+    }, 1000);
 
     it('should respect max retries', async () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
@@ -129,7 +129,7 @@ describe('ApiClient', () => {
       ).rejects.toThrow();
 
       expect(mockFetch).toHaveBeenCalledTimes(3); // Initial + 2 retries
-    });
+    }, 1000);
   });
 
   describe('API methods', () => {
@@ -496,6 +496,6 @@ describe('ApiClient', () => {
       await expect(
         apiClient.getFolders({ signal: controller.signal })
       ).rejects.toThrow();
-    });
+    }, 1000);
   });
 });

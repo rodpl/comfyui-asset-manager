@@ -50,6 +50,7 @@ const TestComponent: React.FC = () => {
       <div data-testid="folders-count">{state.folders?.length || 0}</div>
       <div data-testid="loading-folders">{state.loading.folders.toString()}</div>
       <div data-testid="error-folders">{state.error.folders || 'none'}</div>
+      <div data-testid="error-models">{state.error.models || 'none'}</div>
       <div data-testid="selected-folder">{state.selectedFolder || 'none'}</div>
       <div data-testid="search-query">{state.searchQuery}</div>
       <div data-testid="online-status">{state.isOnline.toString()}</div>
@@ -224,8 +225,10 @@ describe('AssetManagerContext', () => {
       });
 
       await waitFor(() => {
-        expect(mockApiClient.getModelsInFolder).toHaveBeenCalledWith('test-folder');
+        expect(screen.getByTestId('error-models')).toHaveTextContent('Failed to load models');
       });
+
+      expect(mockApiClient.getModelsInFolder).toHaveBeenCalledWith('test-folder');
     });
   });
 

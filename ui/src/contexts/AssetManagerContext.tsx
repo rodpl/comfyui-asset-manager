@@ -116,10 +116,6 @@ function assetManagerReducer(
       return {
         ...state,
         folders: action.payload,
-        error: {
-          ...state.error,
-          folders: null,
-        },
       };
 
     case 'SET_MODELS':
@@ -128,10 +124,6 @@ function assetManagerReducer(
         models: {
           ...state.models,
           [action.payload.folderId]: action.payload.models,
-        },
-        error: {
-          ...state.error,
-          models: null,
         },
       };
 
@@ -294,6 +286,7 @@ export const AssetManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     dispatch({ type: 'SET_LOADING', payload: { key: 'folders', value: true } });
+    dispatch({ type: 'SET_ERROR', payload: { key: 'folders', value: null } }); // Clear previous errors
 
     try {
       const folders = await apiClient.getFolders();
@@ -315,6 +308,7 @@ export const AssetManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
       dispatch({ type: 'SET_LOADING', payload: { key: 'models', value: true } });
+      dispatch({ type: 'SET_ERROR', payload: { key: 'models', value: null } }); // Clear previous errors
 
       try {
         const models = await apiClient.getModelsInFolder(folderId);

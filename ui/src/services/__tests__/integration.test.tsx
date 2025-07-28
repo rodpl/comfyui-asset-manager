@@ -87,6 +87,7 @@ const IntegrationTestComponent: React.FC = () => {
       <div data-testid="folders-count">{state.folders?.length || 0}</div>
       <div data-testid="loading-folders">{state.loading.folders.toString()}</div>
       <div data-testid="error-folders">{state.error.folders || 'none'}</div>
+      <div data-testid="error-models">{state.error.models || 'none'}</div>
       <div data-testid="selected-folder">{state.selectedFolder || 'none'}</div>
       <div data-testid="online-status">{state.isOnline.toString()}</div>
       <div data-testid="search-results">{searchResults.length}</div>
