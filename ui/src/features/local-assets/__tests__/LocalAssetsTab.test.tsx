@@ -250,10 +250,10 @@ describe('LocalAssetsTab Integration', () => {
       await user.click(screen.getByText('Filters'));
 
       // Find the LoRAs filter chip in the filter panel
-      const filterPanel = document.querySelector('.search-filters-panel');
+      const filterPanel = document.querySelector('.search-filters-panel') as HTMLElement;
       expect(filterPanel).toBeInTheDocument();
 
-      const loraChips = within(filterPanel!).getAllByText('LoRAs');
+      const loraChips = within(filterPanel).getAllByText('LoRAs');
       const loraChip = loraChips[0]; // Get the first one (should be in the filter chips)
       await user.click(loraChip);
 
@@ -269,8 +269,8 @@ describe('LocalAssetsTab Integration', () => {
       // Open filters and apply some
       await user.click(screen.getByText('Filters'));
 
-      const filterPanel = document.querySelector('.search-filters-panel');
-      const loraChips = within(filterPanel!).getAllByText('LoRAs');
+      const filterPanel = document.querySelector('.search-filters-panel') as HTMLElement;
+      const loraChips = within(filterPanel).getAllByText('LoRAs');
       await user.click(loraChips[0]);
 
       // Clear all filters - use the one in the filter panel specifically
@@ -381,26 +381,26 @@ describe('LocalAssetsTab Integration', () => {
     it('should support keyboard navigation for model cards', async () => {
       renderLocalAssetsTab();
 
-      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card');
+      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card') as HTMLElement;
       expect(modelCard).toHaveAttribute('tabindex', '0');
       expect(modelCard).toHaveAttribute('role', 'button');
 
       // Test that the card can receive focus
-      modelCard?.focus();
+      modelCard.focus();
       expect(document.activeElement).toBe(modelCard);
     });
 
     it('should support Space key for model selection', async () => {
       renderLocalAssetsTab();
 
-      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card');
+      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card') as HTMLElement;
 
       // Test that the card has proper keyboard event handling
       expect(modelCard).toHaveAttribute('tabindex', '0');
 
       // Focus and press Space - we'll just test that the event handler exists
       // rather than testing the full modal opening flow
-      fireEvent.keyDown(modelCard!, { key: ' ' });
+      fireEvent.keyDown(modelCard, { key: ' ' });
 
       // The component should handle the space key (no error thrown)
       expect(modelCard).toBeInTheDocument();
@@ -411,7 +411,7 @@ describe('LocalAssetsTab Integration', () => {
     it('should handle drag start for models', async () => {
       renderLocalAssetsTab();
 
-      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card');
+      const modelCard = screen.getByText('Realistic Vision V5.1').closest('.model-card') as HTMLElement;
 
       // Mock drag event
       const mockDataTransfer = {
@@ -424,7 +424,7 @@ describe('LocalAssetsTab Integration', () => {
         value: mockDataTransfer,
       });
 
-      fireEvent(modelCard!, dragEvent);
+      fireEvent(modelCard, dragEvent);
 
       // Should set drag data
       expect(mockDataTransfer.setData).toHaveBeenCalledWith(
