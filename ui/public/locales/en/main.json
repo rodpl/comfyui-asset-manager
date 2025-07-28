@@ -110,5 +110,15 @@
     "manualLoad": "Manual Loading",
     "manualLoadDescription": "Use the file path below to manually load this model in ComfyUI nodes:",
     "compatibleNodes": "Compatible Nodes"
+  },
+  "localAssets": {
+    "navigation": {
+      "folders": "Model folders navigation"
+    },
+    "errors": {
+      "modelSelectFailed": "Failed to select model. Please try again.",
+      "workflowAddFailed": "Failed to add model to workflow. Please try again.",
+      "dismiss": "Dismiss error"
+    }
   }
 }

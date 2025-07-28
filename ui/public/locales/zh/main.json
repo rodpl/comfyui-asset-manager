@@ -109,5 +109,15 @@
     "manualLoad": "手动加载",
     "manualLoadDescription": "使用下面的文件路径在 ComfyUI 节点中手动加载此模型：",
     "compatibleNodes": "兼容节点"
+  },
+  "localAssets": {
+    "navigation": {
+      "folders": "模型文件夹导航"
+    },
+    "errors": {
+      "modelSelectFailed": "选择模型失败。请重试。",
+      "workflowAddFailed": "添加模型到工作流失败。请重试。",
+      "dismiss": "关闭错误"
+    }
   }
 }
