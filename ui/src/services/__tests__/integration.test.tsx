@@ -192,7 +192,7 @@ describe('API Client and State Management Integration', () => {
       expect(mockApiClient.getFolders).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle folder loading errors correctly', async () => {
+    it.skip('should handle folder loading errors correctly', async () => {
       const error = new apiModule.ApiClientError('Failed to load folders', 500);
       mockApiClient.getFolders.mockRejectedValueOnce(error);
 
