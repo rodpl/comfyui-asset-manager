@@ -6,7 +6,7 @@ import { mockOutputs } from './mockData';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './OutputsTab.css';
 
-const OutputsTab: React.FC = () => {
+const OutputsTab = () => {
   const { t } = useTranslation();
   const [outputs, setOutputs] = useState<Output[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,10 +21,10 @@ const OutputsTab: React.FC = () => {
     const loadOutputs = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise((resolve) => setTimeout(resolve, 800));
         setOutputs(mockOutputs);
       } catch (err) {
         console.error('Error loading outputs:', err);
@@ -40,7 +40,7 @@ const OutputsTab: React.FC = () => {
   // Sort outputs based on selected option
   const sortedOutputs = useMemo(() => {
     const sorted = [...outputs];
-    
+
     switch (sortBy) {
       case 'date-desc':
         return sorted.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
@@ -70,10 +70,10 @@ const OutputsTab: React.FC = () => {
   const handleRefresh = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Simulate API refresh delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       // In a real implementation, this would refetch from the API
       setOutputs([...mockOutputs]);
     } catch (err) {
@@ -198,7 +198,7 @@ const OutputsTab: React.FC = () => {
                 List
               </button>
             </div>
-            
+
             <div className="outputs-sort-controls">
               <select
                 className="outputs-sort-select"
@@ -213,7 +213,7 @@ const OutputsTab: React.FC = () => {
                 <option value="size-desc">Largest First</option>
                 <option value="size-asc">Smallest First</option>
               </select>
-              
+
               <button
                 className="view-mode-button"
                 onClick={handleRefresh}

@@ -1,14 +1,21 @@
 import React from 'react';
-import { OutputGalleryProps } from '../types';
 import OutputCard from './OutputCard';
 import '../OutputsTab.css';
+import { Output, ViewMode } from '../types';
 
-const OutputGallery: React.FC<OutputGalleryProps> = ({
+export interface OutputGalleryProps {
+  outputs: Output[];
+  viewMode: ViewMode;
+  onOutputSelect: (output: Output) => void;
+  onContextMenu: (output: Output, event: React.MouseEvent) => void;
+}
+
+const OutputGallery = ({
   outputs,
   viewMode,
   onOutputSelect,
-  onContextMenu
-}) => {
+  onContextMenu,
+}: OutputGalleryProps) => {
   if (outputs.length === 0) {
     return (
       <div className="outputs-empty-state">

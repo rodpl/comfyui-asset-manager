@@ -1,6 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import OutputsTab from '../OutputsTab';
+import { Output } from '../types';
+import { OutputGalleryProps } from '../components/OutputGallery';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
@@ -22,16 +24,24 @@ vi.mock('../../../components/LoadingSpinner', () => ({
 
 // Mock the components
 vi.mock('../components', () => ({
-  OutputGallery: ({ outputs, onOutputSelect }: any) => (
+  OutputGallery: ({ outputs, onOutputSelect }: OutputGalleryProps) => (
     <div data-testid="output-gallery">
-      {outputs.map((output: any) => (
+      {outputs.map((output: Output) => (
         <div key={output.id} onClick={() => onOutputSelect(output)}>
           {output.filename}
         </div>
       ))}
     </div>
   ),
-  OutputModal: ({ isOpen, output, onClose }: unknown) =>
+  OutputModal: ({
+    isOpen,
+    output,
+    onClose,
+  }: {
+    isOpen: boolean;
+    output: Output | null;
+    onClose: () => void;
+  }) =>
     isOpen ? (
       <div data-testid="output-modal">
         <div>{output?.filename}</div>
@@ -77,7 +87,9 @@ describe('OutputsTab', () => {
     render(<OutputsTab />);
 
     expect(screen.getByText('Outputs')).toBeInTheDocument();
-    expect(screen.getByText('View and manage your ComfyUI generated images and outputs')).toBeInTheDocument();
+    expect(
+      screen.getByText('View and manage your ComfyUI generated images and outputs')
+    ).toBeInTheDocument();
   });
 
   it('shows loading state initially', () => {

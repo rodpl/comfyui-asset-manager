@@ -1,19 +1,24 @@
 import React, { useEffect, useCallback } from 'react';
-import { OutputModalProps } from '../types';
 import { formatFileSize, formatDate } from '../mockData';
 import '../OutputsTab.css';
+import { Output } from '../types';
 
-const OutputModal: React.FC<OutputModalProps> = ({
-  output,
-  isOpen,
-  onClose,
-  onAction
-}) => {
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  }, [onClose]);
+export interface OutputModalProps {
+  output: Output | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onAction: (action: string, output: Output) => void;
+}
+
+const OutputModal = ({ output, isOpen, onClose, onAction }: OutputModalProps) => {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -55,8 +60,8 @@ const OutputModal: React.FC<OutputModalProps> = ({
   };
 
   return (
-    <div 
-      className="output-modal-backdrop" 
+    <div
+      className="output-modal-backdrop"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -67,11 +72,7 @@ const OutputModal: React.FC<OutputModalProps> = ({
           <h3 id="output-modal-title" className="output-modal-title">
             {output.filename}
           </h3>
-          <button
-            className="output-modal-close"
-            onClick={onClose}
-            aria-label="Close modal"
-          >
+          <button className="output-modal-close" onClick={onClose} aria-label="Close modal">
             <i className="pi pi-times"></i>
           </button>
         </div>
@@ -105,7 +106,9 @@ const OutputModal: React.FC<OutputModalProps> = ({
               <div className="output-modal-details">
                 <div className="detail-row">
                   <span className="detail-label">Dimensions:</span>
-                  <span className="detail-value">{output.imageWidth} × {output.imageHeight}</span>
+                  <span className="detail-value">
+                    {output.imageWidth} × {output.imageHeight}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">File Size:</span>
@@ -133,7 +136,9 @@ const OutputModal: React.FC<OutputModalProps> = ({
                   {output.workflowMetadata.prompt && (
                     <div className="detail-row">
                       <span className="detail-label">Prompt:</span>
-                      <span className="detail-value workflow-prompt">{output.workflowMetadata.prompt}</span>
+                      <span className="detail-value workflow-prompt">
+                        {output.workflowMetadata.prompt}
+                      </span>
                     </div>
                   )}
                   {output.workflowMetadata.model && (

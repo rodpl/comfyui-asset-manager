@@ -1,14 +1,21 @@
 import React from 'react';
-import { OutputCardProps } from '../types';
 import { formatFileSize, formatDate } from '../mockData';
 import '../OutputsTab.css';
+import { Output, ViewMode } from '../types';
 
-const OutputCard: React.FC<OutputCardProps> = ({
+export interface OutputCardProps {
+  output: Output;
+  viewMode: ViewMode;
+  onClick: () => void;
+  onContextMenu: (event: React.MouseEvent) => void;
+}
+
+const OutputCard = ({
   output,
   viewMode,
   onClick,
   onContextMenu
-}) => {
+}: OutputCardProps) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();

@@ -31,7 +31,12 @@ const mockOutputs: Output[] = [
 
 // Mock OutputCard component
 vi.mock('../components/OutputCard', () => ({
-  default: ({ output, onClick, onContextMenu, viewMode }: unknown) => (
+  default: ({ output, onClick, onContextMenu, viewMode }: {
+    output: Output;
+    onClick: () => void;
+    onContextMenu: (event: React.MouseEvent) => void;
+    viewMode: 'grid' | 'list';
+  }) => (
     <div
       data-testid={`output-card-${output.id}`}
       data-view-mode={viewMode}

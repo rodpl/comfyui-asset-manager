@@ -19,8 +19,8 @@ export const mockOutputs: Output[] = [
       steps: 20,
       cfg: 7.5,
       sampler: 'DPM++ 2M Karras',
-      seed: 123456789
-    }
+      seed: 123456789,
+    },
   },
   {
     id: 'output-2',
@@ -39,8 +39,8 @@ export const mockOutputs: Output[] = [
       steps: 25,
       cfg: 8.0,
       sampler: 'Euler a',
-      seed: 987654321
-    }
+      seed: 987654321,
+    },
   },
   {
     id: 'output-3',
@@ -59,8 +59,8 @@ export const mockOutputs: Output[] = [
       steps: 30,
       cfg: 7.0,
       sampler: 'DPM++ SDE Karras',
-      seed: 456789123
-    }
+      seed: 456789123,
+    },
   },
   {
     id: 'output-4',
@@ -79,8 +79,8 @@ export const mockOutputs: Output[] = [
       steps: 15,
       cfg: 6.5,
       sampler: 'DDIM',
-      seed: 789123456
-    }
+      seed: 789123456,
+    },
   },
   {
     id: 'output-5',
@@ -98,8 +98,8 @@ export const mockOutputs: Output[] = [
       steps: 28,
       cfg: 8.5,
       sampler: 'DPM++ 2M',
-      seed: 321654987
-    }
+      seed: 321654987,
+    },
   },
   {
     id: 'output-6',
@@ -118,8 +118,8 @@ export const mockOutputs: Output[] = [
       steps: 22,
       cfg: 7.2,
       sampler: 'Euler',
-      seed: 654987321
-    }
+      seed: 654987321,
+    },
   },
   {
     id: 'output-7',
@@ -138,8 +138,8 @@ export const mockOutputs: Output[] = [
       steps: 35,
       cfg: 9.0,
       sampler: 'DPM++ 2M Karras',
-      seed: 147258369
-    }
+      seed: 147258369,
+    },
   },
   {
     id: 'output-8',
@@ -157,8 +157,8 @@ export const mockOutputs: Output[] = [
       steps: 18,
       cfg: 6.8,
       sampler: 'LMS',
-      seed: 963852741
-    }
+      seed: 963852741,
+    },
   },
   {
     id: 'output-9',
@@ -177,8 +177,8 @@ export const mockOutputs: Output[] = [
       steps: 26,
       cfg: 7.8,
       sampler: 'DPM++ SDE',
-      seed: 258741963
-    }
+      seed: 258741963,
+    },
   },
   {
     id: 'output-10',
@@ -197,9 +197,9 @@ export const mockOutputs: Output[] = [
       steps: 24,
       cfg: 7.5,
       sampler: 'Heun',
-      seed: 741963258
-    }
-  }
+      seed: 741963258,
+    },
+  },
 ];
 
 // Helper function to format file size
@@ -207,12 +207,12 @@ export const formatFileSize = (bytes: number): string => {
   const units = ['B', 'KB', 'MB', 'GB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${size.toFixed(1)} ${units[unitIndex]}`;
 };
 
@@ -223,6 +223,6 @@ export const formatDate = (date: Date): string => {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 };
