@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
@@ -7,7 +6,7 @@ import MetadataEditor from '../MetadataEditor';
 // Mock i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, options?: unknown) => {
+    t: (key: string, options?: { tag?: string; star?: number; [key: string]: unknown }) => {
       const translations: Record<string, string> = {
         'metadataEditor.tags': 'Tags',
         'metadataEditor.addTag': 'Add tag...',
@@ -64,11 +63,11 @@ describe('MetadataEditor', () => {
     expect(screen.getByText('character')).toBeInTheDocument();
     expect(screen.getByText('anime')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Test description')).toBeInTheDocument();
-    
+
     // Check that 4 stars are filled
-    const stars = screen.getAllByRole('button').filter(button => 
-      button.getAttribute('aria-label')?.includes('star')
-    );
+    const stars = screen
+      .getAllByRole('button')
+      .filter((button) => button.getAttribute('aria-label')?.includes('star'));
     expect(stars).toHaveLength(5);
   });
 
@@ -116,14 +115,13 @@ describe('MetadataEditor', () => {
   });
 
   it('allows removing tags', async () => {
-    const user = userEvent.setup();
     const initialMetadata = {
       tags: ['character', 'anime'],
       description: '',
       rating: 0,
     };
 
-    const { rerender } = render(<MetadataEditor {...defaultProps} initialMetadata={initialMetadata} />);
+    render(<MetadataEditor {...defaultProps} initialMetadata={initialMetadata} />);
 
     // Verify both tags are initially present
     expect(screen.getByText('character')).toBeInTheDocument();
@@ -131,15 +129,18 @@ describe('MetadataEditor', () => {
 
     // Find the remove button specifically for 'character' tag
     const characterRemoveButton = screen.getByLabelText('Remove character');
-    
+
     // Click the remove button using fireEvent as a fallback
     fireEvent.click(characterRemoveButton);
 
     // Wait for the tag to be removed
-    await waitFor(() => {
-      expect(screen.queryByText('character')).not.toBeInTheDocument();
-    }, { timeout: 1000 });
-    
+    await waitFor(
+      () => {
+        expect(screen.queryByText('character')).not.toBeInTheDocument();
+      },
+      { timeout: 1000 }
+    );
+
     // Verify the other tag is still there
     expect(screen.getByText('anime')).toBeInTheDocument();
   });
@@ -158,9 +159,9 @@ describe('MetadataEditor', () => {
     const user = userEvent.setup();
     render(<MetadataEditor {...defaultProps} />);
 
-    const stars = screen.getAllByRole('button').filter(button => 
-      button.getAttribute('aria-label')?.includes('star')
-    );
+    const stars = screen
+      .getAllByRole('button')
+      .filter((button) => button.getAttribute('aria-label')?.includes('star'));
 
     await user.click(stars[2]); // Click 3rd star
 
@@ -202,9 +203,9 @@ describe('MetadataEditor', () => {
     await user.type(descriptionInput, 'Test description');
 
     // Set rating
-    const stars = screen.getAllByRole('button').filter(button => 
-      button.getAttribute('aria-label')?.includes('star')
-    );
+    const stars = screen
+      .getAllByRole('button')
+      .filter((button) => button.getAttribute('aria-label')?.includes('star'));
     await user.click(stars[3]); // 4 stars
 
     // Save

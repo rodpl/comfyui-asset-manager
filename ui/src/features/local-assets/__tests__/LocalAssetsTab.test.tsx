@@ -6,7 +6,7 @@ import i18n from '../../../utils/i18n';
 import LocalAssetsTab from '../LocalAssetsTab';
 
 // Mock fetch globally
-global.fetch = vi.fn();
+(globalThis as any).fetch = vi.fn();
 
 // Mock i18n for tests
 vi.mock('react-i18next', async () => {
@@ -72,7 +72,7 @@ describe('LocalAssetsTab Integration', () => {
     vi.clearAllMocks();
     
     // Mock fetch for tags API
-    (global.fetch as any).mockResolvedValue({
+    ((globalThis as any).fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({
         success: true,

@@ -8,7 +8,10 @@ interface BulkMetadataModalProps {
   models: ModelInfo[];
   isOpen: boolean;
   onClose: () => void;
-  onBulkUpdate: (modelIds: string[], metadata: { tags: string[]; description: string; rating: number }) => Promise<void>;
+  onBulkUpdate: (
+    modelIds: string[],
+    metadata: { tags: string[]; description: string; rating: number }
+  ) => Promise<void>;
   availableTags: string[];
 }
 
@@ -22,37 +25,46 @@ const BulkMetadataModal: React.FC<BulkMetadataModalProps> = ({
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
-  const handleMetadataSave = useCallback(async (metadata: { tags: string[]; description: string; rating: number }) => {
-    setLoading(true);
-    try {
-      const modelIds = models.map(model => model.id);
-      await onBulkUpdate(modelIds, metadata);
-      onClose();
-    } catch (error) {
-      console.error('Failed to bulk update metadata:', error);
-      // Error handling is done in the parent component
-    } finally {
-      setLoading(false);
-    }
-  }, [models, onBulkUpdate, onClose]);
+  const handleMetadataSave = useCallback(
+    async (metadata: { tags: string[]; description: string; rating: number }) => {
+      setLoading(true);
+      try {
+        const modelIds = models.map((model) => model.id);
+        await onBulkUpdate(modelIds, metadata);
+        onClose();
+      } catch (error) {
+        console.error('Failed to bulk update metadata:', error);
+        // Error handling is done in the parent component
+      } finally {
+        setLoading(false);
+      }
+    },
+    [models, onBulkUpdate, onClose]
+  );
 
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  }, [onClose]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="bulk-metadata-backdrop" 
+    <div
+      className="bulk-metadata-backdrop"
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       role="dialog"
@@ -66,7 +78,7 @@ const BulkMetadataModal: React.FC<BulkMetadataModalProps> = ({
             <i className="pi pi-tags"></i>
             {t('bulkMetadata.title')}
           </h2>
-          <button 
+          <button
             className="bulk-modal-close-button"
             onClick={onClose}
             aria-label={t('bulkMetadata.close')}
@@ -90,7 +102,7 @@ const BulkMetadataModal: React.FC<BulkMetadataModalProps> = ({
           <div className="selected-models-preview">
             <h3>{t('bulkMetadata.selectedModelsTitle')}</h3>
             <div className="models-list">
-              {models.slice(0, 5).map((model, index) => (
+              {models.slice(0, 5).map((model) => (
                 <div key={model.id} className="model-item">
                   <i className="pi pi-file"></i>
                   <span className="model-name">{model.name}</span>
