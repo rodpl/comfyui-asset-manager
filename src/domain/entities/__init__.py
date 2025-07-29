@@ -18,6 +18,7 @@ from .external_metadata import (
     HuggingFaceMetadata,
     MetadataSource
 )
+from .output import Output, ImageDimensions, FileInfo
 
 __all__ = [
     # Base classes and utilities
@@ -36,5 +37,9 @@ __all__ = [
     "ExternalMetadata",
     "CivitAIMetadata",
     "HuggingFaceMetadata",
-    "MetadataSource"
+    "MetadataSource",
+    # Output entities
+    "Output",
+    "ImageDimensions",
+    "FileInfo"
 ]
