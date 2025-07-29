@@ -30,6 +30,13 @@ const MetadataEditor: React.FC<MetadataEditorProps> = ({
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
 
+  // Update state when initialMetadata changes
+  useEffect(() => {
+    setTags(initialMetadata?.tags || []);
+    setDescription(initialMetadata?.description || '');
+    setRating(initialMetadata?.rating || 0);
+  }, [initialMetadata]);
+
   // Filter tag suggestions based on input
   useEffect(() => {
     if (tagInput.trim()) {

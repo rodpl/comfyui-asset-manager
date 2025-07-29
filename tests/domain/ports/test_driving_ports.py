@@ -32,7 +32,10 @@ def test_model_management_port_has_required_methods():
         'get_models_in_folder',
         'get_model_details', 
         'search_models',
-        'enrich_model_metadata'
+        'enrich_model_metadata',
+        'update_model_metadata',
+        'bulk_update_metadata',
+        'get_all_user_tags'
     ]
     
     for method_name in required_methods:
@@ -86,6 +89,29 @@ def test_model_management_port_method_signatures():
     assert 'model' in annotations
     assert annotations['model'] == Model
     assert annotations['return'] == Model
+    
+    # Check update_model_metadata signature
+    method = ModelManagementPort.update_model_metadata
+    annotations = method.__annotations__
+    assert 'model_id' in annotations
+    assert annotations['model_id'] == str
+    assert 'metadata' in annotations
+    assert annotations['metadata'] == dict
+    assert annotations['return'] == Model
+    
+    # Check bulk_update_metadata signature
+    method = ModelManagementPort.bulk_update_metadata
+    annotations = method.__annotations__
+    assert 'model_ids' in annotations
+    assert annotations['model_ids'] == List[str]
+    assert 'metadata' in annotations
+    assert annotations['metadata'] == dict
+    assert annotations['return'] == List[Model]
+    
+    # Check get_all_user_tags signature
+    method = ModelManagementPort.get_all_user_tags
+    annotations = method.__annotations__
+    assert annotations['return'] == List[str]
 
 
 def test_folder_management_port_method_signatures():
@@ -134,6 +160,46 @@ class MockModelManagementPort(ModelManagementPort):
     
     def enrich_model_metadata(self, model: Model) -> Model:
         return model
+    
+    def update_model_metadata(self, model_id: str, metadata: dict) -> Model:
+        # Return a mock updated model
+        from datetime import datetime
+        from src.domain.entities.model import ModelType
+        return Model(
+            id=model_id,
+            name="Updated Test Model",
+            file_path="/test/path.safetensors",
+            file_size=1024,
+            created_at=datetime.now(),
+            modified_at=datetime.now(),
+            model_type=ModelType.CHECKPOINT,
+            hash="test-hash",
+            folder_id="test-folder",
+            user_metadata=metadata
+        )
+    
+    def bulk_update_metadata(self, model_ids: List[str], metadata: dict) -> List[Model]:
+        # Return mock updated models
+        from datetime import datetime
+        from src.domain.entities.model import ModelType
+        return [
+            Model(
+                id=model_id,
+                name=f"Updated Test Model {i}",
+                file_path=f"/test/path{i}.safetensors",
+                file_size=1024,
+                created_at=datetime.now(),
+                modified_at=datetime.now(),
+                model_type=ModelType.CHECKPOINT,
+                hash=f"test-hash-{i}",
+                folder_id="test-folder",
+                user_metadata=metadata
+            )
+            for i, model_id in enumerate(model_ids)
+        ]
+    
+    def get_all_user_tags(self) -> List[str]:
+        return ["tag1", "tag2", "test-tag"]
 
 
 class MockFolderManagementPort(FolderManagementPort):
@@ -171,6 +237,20 @@ def test_can_implement_model_management_port():
     
     enriched_model = mock_port.enrich_model_metadata(model)
     assert isinstance(enriched_model, Model)
+    
+    # Test new methods
+    updated_model = mock_port.update_model_metadata("test-model", {"rating": 5})
+    assert isinstance(updated_model, Model)
+    assert updated_model.user_metadata["rating"] == 5
+    
+    bulk_updated = mock_port.bulk_update_metadata(["model1", "model2"], {"tag": "bulk"})
+    assert isinstance(bulk_updated, list)
+    assert len(bulk_updated) == 2
+    assert all(isinstance(m, Model) for m in bulk_updated)
+    
+    tags = mock_port.get_all_user_tags()
+    assert isinstance(tags, list)
+    assert all(isinstance(tag, str) for tag in tags)
 
 
 def test_can_implement_folder_management_port():

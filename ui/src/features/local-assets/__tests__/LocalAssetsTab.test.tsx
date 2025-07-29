@@ -5,6 +5,9 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../../../utils/i18n';
 import LocalAssetsTab from '../LocalAssetsTab';
 
+// Mock fetch globally
+global.fetch = vi.fn();
+
 // Mock i18n for tests
 vi.mock('react-i18next', async () => {
   const actual = await vi.importActual('react-i18next');
@@ -67,6 +70,15 @@ describe('LocalAssetsTab Integration', () => {
   beforeEach(() => {
     user = userEvent.setup();
     vi.clearAllMocks();
+    
+    // Mock fetch for tags API
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: ['character', 'style', 'anime', 'realistic']
+      })
+    });
   });
 
   afterEach(() => {

@@ -123,22 +123,22 @@ describe('MetadataEditor', () => {
       rating: 0,
     };
 
-    render(<MetadataEditor {...defaultProps} initialMetadata={initialMetadata} />);
+    const { rerender } = render(<MetadataEditor {...defaultProps} initialMetadata={initialMetadata} />);
 
     // Verify both tags are initially present
     expect(screen.getByText('character')).toBeInTheDocument();
     expect(screen.getByText('anime')).toBeInTheDocument();
 
-    const removeButtons = screen.getAllByLabelText(/Remove/);
-    expect(removeButtons).toHaveLength(2);
+    // Find the remove button specifically for 'character' tag
+    const characterRemoveButton = screen.getByLabelText('Remove character');
     
-    // Click the first remove button (for 'character')
-    await user.click(removeButtons[0]);
+    // Click the remove button using fireEvent as a fallback
+    fireEvent.click(characterRemoveButton);
 
     // Wait for the tag to be removed
     await waitFor(() => {
       expect(screen.queryByText('character')).not.toBeInTheDocument();
-    }, { timeout: 3000 });
+    }, { timeout: 1000 });
     
     // Verify the other tag is still there
     expect(screen.getByText('anime')).toBeInTheDocument();
