@@ -4,6 +4,7 @@ import FolderNavigation from './FolderNavigation';
 import { ModelGrid, SearchFilterBar, SearchEmptyState, ModelDetailModal } from './components';
 import { ModelFolder, ModelType, ModelInfo, FilterOptions, EnrichedModelInfo } from './types';
 import { filterModels } from './utils/searchUtils';
+import { apiClient } from '../../services/api';
 import './LocalAssetsTab.css';
 
 // Mock data for demonstration
@@ -265,6 +266,28 @@ const LocalAssetsTab: React.FC = () => {
     [t]
   );
 
+  const handleUpdateMetadata = useCallback(
+    async (modelId: string, metadata: { tags: string[]; description: string; rating: number }) => {
+      try {
+        const updatedModel = await apiClient.updateModelMetadata(modelId, metadata);
+        
+        // Update the selected model if it's the one being updated
+        if (selectedModel && selectedModel.id === modelId) {
+          setSelectedModel(updatedModel);
+        }
+        
+        // TODO: Update the models list in the current folder
+        // This would require refactoring to use real API data instead of mock data
+        
+      } catch (err) {
+        console.error('Error updating model metadata:', err);
+        setError(t('localAssets.errors.metadataUpdateFailed'));
+        throw err; // Re-throw to let the modal handle the error
+      }
+    },
+    [selectedModel, t]
+  );
+
   const handleModelDrag = useCallback((model: ModelInfo) => {
     console.log('Dragging model:', model);
     // TODO: Handle drag to ComfyUI workflow
@@ -416,6 +439,7 @@ const LocalAssetsTab: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onAddToWorkflow={handleAddToWorkflow}
+          onUpdateMetadata={handleUpdateMetadata}
         />
       )}
     </div>

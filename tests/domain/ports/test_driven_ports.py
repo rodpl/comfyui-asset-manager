@@ -30,7 +30,8 @@ class TestModelRepositoryPort:
             'find_by_id',
             'search',
             'save',
-            'delete'
+            'delete',
+            'get_all_user_tags'
         ]
         
         for method_name in required_methods:
@@ -67,6 +68,11 @@ class TestModelRepositoryPort:
         sig = inspect.signature(ModelRepositoryPort.delete)
         params = list(sig.parameters.keys())
         assert params == ['self', 'model_id']
+        
+        # get_all_user_tags
+        sig = inspect.signature(ModelRepositoryPort.get_all_user_tags)
+        params = list(sig.parameters.keys())
+        assert params == ['self']
     
     def test_can_implement_interface(self):
         """Test that the interface can be properly implemented."""
@@ -86,6 +92,9 @@ class TestModelRepositoryPort:
             
             def delete(self, model_id: str) -> bool:
                 return False
+            
+            def get_all_user_tags(self) -> List[str]:
+                return ["tag1", "tag2"]
         
         # Should be able to instantiate the implementation
         repo = TestModelRepository()

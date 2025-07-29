@@ -578,4 +578,67 @@
     flex-direction: column;
     gap: 8px;
   }
+}/*
+ Metadata editing styles */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.edit-metadata-button,
+.add-metadata-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: var(--primary-color-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-metadata-button:hover,
+.add-metadata-button:hover {
+  background: var(--primary-color-hover);
+}
+
+.no-metadata {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-secondary);
+}
+
+.no-metadata i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--surface-400);
+}
+
+.no-metadata p {
+  margin-bottom: 1rem;
+}
+
+.add-metadata-button {
+  margin-top: 1rem;
+}
+
+/* Additional responsive styles for metadata editing */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .edit-metadata-button,
+  .add-metadata-button {
+    width: 100%;
+    justify-content: center;
+  }
 }

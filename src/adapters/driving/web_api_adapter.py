@@ -47,6 +47,11 @@ class WebAPIAdapter:
         
         # Search endpoint
         app.router.add_get('/asset_manager/search', self.search_models)
+        
+        # Metadata management endpoints
+        app.router.add_put('/asset_manager/models/{model_id}/metadata', self.update_model_metadata)
+        app.router.add_post('/asset_manager/models/bulk-metadata', self.bulk_update_metadata)
+        app.router.add_get('/asset_manager/tags', self.get_all_user_tags)
     
     async def get_folders(self, request: Request) -> Response:
         """Handle GET /asset_manager/folders endpoint.
@@ -245,3 +250,123 @@ class WebAPIAdapter:
             "error": "An unexpected error occurred",
             "error_type": "internal_error"
         }, status=500)
+    
+    async def update_model_metadata(self, request: Request) -> Response:
+        """Handle PUT /asset_manager/models/{model_id}/metadata endpoint.
+        
+        Updates user metadata for a specific model.
+        
+        Args:
+            request: The HTTP request with model_id in path and metadata in body
+            
+        Returns:
+            JSON response with updated model
+        """
+        try:
+            model_id = request.match_info['model_id']
+            
+            # Parse request body
+            try:
+                metadata = await request.json()
+            except json.JSONDecodeError:
+                return web.json_response({
+                    "success": False,
+                    "error": "Invalid JSON in request body",
+                    "error_type": "validation_error"
+                }, status=400)
+            
+            updated_model = self._model_management.update_model_metadata(model_id, metadata)
+            
+            return web.json_response({
+                "success": True,
+                "data": updated_model.to_dict()
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except NotFoundError as e:
+            return self._handle_not_found_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def bulk_update_metadata(self, request: Request) -> Response:
+        """Handle POST /asset_manager/models/bulk-metadata endpoint.
+        
+        Updates metadata for multiple models at once.
+        
+        Args:
+            request: The HTTP request with model_ids and metadata in body
+            
+        Returns:
+            JSON response with updated models
+        """
+        try:
+            # Parse request body
+            try:
+                body = await request.json()
+            except json.JSONDecodeError:
+                return web.json_response({
+                    "success": False,
+                    "error": "Invalid JSON in request body",
+                    "error_type": "validation_error"
+                }, status=400)
+            
+            # Validate required fields
+            if "model_ids" not in body:
+                return web.json_response({
+                    "success": False,
+                    "error": "Missing required field 'model_ids'",
+                    "error_type": "validation_error"
+                }, status=400)
+            
+            if "metadata" not in body:
+                return web.json_response({
+                    "success": False,
+                    "error": "Missing required field 'metadata'",
+                    "error_type": "validation_error"
+                }, status=400)
+            
+            model_ids = body["model_ids"]
+            metadata = body["metadata"]
+            
+            updated_models = self._model_management.bulk_update_metadata(model_ids, metadata)
+            
+            return web.json_response({
+                "success": True,
+                "data": [model.to_dict() for model in updated_models],
+                "count": len(updated_models)
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_all_user_tags(self, request: Request) -> Response:
+        """Handle GET /asset_manager/tags endpoint.
+        
+        Returns all unique user tags for autocomplete functionality.
+        
+        Args:
+            request: The HTTP request
+            
+        Returns:
+            JSON response with list of tags
+        """
+        try:
+            tags = self._model_management.get_all_user_tags()
+            
+            return web.json_response({
+                "success": True,
+                "data": tags,
+                "count": len(tags)
+            })
+            
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)

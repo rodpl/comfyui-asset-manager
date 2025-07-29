@@ -90,6 +90,9 @@
     "rating": "评分",
     "userTags": "标签",
     "noUserMetadata": "没有用户元数据。您可以添加自定义标签、描述和评分来组织您的模型。",
+    "edit": "编辑",
+    "editMetadata": "编辑元数据",
+    "addMetadata": "添加元数据",
     "technicalDetails": "技术详情",
     "fileFormat": "文件格式",
     "compatibility": {
@@ -117,7 +120,29 @@
     "errors": {
       "modelSelectFailed": "选择模型失败。请重试。",
       "workflowAddFailed": "添加模型到工作流失败。请重试。",
+      "metadataUpdateFailed": "更新模型元数据失败。请重试。",
       "dismiss": "关闭错误"
     }
+  },
+  "metadataEditor": {
+    "tags": "标签",
+    "addTag": "添加标签...",
+    "removeTag": "移除 {{tag}}",
+    "description": "描述",
+    "descriptionPlaceholder": "为此模型添加描述...",
+    "rating": "评分",
+    "ratingStar": "{{star}} 星",
+    "clearRating": "清除评分",
+    "save": "保存",
+    "cancel": "取消"
+  },
+  "bulkMetadata": {
+    "title": "批量编辑元数据",
+    "close": "关闭",
+    "selectedModels": "已选择 {{count}} 个模型",
+    "warning": "更改将应用于所有选定的模型",
+    "selectedModelsTitle": "选定的模型",
+    "moreModels": "还有 {{count}} 个...",
+    "metadataToApply": "要应用的元数据"
   }
 }

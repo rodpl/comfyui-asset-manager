@@ -5,6 +5,9 @@ import i18n from 'i18next';
 import ModelDetailModal from '../ModelDetailModal';
 import { EnrichedModelInfo, ModelType } from '../../types';
 
+// Mock fetch globally
+(globalThis as any).fetch = vi.fn();
+
 // Initialize i18n for tests
 i18n.init({
   lng: 'en',
@@ -126,6 +129,15 @@ const renderModal = (props = {}) => {
 describe('ModelDetailModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Mock fetch for tags API
+    ((globalThis as any).fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: ['character', 'style', 'anime', 'realistic']
+      })
+    });
   });
 
   it('should not render when isOpen is false', () => {
