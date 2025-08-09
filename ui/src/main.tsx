@@ -16,6 +16,18 @@ declare global {
 // Lazy load the App component for better performance
 const App = React.lazy(() => import('./App'));
 
+// Ensure the built entry CSS (extracted by Vite as main.css) is loaded when running inside ComfyUI
+function ensureGlobalStylesLoaded(): void {
+  const linkId = 'comfyui-asset-manager-global-styles';
+  if (!document.getElementById(linkId)) {
+    const link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = '/asset_manager/main.css';
+    document.head.appendChild(link);
+  }
+}
+
 // Function to wait for document and app to be ready
 function waitForInit(): Promise<void> {
   return new Promise((resolve) => {
@@ -57,6 +69,9 @@ async function initializeExtension(): Promise<void> {
     // Wait for document and ComfyUI app
     await waitForInit();
 
+    // Load global styles extracted by Vite (since there's no HTML to inject them)
+    ensureGlobalStylesLoaded();
+
     if (!window.app) {
       console.error('ComfyUI app not available');
       return;
@@ -78,6 +93,8 @@ async function initializeExtension(): Promise<void> {
       type: 'custom' as const,
       render: (element: HTMLElement) => {
         console.log('Rendering Asset Manager Model Browser Extension');
+        // Ensure styles are present even if this callback runs before initializeExtension
+        ensureGlobalStylesLoaded();
         // Create a container for our React app
         const container = document.createElement('div');
         container.id = 'comfyui-asset-manager-root';

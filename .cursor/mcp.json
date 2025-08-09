@@ -1,0 +1,13 @@
+{
+    "mcpServers": {
+      "ComfyUI-React-Template Docs": {
+        "url": "https://gitmcp.io/Comfy-Org/ComfyUI-React-Extension-Template"
+      },
+      "ComfyUI-Frontend Docs": {
+        "url": "https://gitmcp.io/Comfy-Org/ComfyUI_frontend"
+      },
+      "ComfyUI-Copilot Docs": {
+          "url": "https://gitmcp.io/AIDC-AI/ComfyUI-Copilot"
+        }
+    }
+}

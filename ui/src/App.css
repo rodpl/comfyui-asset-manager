@@ -1,6 +1,5 @@
 /* Asset Manager Container */
 .asset-manager-container {
-  padding: 16px;
   height: 100%;
   max-height: 100vh;
   display: flex;
@@ -10,25 +9,36 @@
   overflow: hidden;
 }
 
-/* Header */
-.asset-manager-header {
-  margin-bottom: 20px;
-  flex-shrink: 0;
-}
+    .p-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        padding: var(--p-toolbar-padding);
+        background: var(--p-toolbar-background);
+        border-left: 1px solid var(--p-toolbar-border-color);
+        border-right: 1px solid var(--p-toolbar-border-color);
+        border-bottom: 1px solid var(--p-toolbar-border-color);
+        border-top: 1px solid var(--p-toolbar-border-color);
+        color: var(--p-toolbar-color);
+        border-radius: var(--p-toolbar-border-radius);
+        gap: var(--p-toolbar-gap);
+    }
+    
+    /* Allow Tailwind border utilities to override */
+    .p-toolbar.border-t-0 {
+        border-top: 0 !important;
+    }
+    
+    .p-toolbar.border-x-0 {
+        border-left: 0 !important;
+        border-right: 0 !important;
+    }
 
-.asset-manager-header h2 {
-  margin: 0 0 8px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--example-border-color);
-  color: var(--example-primary-color);
-  font-size: 1.5rem;
-}
-
-.app-description {
-  margin: 8px 0 0 0;
-  color: var(--example-muted-text-color);
-  font-size: 0.9rem;
-}
+    .p-toolbar-start, .p-toolbar-center, .p-toolbar-end {
+        display: flex;
+        align-items: center;
+    }
 
 /* Tab Navigation */
 .tab-navigation {

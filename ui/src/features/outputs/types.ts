@@ -25,7 +25,7 @@ export interface OutputResponse {
   imageHeight: number;
   fileFormat: string;
   thumbnailPath?: string;
-  workflowMetadata?: Record<string, any>;
+  workflowMetadata?: Record<string, unknown>;
 }
 
 export interface OutputsListResponse {
@@ -36,7 +36,13 @@ export interface OutputsListResponse {
 }
 
 export type ViewMode = 'grid' | 'list';
-export type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' | 'size-desc' | 'size-asc';
+export type SortOption =
+  | 'date-desc'
+  | 'date-asc'
+  | 'name-asc'
+  | 'name-desc'
+  | 'size-desc'
+  | 'size-asc';
 
 export interface OutputsState {
   outputs: Output[];
@@ -44,27 +50,6 @@ export interface OutputsState {
   error: string | null;
   viewMode: ViewMode;
   sortBy: SortOption;
-}
-
-export interface OutputGalleryProps {
-  outputs: Output[];
-  viewMode: ViewMode;
-  onOutputSelect: (output: Output) => void;
-  onContextMenu: (output: Output, event: React.MouseEvent) => void;
-}
-
-export interface OutputCardProps {
-  output: Output;
-  viewMode: ViewMode;
-  onClick: () => void;
-  onContextMenu: (event: React.MouseEvent) => void;
-}
-
-export interface OutputModalProps {
-  output: Output | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onAction: (action: string, output: Output) => void;
 }
 
 export interface OutputToolbarProps {

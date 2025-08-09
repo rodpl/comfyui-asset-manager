@@ -44,11 +44,23 @@ const App: React.FC = () => {
   }, [activeTab]);
 
   return (
-    <div className="asset-manager-container">
-      <header className="asset-manager-header">
-        <h2>{t('app.title')}</h2>
-        <p className="app-description">{t('app.description')}</p>
-      </header>
+    <div className="asset-manager-container h-full">
+      <div className="comfy-vue-side-bar-container flex flex-col h-full">
+        <div className="comfy-vue-side-bar-header">
+          <div
+            className="p-toolbar p-component border-x-0 border-t-0 rounded-none px-2 py-1 min-h-8"
+            role="toolbar"
+          >
+            <div className="p-toolbar-start">
+              <span className="text-xs 2xl:text-sm truncate" title="{t('app.title.)}">
+                {t('app.title').toUpperCase()}
+              </span>
+            </div>
+            <div className="p-toolbar-center"></div>
+            <div className="p-toolbar-end"></div>
+          </div>
+        </div>
+      </div>
 
       <nav className="tab-navigation" role="tablist">
         {TABS.map((tab) => (
