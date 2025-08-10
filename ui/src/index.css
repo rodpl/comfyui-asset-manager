@@ -1,5 +1,5 @@
 /* Base styles for our extension */
-:root {
+#comfyui-asset-manager-root {
   --example-primary-color: #3498db;
   --example-secondary-color: #2c3e50;
   --example-text-color: #ecf0f1;
@@ -18,7 +18,7 @@
 }
 
 /* Light mode overrides */
-:root.comfy-theme-light #comfyui-asset-manager-root {
+.comfy-theme-light #comfyui-asset-manager-root {
   --example-primary-color: #2980b9;
   --example-secondary-color: #34495e;
   --example-text-color: #2c3e50;
