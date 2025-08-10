@@ -8,6 +8,7 @@ from aiohttp.web_response import Response
 
 from ...domain.ports.driving.model_management_port import ModelManagementPort
 from ...domain.ports.driving.folder_management_port import FolderManagementPort
+from ...domain.ports.driving.output_management_port import OutputManagementPort
 from ...domain.entities.base import ValidationError, NotFoundError, DomainError
 
 
@@ -21,16 +22,19 @@ class WebAPIAdapter:
     def __init__(
         self,
         model_management: ModelManagementPort,
-        folder_management: FolderManagementPort
+        folder_management: FolderManagementPort,
+        output_management: OutputManagementPort
     ):
         """Initialize the Web API adapter.
         
         Args:
             model_management: Port for model management operations
             folder_management: Port for folder management operations
+            output_management: Port for output management operations
         """
         self._model_management = model_management
         self._folder_management = folder_management
+        self._output_management = output_management
     
     def register_routes(self, app: web.Application) -> None:
         """Register all API routes with the application.
@@ -52,6 +56,11 @@ class WebAPIAdapter:
         app.router.add_put('/asset_manager/models/{model_id}/metadata', self.update_model_metadata)
         app.router.add_post('/asset_manager/models/bulk-metadata', self.bulk_update_metadata)
         app.router.add_get('/asset_manager/tags', self.get_all_user_tags)
+        
+        # Output endpoints
+        app.router.add_get('/asset_manager/outputs', self.get_outputs)
+        app.router.add_get('/asset_manager/outputs/{output_id}', self.get_output_details)
+        app.router.add_post('/asset_manager/outputs/refresh', self.refresh_outputs)
     
     async def get_folders(self, request: Request) -> Response:
         """Handle GET /asset_manager/folders endpoint.
@@ -366,6 +375,136 @@ class WebAPIAdapter:
                 "count": len(tags)
             })
             
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_outputs(self, request: Request) -> Response:
+        """Handle GET /asset_manager/outputs endpoint.
+        
+        Returns a list of all generated outputs with optional filtering.
+        
+        Query parameters:
+        - format: Filter by file format (png, jpg, jpeg, webp)
+        - start_date: Filter by start date (ISO format)
+        - end_date: Filter by end date (ISO format)
+        - sort_by: Sort criteria (date, name, size)
+        - ascending: Sort order (true/false, default: false for date, true for others)
+        
+        Args:
+            request: The HTTP request
+            
+        Returns:
+            JSON response with list of outputs
+        """
+        try:
+            query_params = request.query
+            
+            # Get optional filtering parameters
+            file_format = query_params.get('format')
+            start_date_str = query_params.get('start_date')
+            end_date_str = query_params.get('end_date')
+            sort_by = query_params.get('sort_by', 'date')
+            ascending_str = query_params.get('ascending', 'false' if sort_by == 'date' else 'true')
+            ascending = ascending_str.lower() in ('true', '1', 'yes')
+            
+            # Get outputs based on filters
+            if start_date_str and end_date_str:
+                from datetime import datetime
+                try:
+                    start_date = datetime.fromisoformat(start_date_str.replace('Z', '+00:00'))
+                    end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
+                    outputs = self._output_management.get_outputs_by_date_range(start_date, end_date)
+                except ValueError:
+                    return web.json_response({
+                        "success": False,
+                        "error": "Invalid date format. Use ISO format (YYYY-MM-DDTHH:MM:SS)",
+                        "error_type": "validation_error"
+                    }, status=400)
+            elif file_format:
+                outputs = self._output_management.get_outputs_by_format(file_format)
+            else:
+                outputs = self._output_management.get_all_outputs()
+            
+            # Sort outputs
+            sorted_outputs = self._output_management.sort_outputs(outputs, sort_by, ascending)
+            
+            output_data = [output.to_dict() for output in sorted_outputs]
+            
+            return web.json_response({
+                "success": True,
+                "data": output_data,
+                "count": len(output_data),
+                "filters": {
+                    "format": file_format,
+                    "start_date": start_date_str,
+                    "end_date": end_date_str,
+                    "sort_by": sort_by,
+                    "ascending": ascending
+                }
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_output_details(self, request: Request) -> Response:
+        """Handle GET /asset_manager/outputs/{output_id} endpoint.
+        
+        Returns detailed information about a specific output.
+        
+        Args:
+            request: The HTTP request with output_id in path
+            
+        Returns:
+            JSON response with output details
+        """
+        try:
+            output_id = request.match_info['output_id']
+            output = self._output_management.get_output_details(output_id)
+            
+            return web.json_response({
+                "success": True,
+                "data": output.to_dict()
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except NotFoundError as e:
+            return self._handle_not_found_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def refresh_outputs(self, request: Request) -> Response:
+        """Handle POST /asset_manager/outputs/refresh endpoint.
+        
+        Refreshes the output list by rescanning the output directory.
+        
+        Args:
+            request: The HTTP request
+            
+        Returns:
+            JSON response with refreshed list of outputs
+        """
+        try:
+            outputs = self._output_management.refresh_outputs()
+            output_data = [output.to_dict() for output in outputs]
+            
+            return web.json_response({
+                "success": True,
+                "data": output_data,
+                "count": len(output_data),
+                "message": "Output directory rescanned successfully"
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
         except DomainError as e:
             return self._handle_domain_error(e)
         except Exception as e:

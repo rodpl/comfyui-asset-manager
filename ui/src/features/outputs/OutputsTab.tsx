@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OutputGallery, OutputModal } from './components';
 import { Output, ViewMode, SortOption } from './types';
-import { mockOutputs } from './mockData';
+import { apiClient } from '../../services/api';
+import { convertOutputResponseArray } from './utils/outputUtils';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './OutputsTab.css';
 
@@ -16,16 +17,24 @@ const OutputsTab = () => {
   const [selectedOutput, setSelectedOutput] = useState<Output | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  // Simulate loading outputs from API
+  // Load outputs from API
   useEffect(() => {
     const loadOutputs = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setOutputs(mockOutputs);
+        // Convert sortBy to API format
+        const [sortField, sortOrder] = sortBy.split('-');
+        const ascending = sortOrder === 'asc';
+        
+        const response = await apiClient.getOutputs({
+          sortBy: sortField,
+          ascending: ascending
+        });
+        
+        const outputs = convertOutputResponseArray(response.data);
+        setOutputs(outputs);
       } catch (err) {
         console.error('Error loading outputs:', err);
         setError('Failed to load outputs. Please try again.');
@@ -35,29 +44,10 @@ const OutputsTab = () => {
     };
 
     loadOutputs();
-  }, []);
+  }, [sortBy]);
 
-  // Sort outputs based on selected option
-  const sortedOutputs = useMemo(() => {
-    const sorted = [...outputs];
-
-    switch (sortBy) {
-      case 'date-desc':
-        return sorted.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-      case 'date-asc':
-        return sorted.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-      case 'name-asc':
-        return sorted.sort((a, b) => a.filename.localeCompare(b.filename));
-      case 'name-desc':
-        return sorted.sort((a, b) => b.filename.localeCompare(a.filename));
-      case 'size-desc':
-        return sorted.sort((a, b) => b.fileSize - a.fileSize);
-      case 'size-asc':
-        return sorted.sort((a, b) => a.fileSize - b.fileSize);
-      default:
-        return sorted;
-    }
-  }, [outputs, sortBy]);
+  // Outputs are already sorted by the API
+  const sortedOutputs = outputs;
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     setViewMode(mode);
@@ -72,10 +62,9 @@ const OutputsTab = () => {
     setError(null);
 
     try {
-      // Simulate API refresh delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // In a real implementation, this would refetch from the API
-      setOutputs([...mockOutputs]);
+      const response = await apiClient.refreshOutputs();
+      const outputs = convertOutputResponseArray(response.data);
+      setOutputs(outputs);
     } catch (err) {
       console.error('Error refreshing outputs:', err);
       setError('Failed to refresh outputs. Please try again.');
