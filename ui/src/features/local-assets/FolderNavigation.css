@@ -3,8 +3,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--example-secondary-color);
-  border-right: 1px solid var(--example-border-color);
+  background-color: var(--cam-secondary-color);
+  border-right: 1px solid var(--cam-border-color);
   min-width: 250px;
   max-width: 300px;
 }
@@ -14,24 +14,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  border-bottom: 1px solid var(--example-border-color);
-  background-color: var(--example-background-color);
+  border-bottom: 1px solid var(--cam-border-color);
+  background-color: var(--cam-background-color);
 }
 
 .folder-navigation-header h4 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
 }
 
 .folder-count {
   font-size: 0.75rem;
-  color: var(--example-muted-text-color);
-  background-color: var(--example-secondary-color);
+  color: var(--cam-muted-text-color);
+  background-color: var(--cam-secondary-color);
   padding: 2px 8px;
   border-radius: 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
 }
 
 .folder-navigation-content {
@@ -58,13 +58,13 @@
 }
 
 .folder-item:hover {
-  background-color: var(--example-hover-color, rgba(255, 255, 255, 0.05));
-  border-left-color: var(--example-primary-color);
+  background-color: var(--cam-hover-color, rgba(255, 255, 255, 0.05));
+  border-left-color: var(--cam-primary-color);
 }
 
 .folder-item.selected {
-  background-color: var(--example-primary-color);
-  border-left-color: var(--example-primary-color);
+  background-color: var(--cam-primary-color);
+  border-left-color: var(--cam-primary-color);
   color: white;
 }
 
@@ -78,7 +78,7 @@
 }
 
 .folder-item:focus {
-  outline: 2px solid var(--example-primary-color);
+  outline: 2px solid var(--cam-primary-color);
   outline-offset: -2px;
 }
 
@@ -90,8 +90,8 @@
   height: 32px;
   margin-right: 12px;
   border-radius: 6px;
-  background-color: var(--example-background-color);
-  border: 1px solid var(--example-border-color);
+  background-color: var(--cam-background-color);
+  border: 1px solid var(--cam-border-color);
 }
 
 .folder-item.selected .folder-item-icon {
@@ -101,7 +101,7 @@
 
 .folder-item-icon i {
   font-size: 1.1rem;
-  color: var(--example-primary-color);
+  color: var(--cam-primary-color);
 }
 
 .folder-item-content {
@@ -112,7 +112,7 @@
 .folder-item-name {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -127,7 +127,7 @@
 
 .folder-item-count {
   font-size: 0.75rem;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   font-weight: 500;
 }
 
@@ -137,7 +137,7 @@
 
 .folder-item-path {
   font-size: 0.7rem;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -169,7 +169,7 @@
   justify-content: center;
   padding: 32px 16px;
   text-align: center;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
 }
 
 .folder-loading i,

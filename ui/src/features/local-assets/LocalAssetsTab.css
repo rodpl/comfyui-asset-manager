@@ -16,8 +16,8 @@
 .local-assets-sidebar {
   flex-shrink: 0;
   width: 250px;
-  border-right: 1px solid var(--example-border-color);
-  background-color: var(--example-secondary-color);
+  border-right: 1px solid var(--cam-border-color);
+  background-color: var(--cam-secondary-color);
 }
 
 .local-assets-main {
@@ -33,7 +33,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid var(--example-border-color);
+  border-bottom: 1px solid var(--cam-border-color);
   margin-bottom: 16px;
 }
 
@@ -46,10 +46,10 @@
   flex: 1;
   max-width: 300px;
   padding: 8px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 4px;
-  background-color: var(--example-secondary-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
 }
 
 .local-assets-grid {
@@ -61,8 +61,8 @@
 }
 
 .asset-card {
-  background-color: var(--example-secondary-color);
-  border: 1px solid var(--example-border-color);
+  background-color: var(--cam-secondary-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 8px;
   padding: 16px;
   transition: all 0.2s ease;
@@ -70,7 +70,7 @@
 }
 
 .asset-card:hover {
-  border-color: var(--example-primary-color);
+  border-color: var(--cam-primary-color);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -84,12 +84,12 @@
 
 .asset-type-icon {
   font-size: 1.2rem;
-  color: var(--example-primary-color);
+  color: var(--cam-primary-color);
 }
 
 .asset-name {
   font-weight: 600;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
@@ -98,14 +98,14 @@
 
 .asset-details {
   font-size: 0.8rem;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   line-height: 1.4;
 }
 
 .asset-size {
   margin-top: 8px;
   font-size: 0.75rem;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
 }
 
 /* Error Banner */
@@ -169,7 +169,7 @@
 
 /* Search highlighting */
 mark {
-  background-color: var(--example-primary-color);
+  background-color: var(--cam-primary-color);
   color: white;
   padding: 1px 2px;
   border-radius: 2px;
@@ -191,7 +191,7 @@ mark {
   .local-assets-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid var(--example-border-color);
+    border-bottom: 1px solid var(--cam-border-color);
     flex-shrink: 0;
     height: auto;
     max-height: 200px;
