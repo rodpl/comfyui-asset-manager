@@ -16,7 +16,7 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 24px;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   opacity: 0.6;
 }
 
@@ -28,13 +28,13 @@
 .search-empty-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   margin: 0 0 12px;
 }
 
 .search-empty-description {
   font-size: 16px;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   line-height: 1.5;
   margin: 0 0 24px;
 }
@@ -47,7 +47,7 @@
 .search-empty-suggestions h4 {
   font-size: 14px;
   font-weight: 600;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   margin: 0 0 12px;
 }
 
@@ -59,7 +59,7 @@
 
 .search-empty-suggestions li {
   font-size: 14px;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   padding: 4px 0;
   position: relative;
   padding-left: 20px;
@@ -69,7 +69,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--example-primary-color);
+  color: var(--cam-primary-color);
   font-weight: bold;
 }
 
@@ -82,7 +82,7 @@
 
 .search-empty-button {
   padding: 10px 20px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
@@ -92,25 +92,25 @@
 }
 
 .search-empty-button.primary {
-  background-color: var(--example-primary-color);
+  background-color: var(--cam-primary-color);
   color: white;
-  border-color: var(--example-primary-color);
+  border-color: var(--cam-primary-color);
 }
 
 .search-empty-button.primary:hover {
-  background-color: var(--example-primary-color-dark, var(--example-primary-color));
+  background-color: var(--cam-primary-color-dark, var(--cam-primary-color));
   transform: translateY(-1px);
 }
 
 .search-empty-button.secondary {
-  background-color: var(--example-secondary-color);
-  color: var(--example-text-color);
-  border-color: var(--example-border-color);
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
+  border-color: var(--cam-border-color);
 }
 
 .search-empty-button.secondary:hover {
-  background-color: var(--example-background-color);
-  border-color: var(--example-primary-color);
+  background-color: var(--cam-background-color);
+  border-color: var(--cam-primary-color);
 }
 
 /* Responsive Design */

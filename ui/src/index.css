@@ -1,36 +1,36 @@
 /* Base styles for our extension */
 #comfyui-asset-manager-root {
-  --example-primary-color: #3498db;
-  --example-secondary-color: #2c3e50;
-  --example-text-color: #ecf0f1;
-  --example-accent-color: #e74c3c;
-  --example-bg-color: #34495e;
-  --example-border-color: #7f8c8d;
-  --example-muted-text-color: #95a5a6;
+  --cam-primary-color: #3498db;
+  --cam-secondary-color: #2c3e50;
+  --cam-text-color: #ecf0f1;
+  --cam-accent-color: #e74c3c;
+  --cam-bg-color: #34495e;
+  --cam-border-color: #7f8c8d;
+  --cam-muted-text-color: #95a5a6;
   
   /* PrimeVue Toolbar Variables - matching ComfyUI theme */
   --p-toolbar-padding: 0.5rem 0.75rem;
-  --p-toolbar-background: var(--example-bg-color);
-  --p-toolbar-border-color: var(--example-border-color);
-  --p-toolbar-color: var(--example-text-color);
+  --p-toolbar-background: var(--cam-bg-color);
+  --p-toolbar-border-color: var(--cam-border-color);
+  --p-toolbar-color: var(--cam-text-color);
   --p-toolbar-border-radius: 0.375rem;
   --p-toolbar-gap: 0.5rem;
 }
 
 /* Light mode overrides */
 .comfy-theme-light #comfyui-asset-manager-root {
-  --example-primary-color: #2980b9;
-  --example-secondary-color: #34495e;
-  --example-text-color: #2c3e50;
-  --example-accent-color: #c0392b;
-  --example-bg-color: #ecf0f1;
-  --example-border-color: #bdc3c7;
-  --example-muted-text-color: #7f8c8d;
+  --cam-primary-color: #2980b9;
+  --cam-secondary-color: #34495e;
+  --cam-text-color: #2c3e50;
+  --cam-accent-color: #c0392b;
+  --cam-bg-color: #ecf0f1;
+  --cam-border-color: #bdc3c7;
+  --cam-muted-text-color: #7f8c8d;
   
   /* PrimeVue Toolbar Variables - light mode */
-  --p-toolbar-background: var(--example-bg-color);
-  --p-toolbar-border-color: var(--example-border-color);
-  --p-toolbar-color: var(--example-text-color);
+  --p-toolbar-background: var(--cam-bg-color);
+  --p-toolbar-border-color: var(--cam-border-color);
+  --p-toolbar-color: var(--cam-text-color);
 }
 
 /* Make sure our styles don't leak out to the rest of ComfyUI */
@@ -38,7 +38,7 @@
   height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
 }
 
 #comfyui-asset-manager-root * {

@@ -10,7 +10,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--example-border-color);
+  border-bottom: 1px solid var(--cam-border-color);
   margin-bottom: 16px;
 }
 
@@ -23,18 +23,18 @@
 .model-search-input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 4px;
-  background-color: var(--example-secondary-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
 }
 
 .platform-selector {
   padding: 8px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 4px;
-  background-color: var(--example-secondary-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
   min-width: 120px;
 }
 
@@ -46,10 +46,10 @@
 
 .filter-chip {
   padding: 4px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 16px;
   background-color: transparent;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -57,9 +57,9 @@
 
 .filter-chip:hover,
 .filter-chip.active {
-  background-color: var(--example-primary-color);
+  background-color: var(--cam-primary-color);
   color: white;
-  border-color: var(--example-primary-color);
+  border-color: var(--cam-primary-color);
 }
 
 .model-browser-content {
@@ -74,8 +74,8 @@
 }
 
 .model-card {
-  background-color: var(--example-secondary-color);
-  border: 1px solid var(--example-border-color);
+  background-color: var(--cam-secondary-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.2s ease;
@@ -83,7 +83,7 @@
 }
 
 .model-card:hover {
-  border-color: var(--example-primary-color);
+  border-color: var(--cam-primary-color);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -91,11 +91,11 @@
 .model-card-image {
   width: 100%;
   height: 160px;
-  background-color: var(--example-bg-color);
+  background-color: var(--cam-bg-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
 }
 
 .model-card-content {
@@ -104,7 +104,7 @@
 
 .model-card-title {
   font-weight: 600;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   margin-bottom: 8px;
   font-size: 0.9rem;
   line-height: 1.3;
@@ -112,7 +112,7 @@
 
 .model-card-author {
   font-size: 0.8rem;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   margin-bottom: 8px;
 }
 
@@ -121,11 +121,11 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.75rem;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
 }
 
 .model-card-platform {
-  background-color: var(--example-primary-color);
+  background-color: var(--cam-primary-color);
   color: white;
   padding: 2px 6px;
   border-radius: 4px;

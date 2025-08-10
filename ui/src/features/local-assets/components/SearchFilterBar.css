@@ -4,8 +4,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background-color: var(--example-secondary-color);
-  border-bottom: 1px solid var(--example-border-color);
+  background-color: var(--cam-secondary-color);
+  border-bottom: 1px solid var(--cam-border-color);
 }
 
 .search-filter-main {
@@ -28,18 +28,18 @@
 .search-input {
   width: 100%;
   padding: 10px 12px 10px 40px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 6px;
-  background-color: var(--example-background-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-background-color);
+  color: var(--cam-text-color);
   font-size: 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--example-primary-color);
-  box-shadow: 0 0 0 2px rgba(var(--example-primary-color-rgb), 0.2);
+  border-color: var(--cam-primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--cam-primary-color-rgb), 0.2);
 }
 
 .search-input:disabled {
@@ -48,7 +48,7 @@
 }
 
 .search-input::placeholder {
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
 }
 
 .search-icon {
@@ -56,7 +56,7 @@
   left: 12px;
   width: 16px;
   height: 16px;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   pointer-events: none;
 }
 
@@ -67,7 +67,7 @@
   height: 24px;
   border: none;
   background: none;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   cursor: pointer;
   border-radius: 4px;
   display: flex;
@@ -77,8 +77,8 @@
 }
 
 .search-clear-button:hover {
-  color: var(--example-text-color);
-  background-color: var(--example-border-color);
+  color: var(--cam-text-color);
+  background-color: var(--cam-border-color);
 }
 
 .search-clear-button svg {
@@ -93,8 +93,8 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  border: 2px solid var(--example-border-color);
-  border-top: 2px solid var(--example-primary-color);
+  border: 2px solid var(--cam-border-color);
+  border-top: 2px solid var(--cam-primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -115,10 +115,10 @@
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 6px;
-  background-color: var(--example-background-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-background-color);
+  color: var(--cam-text-color);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -126,13 +126,13 @@
 }
 
 .filter-toggle-button:hover {
-  border-color: var(--example-primary-color);
-  background-color: var(--example-secondary-color);
+  border-color: var(--cam-primary-color);
+  background-color: var(--cam-secondary-color);
 }
 
 .filter-toggle-button.active {
-  border-color: var(--example-primary-color);
-  background-color: var(--example-primary-color);
+  border-color: var(--cam-primary-color);
+  background-color: var(--cam-primary-color);
   color: white;
 }
 
@@ -143,9 +143,9 @@
   right: -2px;
   width: 8px;
   height: 8px;
-  background-color: var(--example-accent-color, #ff6b6b);
+  background-color: var(--cam-accent-color, #ff6b6b);
   border-radius: 50%;
-  border: 2px solid var(--example-background-color);
+  border: 2px solid var(--cam-background-color);
 }
 
 .filter-toggle-button svg {
@@ -159,14 +159,14 @@
   right: -4px;
   width: 8px;
   height: 8px;
-  background-color: var(--example-accent-color, #ff6b6b);
+  background-color: var(--cam-accent-color, #ff6b6b);
   border-radius: 50%;
-  border: 2px solid var(--example-background-color);
+  border: 2px solid var(--cam-background-color);
 }
 
 .search-results-count {
   font-size: 14px;
-  color: var(--example-muted-text-color);
+  color: var(--cam-muted-text-color);
   white-space: nowrap;
 }
 
@@ -176,8 +176,8 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-  background-color: var(--example-background-color);
-  border: 1px solid var(--example-border-color);
+  background-color: var(--cam-background-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 6px;
   animation: slideDown 0.2s ease-out;
 }
@@ -202,7 +202,7 @@
 .filter-section-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   margin: 0;
 }
 
@@ -214,10 +214,10 @@
 
 .filter-chip {
   padding: 6px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 16px;
-  background-color: var(--example-secondary-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -225,13 +225,13 @@
 }
 
 .filter-chip:hover {
-  border-color: var(--example-primary-color);
-  background-color: var(--example-background-color);
+  border-color: var(--cam-primary-color);
+  background-color: var(--cam-background-color);
 }
 
 .filter-chip.active {
-  border-color: var(--example-primary-color);
-  background-color: var(--example-primary-color);
+  border-color: var(--cam-primary-color);
+  background-color: var(--cam-primary-color);
   color: white;
 }
 
@@ -246,37 +246,37 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: var(--example-text-color);
+  color: var(--cam-text-color);
   cursor: pointer;
 }
 
 .filter-checkbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: var(--example-primary-color);
+  accent-color: var(--cam-primary-color);
 }
 
 .filter-actions {
   display: flex;
   justify-content: flex-end;
   padding-top: 8px;
-  border-top: 1px solid var(--example-border-color);
+  border-top: 1px solid var(--cam-border-color);
 }
 
 .filter-clear-button {
   padding: 6px 12px;
-  border: 1px solid var(--example-border-color);
+  border: 1px solid var(--cam-border-color);
   border-radius: 4px;
-  background-color: var(--example-secondary-color);
-  color: var(--example-text-color);
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .filter-clear-button:hover:not(:disabled) {
-  border-color: var(--example-primary-color);
-  background-color: var(--example-background-color);
+  border-color: var(--cam-primary-color);
+  background-color: var(--cam-background-color);
 }
 
 .filter-clear-button:disabled {
