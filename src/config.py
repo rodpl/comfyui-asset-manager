@@ -1,7 +1,7 @@
 """Configuration management for the asset manager application."""
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 
@@ -27,8 +27,8 @@ class CacheConfig:
 @dataclass
 class ApplicationConfig:
     """Main application configuration."""
-    external_apis: ExternalAPIConfig
-    cache: CacheConfig
+    external_apis: ExternalAPIConfig = field(default_factory=ExternalAPIConfig)
+    cache: CacheConfig = field(default_factory=CacheConfig)
     debug: bool = False
     log_level: str = "INFO"
 

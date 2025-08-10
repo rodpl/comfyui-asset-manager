@@ -23,7 +23,7 @@ class WebAPIAdapter:
         self,
         model_management: ModelManagementPort,
         folder_management: FolderManagementPort,
-        output_management: OutputManagementPort
+        output_management: Optional[OutputManagementPort] = None,
     ):
         """Initialize the Web API adapter.
         
