@@ -305,14 +305,16 @@ if __name__ == "__main__":
         site = web.TCPSite(runner, 'localhost', 8080)
         await site.start()
         
-        print("Asset manager running on http://localhost:8080")
-        print("Health check: http://localhost:8080/health")
-        print("API endpoints: http://localhost:8080/asset_manager/")
+        from src.utils import logger
+        logger.info("Asset manager running on http://localhost:8080")
+        logger.info("Health check: http://localhost:8080/health")
+        logger.info("API endpoints: http://localhost:8080/asset_manager/")
         
         try:
             await asyncio.Future()  # Run forever
         except KeyboardInterrupt:
-            print("Shutting down...")
+            from src.utils import logger
+            logger.info("Shutting down...")
         finally:
             await runner.cleanup()
             app_instance.shutdown()

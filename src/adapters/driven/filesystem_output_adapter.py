@@ -10,6 +10,7 @@ import hashlib
 
 from ...domain.ports.driven.output_repository_port import OutputRepositoryPort
 from ...domain.entities.output import Output
+from src.utils import logger
 
 
 class FilesystemOutputAdapter(OutputRepositoryPort):
@@ -76,7 +77,7 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                             outputs.append(output)
                     except Exception as e:
                         # Log error but continue processing other files
-                        print(f"Warning: Failed to process file {file_path}: {e}")
+                        logger.warn(f"Failed to process file {file_path}: {e}")
                         continue
         
         except Exception as e:
@@ -190,7 +191,7 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                 return str(thumbnail_path)
         
         except Exception as e:
-            print(f"Warning: Failed to generate thumbnail for {output.file_path}: {e}")
+            logger.warn(f"Failed to generate thumbnail for {output.file_path}: {e}")
             return None
     
     def extract_workflow_metadata(self, output: Output) -> Optional[Dict[str, Any]]:
@@ -241,7 +242,7 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                 return metadata if metadata else None
         
         except Exception as e:
-            print(f"Warning: Failed to extract metadata from {output.file_path}: {e}")
+            logger.warn(f"Failed to extract metadata from {output.file_path}: {e}")
             return None
     
     def _create_output_from_file(self, file_path: Path) -> Optional[Output]:
@@ -281,7 +282,7 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
             )
         
         except Exception as e:
-            print(f"Warning: Failed to create output from file {file_path}: {e}")
+            logger.warn(f"Failed to create output from file {file_path}: {e}")
             return None
     
     def _generate_output_id(self, file_path: str) -> str:
