@@ -4,6 +4,13 @@ import os
 import sys
 import importlib
 import importlib.util
+
+# Ensure the custom node root is on sys.path so that the local 'src' package
+# is importable when this module is loaded by ComfyUI's dynamic loader.
+_NODE_ROOT = os.path.dirname(__file__)
+if _NODE_ROOT not in sys.path:
+    sys.path.insert(0, _NODE_ROOT)
+
 from src.utils import logger
 
 NODE_CLASS_MAPPINGS = {}
