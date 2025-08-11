@@ -12,7 +12,9 @@ export const convertOutputResponse = (response: OutputResponse): Output => {
     id: response.id,
     filename: response.filename,
     filePath: response.filePath,
-    fileSize: response.fileSize,
+    fileSize: typeof (response as any).fileSize === 'number' && isFinite((response as any).fileSize)
+      ? (response as any).fileSize
+      : 0,
     createdAt: new Date(response.createdAt),
     modifiedAt: new Date(response.modifiedAt),
     imageWidth: response.imageWidth,
@@ -33,14 +35,15 @@ export const convertOutputResponseArray = (responses: OutputResponse[]): Output[
 /**
  * Format file size in human-readable format
  */
-export const formatFileSize = (bytes: number): string => {
+export const formatFileSize = (bytes?: number | null): string => {
+  if (typeof bytes !== 'number' || !isFinite(bytes) || bytes < 0) return '—';
   if (bytes === 0) return '0 B';
-  
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  const i = Math.min(sizes.length - 1, Math.floor(Math.log(bytes) / Math.log(k)));
+  const value = bytes / Math.pow(k, i);
+  return `${parseFloat(value.toFixed(1))} ${sizes[i]}`;
 };
 
 /**
