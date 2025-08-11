@@ -152,7 +152,7 @@ const OutputsTab = () => {
     setIsModalOpen(true);
   };
 
-  const handleContextMenu = (output: Output, event: MouseEvent) => {
+  const handleContextMenu = (output: Output, event: React.MouseEvent) => {
     event.preventDefault();
     // TODO: Implement context menu functionality
     console.log('Context menu for output:', output);
