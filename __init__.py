@@ -23,6 +23,7 @@ def _is_comfyui_runtime_available() -> bool:
     required_modules = ["server", "nodes"]
     return all(importlib.util.find_spec(m) is not None for m in required_modules)
 
+logger.info("ComfyUI Asset Manager: Initializing")
 
 # Only run ComfyUI-specific initialization when ComfyUI is available and not under pytest
 if _is_comfyui_runtime_available() and not _is_pytest_environment():
@@ -79,3 +80,5 @@ if _is_comfyui_runtime_available() and not _is_pytest_environment():
             pass
     else:
         logger.warn("ComfyUI Asset Manager: Web directory not found")
+        
+logger.info("ComfyUI Asset Manager: Initialized")
