@@ -4,6 +4,7 @@ import os
 import sys
 import importlib
 import importlib.util
+from src.utils import logger
 
 NODE_CLASS_MAPPINGS = {}
 __all__ = ["NODE_CLASS_MAPPINGS"]
@@ -34,11 +35,11 @@ if _is_comfyui_runtime_available() and not _is_pytest_environment():
     dist_path = os.path.join(workspace_path, "dist/asset_manager")
     dist_locales_path = os.path.join(workspace_path, "dist/locales")
 
-    # Print the current paths for debugging
-    print(f"ComfyUI Asset Manager workspace path: {workspace_path}")
-    print(f"Dist path: {dist_path}")
-    print(f"Dist locales path: {dist_locales_path}")
-    print(f"Locales exist: {os.path.exists(dist_locales_path)}")
+    # Log the current paths for debugging
+    logger.info(f"ComfyUI Asset Manager workspace path: {workspace_path}")
+    logger.info(f"Dist path: {dist_path}")
+    logger.info(f"Dist locales path: {dist_locales_path}")
+    logger.info(f"Locales exist: {os.path.exists(dist_locales_path)}")
 
     # Register the static route for serving our React app assets
     if os.path.exists(dist_path):
@@ -47,18 +48,18 @@ if _is_comfyui_runtime_available() and not _is_pytest_environment():
         # Register the locale files route
         if os.path.exists(dist_locales_path):
             server.PromptServer.instance.app.add_routes([web.static("/locales/", dist_locales_path)])
-            print("Registered locale files route at /locales/")
+            logger.info("Registered locale files route at /locales/")
         else:
-            print("WARNING: Locale directory not found!")
+            logger.warn("Locale directory not found!")
 
         # Initialize and register the asset manager API
         try:
             from src.main import register_with_comfyui
 
             register_with_comfyui(server.PromptServer.instance.app)
-            print("Asset Manager API registered successfully")
+            logger.info("Asset Manager API registered successfully")
         except Exception as e:
-            print(f"WARNING: Failed to register Asset Manager API: {e}")
+            logger.error(f"Failed to register Asset Manager API: {e}")
 
         # Also register the standard ComfyUI extension web directory
         project_name = os.path.basename(workspace_path)
@@ -68,13 +69,13 @@ if _is_comfyui_runtime_available() and not _is_pytest_environment():
             config_parser = importlib.import_module("comfy_config.config_parser")
             project_config = config_parser.extract_node_configuration(workspace_path)  # type: ignore[attr-defined]
             project_name = project_config.project.name
-            print(f"project name read from pyproject.toml: {project_name}")
+            logger.info(f"project name read from pyproject.toml: {project_name}")
         except Exception as e:
-            print(f"Could not load project config, using default name '{project_name}': {e}")
+            logger.warn(f"Could not load project config, using default name '{project_name}': {e}")
 
         try:
             nodes.EXTENSION_WEB_DIRS[project_name] = os.path.join(workspace_path, "dist")  # type: ignore[name-defined]
         except Exception:
             pass
     else:
-        print("ComfyUI Asset Manager: Web directory not found")
+        logger.warn("ComfyUI Asset Manager: Web directory not found")
