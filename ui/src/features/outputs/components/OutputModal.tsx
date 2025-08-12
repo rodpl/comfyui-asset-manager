@@ -1,7 +1,7 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react';
-import { formatFileSize, formatDate } from '../utils/outputUtils';
-import '../OutputsTab.css';
-import { Output } from '../types';
+import React, { useEffect, useCallback, useState, useRef } from "react";
+import { formatFileSize, formatDate } from "../utils/outputUtils";
+import "../OutputsTab.css";
+import { Output } from "../types";
 
 export interface OutputModalProps {
   output: Output | null;
@@ -12,7 +12,14 @@ export interface OutputModalProps {
   onNavigate?: (output: Output) => void; // Navigate to different output
 }
 
-const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNavigate }: OutputModalProps) => {
+const OutputModal = ({
+  output,
+  isOpen,
+  onClose,
+  onAction,
+  outputs = [],
+  onNavigate,
+}: OutputModalProps) => {
   // Image zoom and pan state
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -32,7 +39,9 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
   }, [output, output.id]);
 
   // Find current output index for navigation
-  const currentIndex = output ? outputs.findIndex(o => o.id === output.id) : -1;
+  const currentIndex = output
+    ? outputs.findIndex((o) => o.id === output.id)
+    : -1;
   const canNavigatePrev = currentIndex > 0;
   const canNavigateNext = currentIndex < outputs.length - 1;
 
@@ -50,11 +59,11 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
 
   // Zoom and pan handlers
   const handleZoomIn = useCallback(() => {
-    setScale(prev => Math.min(prev * 1.2, 5));
+    setScale((prev) => Math.min(prev * 1.2, 5));
   }, []);
 
   const handleZoomOut = useCallback(() => {
-    setScale(prev => Math.max(prev / 1.2, 0.1));
+    setScale((prev) => Math.max(prev / 1.2, 0.1));
   }, []);
 
   const handleZoomReset = useCallback(() => {
@@ -64,55 +73,68 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
-      } else if (event.key === 'ArrowLeft') {
+      } else if (event.key === "ArrowLeft") {
         event.preventDefault();
         navigateToPrevious();
-      } else if (event.key === 'ArrowRight') {
+      } else if (event.key === "ArrowRight") {
         event.preventDefault();
         navigateToNext();
-      } else if (event.key === '=' || event.key === '+') {
+      } else if (event.key === "=" || event.key === "+") {
         event.preventDefault();
         handleZoomIn();
-      } else if (event.key === '-') {
+      } else if (event.key === "-") {
         event.preventDefault();
         handleZoomOut();
-      } else if (event.key === '0') {
+      } else if (event.key === "0") {
         event.preventDefault();
         handleZoomReset();
       }
     },
-    [onClose, navigateToPrevious, navigateToNext, handleZoomIn, handleZoomOut, handleZoomReset]
+    [
+      onClose,
+      navigateToPrevious,
+      navigateToNext,
+      handleZoomIn,
+      handleZoomOut,
+      handleZoomReset,
+    ]
   );
 
   const handleWheel = useCallback((event: React.WheelEvent) => {
     if (event.ctrlKey || event.metaKey) {
       event.preventDefault();
       const delta = event.deltaY > 0 ? 0.9 : 1.1;
-      setScale(prev => Math.min(Math.max(prev * delta, 0.1), 5));
+      setScale((prev) => Math.min(Math.max(prev * delta, 0.1), 5));
     }
   }, []);
 
-  const handleMouseDown = useCallback((event: React.MouseEvent) => {
-    if (scale > 1) {
-      event.preventDefault();
-      setIsDragging(true);
-      setDragStart({ x: event.clientX, y: event.clientY });
-      setLastPanPosition(position);
-    }
-  }, [scale, position]);
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent) => {
+      if (scale > 1) {
+        event.preventDefault();
+        setIsDragging(true);
+        setDragStart({ x: event.clientX, y: event.clientY });
+        setLastPanPosition(position);
+      }
+    },
+    [scale, position]
+  );
 
-  const handleMouseMove = useCallback((event: React.MouseEvent) => {
-    if (isDragging && scale > 1) {
-      const deltaX = event.clientX - dragStart.x;
-      const deltaY = event.clientY - dragStart.y;
-      setPosition({
-        x: lastPanPosition.x + deltaX,
-        y: lastPanPosition.y + deltaY
-      });
-    }
-  }, [isDragging, scale, dragStart, lastPanPosition]);
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent) => {
+      if (isDragging && scale > 1) {
+        const deltaX = event.clientX - dragStart.x;
+        const deltaY = event.clientY - dragStart.y;
+        setPosition({
+          x: lastPanPosition.x + deltaX,
+          y: lastPanPosition.y + deltaY,
+        });
+      }
+    },
+    [isDragging, scale, dragStart, lastPanPosition]
+  );
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -120,15 +142,15 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, handleKeyDown]);
 
@@ -145,16 +167,16 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
   const handleCopyPath = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(output.filePath);
-      onAction('copy-path', output);
+      onAction("copy-path", output);
     }
   };
 
   const handleOpenSystem = () => {
-    onAction('open-system', output);
+    onAction("open-system", output);
   };
 
   const handleShowFolder = () => {
-    onAction('show-folder', output);
+    onAction("show-folder", output);
   };
 
   return (
@@ -170,13 +192,17 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
           <h3 id="output-modal-title" className="output-modal-title">
             {output.filename}
           </h3>
-          <button className="output-modal-close" onClick={onClose} aria-label="Close modal">
+          <button
+            className="output-modal-close"
+            onClick={onClose}
+            aria-label="Close modal"
+          >
             <i className="pi pi-times"></i>
           </button>
         </div>
 
         <div className="output-modal-content">
-          <div 
+          <div
             className="output-modal-image-container"
             ref={containerRef}
             onWheel={handleWheel}
@@ -184,7 +210,10 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            style={{ cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+            style={{
+              cursor:
+                scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
+            }}
           >
             {/* Navigation arrows */}
             {canNavigatePrev && (
@@ -245,16 +274,18 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
               alt={output.filename}
               className="output-modal-image"
               style={{
-                transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
-                transformOrigin: 'center center',
-                transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+                transform: `scale(${scale}) translate(${position.x / scale}px, ${
+                  position.y / scale
+                }px)`,
+                transformOrigin: "center center",
+                transition: isDragging ? "none" : "transform 0.1s ease-out",
               }}
               onError={(e) => {
                 // Fallback if full image fails to load
                 const target = e.target as HTMLImageElement;
-                target.src = output.thumbnailPath || '';
+                target.src = output.thumbnailPath || "";
                 if (!output.thumbnailPath) {
-                  target.style.display = 'none';
+                  target.style.display = "none";
                   target.parentElement!.innerHTML = `
                     <div class="output-modal-image-error">
                       <i class="pi pi-exclamation-triangle" style="font-size: 3rem; opacity: 0.5;"></i>
@@ -279,19 +310,27 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">File Size:</span>
-                  <span className="detail-value">{formatFileSize(output.fileSize)}</span>
+                  <span className="detail-value">
+                    {formatFileSize(output.fileSize)}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Format:</span>
-                  <span className="detail-value">{output.fileFormat.toUpperCase()}</span>
+                  <span className="detail-value">
+                    {output.fileFormat.toUpperCase()}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Created:</span>
-                  <span className="detail-value">{formatDate(output.createdAt)}</span>
+                  <span className="detail-value">
+                    {formatDate(output.createdAt)}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Modified:</span>
-                  <span className="detail-value">{formatDate(output.modifiedAt)}</span>
+                  <span className="detail-value">
+                    {formatDate(output.modifiedAt)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -311,31 +350,41 @@ const OutputModal = ({ output, isOpen, onClose, onAction, outputs = [], onNaviga
                   {output.workflowMetadata.model && (
                     <div className="detail-row">
                       <span className="detail-label">Model:</span>
-                      <span className="detail-value">{output.workflowMetadata.model}</span>
+                      <span className="detail-value">
+                        {output.workflowMetadata.model}
+                      </span>
                     </div>
                   )}
                   {output.workflowMetadata.steps && (
                     <div className="detail-row">
                       <span className="detail-label">Steps:</span>
-                      <span className="detail-value">{output.workflowMetadata.steps}</span>
+                      <span className="detail-value">
+                        {output.workflowMetadata.steps}
+                      </span>
                     </div>
                   )}
                   {output.workflowMetadata.cfg && (
                     <div className="detail-row">
                       <span className="detail-label">CFG Scale:</span>
-                      <span className="detail-value">{output.workflowMetadata.cfg}</span>
+                      <span className="detail-value">
+                        {output.workflowMetadata.cfg}
+                      </span>
                     </div>
                   )}
                   {output.workflowMetadata.sampler && (
                     <div className="detail-row">
                       <span className="detail-label">Sampler:</span>
-                      <span className="detail-value">{output.workflowMetadata.sampler}</span>
+                      <span className="detail-value">
+                        {output.workflowMetadata.sampler}
+                      </span>
                     </div>
                   )}
                   {output.workflowMetadata.seed && (
                     <div className="detail-row">
                       <span className="detail-label">Seed:</span>
-                      <span className="detail-value">{output.workflowMetadata.seed}</span>
+                      <span className="detail-value">
+                        {output.workflowMetadata.seed}
+                      </span>
                     </div>
                   )}
                 </div>
