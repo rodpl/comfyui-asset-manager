@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { formatFileSize, formatDate } from '../mockData';
+import { formatFileSize, formatDate } from '../utils/outputUtils';
 import '../OutputsTab.css';
 import { Output } from '../types';
 

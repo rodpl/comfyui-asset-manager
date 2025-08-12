@@ -12,8 +12,9 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:watch": "vitest --watch"
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:ci": "vitest run --reporter=dot --silent"
   },
   "dependencies": {
     "i18next": "^23.10.2",

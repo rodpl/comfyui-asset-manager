@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from src.domain.ports.driven.cache_port import CachePort
+from src.utils import logger
 
 
 class FileCacheAdapter(CachePort):
@@ -85,7 +86,7 @@ class FileCacheAdapter(CachePort):
         
         except (OSError, TypeError) as e:
             # Log error but don't raise - cache failures shouldn't break the app
-            print(f"Warning: Failed to write cache file {cache_file}: {e}")
+            logger.warn(f"Failed to write cache file {cache_file}: {e}")
     
     def delete(self, key: str) -> bool:
         """Delete a value from the cache.
@@ -112,7 +113,7 @@ class FileCacheAdapter(CachePort):
             for cache_file in self._cache_dir.rglob("*.json"):
                 self._delete_cache_file(cache_file)
         except OSError as e:
-            print(f"Warning: Failed to clear cache directory {self._cache_dir}: {e}")
+            logger.warn(f"Failed to clear cache directory {self._cache_dir}: {e}")
     
     def exists(self, key: str) -> bool:
         """Check if a key exists in the cache.
@@ -175,7 +176,7 @@ class FileCacheAdapter(CachePort):
                         removed_count += 1
         
         except OSError as e:
-            print(f"Warning: Failed to cleanup cache directory {self._cache_dir}: {e}")
+            logger.warn(f"Failed to cleanup cache directory {self._cache_dir}: {e}")
         
         return removed_count
     

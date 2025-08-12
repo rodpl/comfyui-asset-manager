@@ -8,6 +8,7 @@ import uuid
 from ...domain.ports.driven.folder_repository_port import FolderRepositoryPort
 from ...domain.entities.folder import Folder
 from ...domain.entities.model import ModelType
+from src.utils import logger
 
 
 class ComfyUIFolderAdapter(FolderRepositoryPort):
@@ -77,7 +78,7 @@ class ComfyUIFolderAdapter(FolderRepositoryPort):
                         
             except Exception as e:
                 # Log error but continue with other folders
-                print(f"Error discovering folder {folder_name}: {e}")
+                logger.error(f"Error discovering folder {folder_name}: {e}")
                 continue
         
         return folders

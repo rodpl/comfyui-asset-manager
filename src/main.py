@@ -55,6 +55,7 @@ class AssetManagerApplication:
             folder_service = self._container.get_folder_service()
             model_service = self._container.get_model_service()
             metadata_service = self._container.get_metadata_service()
+            output_service = self._container.get_output_service()
             
             logger.info("Core services initialized successfully")
             
@@ -171,6 +172,7 @@ class AssetManagerApplication:
             folder_service = self._container.get_folder_service()
             model_service = self._container.get_model_service()
             metadata_service = self._container.get_metadata_service()
+            output_service = self._container.get_output_service()
             
             # Get cache statistics if caching is enabled
             cache_stats = {}
@@ -185,6 +187,7 @@ class AssetManagerApplication:
                     "folder_service": "available",
                     "model_service": "available",
                     "metadata_service": "available",
+                    "output_service": "available",
                     "civitai_enabled": self.config.external_apis.civitai_enabled,
                     "huggingface_enabled": self.config.external_apis.huggingface_enabled,
                     "cache_enabled": self.config.cache.enabled
@@ -302,14 +305,16 @@ if __name__ == "__main__":
         site = web.TCPSite(runner, 'localhost', 8080)
         await site.start()
         
-        print("Asset manager running on http://localhost:8080")
-        print("Health check: http://localhost:8080/health")
-        print("API endpoints: http://localhost:8080/asset_manager/")
+        from src.utils import logger
+        logger.info("Asset manager running on http://localhost:8080")
+        logger.info("Health check: http://localhost:8080/health")
+        logger.info("API endpoints: http://localhost:8080/asset_manager/")
         
         try:
             await asyncio.Future()  # Run forever
         except KeyboardInterrupt:
-            print("Shutting down...")
+            from src.utils import logger
+            logger.info("Shutting down...")
         finally:
             await runner.cleanup()
             app_instance.shutdown()

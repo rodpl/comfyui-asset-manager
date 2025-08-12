@@ -4,6 +4,7 @@
  */
 
 import { ModelFolder, ModelInfo, EnrichedModelInfo } from '../features/local-assets/types';
+import { OutputResponse } from '../features/outputs/types';
 
 // API Configuration
 const API_BASE_URL = '/asset_manager';
@@ -383,6 +384,49 @@ export class ApiClient {
    */
   async getAllUserTags(options?: RequestOptions): Promise<string[]> {
     return this.get<string[]>('/tags', options);
+  }
+
+  /**
+   * Get all outputs with optional filtering
+   */
+  async getOutputs(
+    filters?: {
+      format?: string;
+      startDate?: string;
+      endDate?: string;
+      sortBy?: string;
+      ascending?: boolean;
+    },
+    options?: RequestOptions
+  ): Promise<{ data: OutputResponse[]; count: number; filters: any }> {
+    const params = new URLSearchParams();
+    if (filters?.format) params.append('format', filters.format);
+    if (filters?.startDate) params.append('start_date', filters.startDate);
+    if (filters?.endDate) params.append('end_date', filters.endDate);
+    if (filters?.sortBy) params.append('sort_by', filters.sortBy);
+    if (filters?.ascending !== undefined) params.append('ascending', filters.ascending.toString());
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `/outputs?${queryString}` : '/outputs';
+    
+    return this.get<{ data: OutputResponse[]; count: number; filters: any }>(endpoint, options);
+  }
+
+  /**
+   * Get detailed information about a specific output
+   */
+  async getOutputDetails(outputId: string, options?: RequestOptions): Promise<{ data: OutputResponse }> {
+    return this.get<{ data: OutputResponse }>(`/outputs/${encodeURIComponent(outputId)}`, options);
+  }
+
+  /**
+   * Refresh outputs by rescanning the output directory
+   */
+  async refreshOutputs(options?: RequestOptions): Promise<{ data: OutputResponse[]; count: number; message: string }> {
+    return this.request<{ data: OutputResponse[]; count: number; message: string }>('/outputs/refresh', {
+      method: 'POST',
+      ...options,
+    });
   }
 
   /**

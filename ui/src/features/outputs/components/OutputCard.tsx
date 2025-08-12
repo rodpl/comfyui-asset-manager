@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatFileSize, formatDate } from '../mockData';
+import { formatFileSize, formatDate } from '../utils/outputUtils';
 import '../OutputsTab.css';
 import { Output, ViewMode } from '../types';
 

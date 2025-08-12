@@ -9,6 +9,7 @@ from .config import ApplicationConfig, load_config
 from .domain.services.model_service import ModelService
 from .domain.services.folder_service import FolderService
 from .domain.services.metadata_service import MetadataService
+from .domain.services.output_service import OutputService
 
 # Driving adapters
 from .adapters.driving.web_api_adapter import WebAPIAdapter
@@ -19,6 +20,7 @@ from .adapters.driven.filesystem_model_adapter import FileSystemModelAdapter
 from .adapters.driven.civitai_metadata_adapter import CivitAIMetadataAdapter
 from .adapters.driven.huggingface_metadata_adapter import HuggingFaceMetadataAdapter
 from .adapters.driven.file_cache_adapter import FileCacheAdapter
+from .adapters.driven.comfyui_output_adapter import ComfyUIOutputAdapter
 
 
 logger = logging.getLogger(__name__)
@@ -44,12 +46,14 @@ class DIContainer:
         self._cache_adapter: Optional[FileCacheAdapter] = None
         self._folder_repository: Optional[ComfyUIFolderAdapter] = None
         self._model_repository: Optional[FileSystemModelAdapter] = None
+        self._output_repository: Optional[ComfyUIOutputAdapter] = None
         self._civitai_adapter: Optional[CivitAIMetadataAdapter] = None
         self._huggingface_adapter: Optional[HuggingFaceMetadataAdapter] = None
         
         self._metadata_service: Optional[MetadataService] = None
         self._model_service: Optional[ModelService] = None
         self._folder_service: Optional[FolderService] = None
+        self._output_service: Optional[OutputService] = None
         
         self._web_api_adapter: Optional[WebAPIAdapter] = None
     
@@ -147,6 +151,18 @@ class DIContainer:
         
         return self._huggingface_adapter
     
+    def get_output_repository(self) -> ComfyUIOutputAdapter:
+        """Get output repository adapter instance.
+        
+        Returns:
+            ComfyUI output adapter
+        """
+        if self._output_repository is None:
+            logger.info("Initializing ComfyUI output adapter")
+            self._output_repository = ComfyUIOutputAdapter()
+        
+        return self._output_repository
+    
     # Domain services
     
     def get_metadata_service(self) -> MetadataService:
@@ -199,6 +215,19 @@ class DIContainer:
         
         return self._folder_service
     
+    def get_output_service(self) -> OutputService:
+        """Get output service instance.
+        
+        Returns:
+            Output service with configured dependencies
+        """
+        if self._output_service is None:
+            logger.info("Initializing output service")
+            output_repository = self.get_output_repository()
+            self._output_service = OutputService(output_repository)
+        
+        return self._output_service
+    
     # Driving adapters
     
     def get_web_api_adapter(self) -> WebAPIAdapter:
@@ -211,10 +240,12 @@ class DIContainer:
             logger.info("Initializing web API adapter")
             model_service = self.get_model_service()
             folder_service = self.get_folder_service()
+            output_service = self.get_output_service()
             
             self._web_api_adapter = WebAPIAdapter(
                 model_management=model_service,
-                folder_management=folder_service
+                folder_management=folder_service,
+                output_management=output_service
             )
         
         return self._web_api_adapter

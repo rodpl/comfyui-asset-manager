@@ -3,7 +3,7 @@ name = "comfyui-asset-manager"
 description = "ComfyUI Asset Manager for managing assets in ComfyUI"
 version = "0.1.0"
 license = { file = "LICENSE" }
-dependencies = ["aiohttp (>=3.12.14,<4.0.0)"]
+dependencies = ["aiohttp (>=3.12.14,<4.0.0)", "pillow (>=11.0.0,<12.0.0)"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0.0", "pytest-cov>=4.0.0", "pytest-asyncio>=0.21.0"]
@@ -25,11 +25,15 @@ packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.12"
+aiohttp = "^3.12.14"
+# Pillow 10.x does not provide wheels for Python 3.13. Bump to 11.x which supports 3.13
+pillow = "^11.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-pytest-cov = "^4.0.0"
-pytest-asyncio = "^0.21.0"
+pytest = "^8.2"
+pytest-cov = "^5"
+pytest-asyncio = "^0.23"
+aiohttp = "^3.12.14"
 
 
 # Pytest configuration

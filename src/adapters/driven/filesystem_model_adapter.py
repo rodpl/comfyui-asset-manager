@@ -11,6 +11,7 @@ from ...domain.ports.driven.model_repository_port import ModelRepositoryPort
 from ...domain.ports.driven.folder_repository_port import FolderRepositoryPort
 from ...domain.entities.model import Model, ModelType
 from ...domain.entities.folder import Folder
+from src.utils import logger
 
 
 class FileSystemModelAdapter(ModelRepositoryPort):
@@ -113,7 +114,7 @@ class FileSystemModelAdapter(ModelRepositoryPort):
             
         except Exception as e:
             # Log error but don't fail completely
-            print(f"Error extracting metadata from {file_path}: {e}")
+            logger.error(f"Error extracting metadata from {file_path}: {e}")
             return None
     
     def _find_thumbnail_path(self, model_path: str) -> Optional[str]:
@@ -170,7 +171,7 @@ class FileSystemModelAdapter(ModelRepositoryPort):
                         models.append(model)
             
         except Exception as e:
-            print(f"Error scanning folder {folder.path}: {e}")
+            logger.error(f"Error scanning folder {folder.path}: {e}")
         
         return models
     
@@ -191,7 +192,7 @@ class FileSystemModelAdapter(ModelRepositoryPort):
             self._cache_timestamp = datetime.now()
             
         except Exception as e:
-            print(f"Error refreshing models cache: {e}")
+            logger.error(f"Error refreshing models cache: {e}")
             self._invalidate_cache()
     
     def find_all_in_folder(self, folder_id: str) -> List[Model]:
