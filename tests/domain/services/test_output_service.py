@@ -283,4 +283,100 @@ class TestOutputService:
             output_service.sort_outputs("not a list", "date", ascending=True)
         
         assert "outputs must be a list" in str(exc_info.value)
-        assert exc_info.value.field == "outputs"
+        assert exc_info.value.field == "outputs"    
+
+    def test_load_workflow_success(self, output_service, mock_output_repository, sample_output):
+        """Test successful workflow loading."""
+        mock_output_repository.get_output_by_id.return_value = sample_output
+        mock_output_repository.load_workflow_to_comfyui.return_value = True
+        
+        result = output_service.load_workflow("output-1")
+        
+        assert result is True
+        mock_output_repository.get_output_by_id.assert_called_once_with("output-1")
+        mock_output_repository.load_workflow_to_comfyui.assert_called_once_with(sample_output)
+    
+    def test_load_workflow_not_found(self, output_service, mock_output_repository):
+        """Test workflow loading for non-existent output."""
+        mock_output_repository.get_output_by_id.return_value = None
+        
+        with pytest.raises(NotFoundError) as exc_info:
+            output_service.load_workflow("nonexistent-id")
+        
+        assert exc_info.value.identifier == "nonexistent-id"
+        mock_output_repository.get_output_by_id.assert_called_once_with("nonexistent-id")
+    
+    def test_load_workflow_empty_id(self, output_service, mock_output_repository):
+        """Test validation of empty output ID for workflow loading."""
+        with pytest.raises(ValidationError) as exc_info:
+            output_service.load_workflow("")
+        
+        assert exc_info.value.field == "output_id"
+    
+    def test_load_workflow_failure(self, output_service, mock_output_repository, sample_output):
+        """Test workflow loading failure."""
+        mock_output_repository.get_output_by_id.return_value = sample_output
+        mock_output_repository.load_workflow_to_comfyui.return_value = False
+        
+        result = output_service.load_workflow("output-1")
+        
+        assert result is False
+        mock_output_repository.load_workflow_to_comfyui.assert_called_once_with(sample_output)
+    
+    def test_open_in_system_viewer_success(self, output_service, mock_output_repository, sample_output):
+        """Test successful opening in system viewer."""
+        mock_output_repository.get_output_by_id.return_value = sample_output
+        mock_output_repository.open_file_in_system.return_value = True
+        
+        result = output_service.open_in_system_viewer("output-1")
+        
+        assert result is True
+        mock_output_repository.get_output_by_id.assert_called_once_with("output-1")
+        mock_output_repository.open_file_in_system.assert_called_once_with(sample_output)
+    
+    def test_open_in_system_viewer_not_found(self, output_service, mock_output_repository):
+        """Test opening in system viewer for non-existent output."""
+        mock_output_repository.get_output_by_id.return_value = None
+        
+        with pytest.raises(NotFoundError) as exc_info:
+            output_service.open_in_system_viewer("nonexistent-id")
+        
+        assert exc_info.value.identifier == "nonexistent-id"
+    
+    def test_open_in_system_viewer_failure(self, output_service, mock_output_repository, sample_output):
+        """Test system viewer opening failure."""
+        mock_output_repository.get_output_by_id.return_value = sample_output
+        mock_output_repository.open_file_in_system.return_value = False
+        
+        result = output_service.open_in_system_viewer("output-1")
+        
+        assert result is False
+    
+    def test_show_in_folder_success(self, output_service, mock_output_repository, sample_output):
+        """Test successful showing in folder."""
+        mock_output_repository.get_output_by_id.return_value = sample_output
+        mock_output_repository.show_file_in_folder.return_value = True
+        
+        result = output_service.show_in_folder("output-1")
+        
+        assert result is True
+        mock_output_repository.get_output_by_id.assert_called_once_with("output-1")
+        mock_output_repository.show_file_in_folder.assert_called_once_with(sample_output)
+    
+    def test_show_in_folder_not_found(self, output_service, mock_output_repository):
+        """Test showing in folder for non-existent output."""
+        mock_output_repository.get_output_by_id.return_value = None
+        
+        with pytest.raises(NotFoundError) as exc_info:
+            output_service.show_in_folder("nonexistent-id")
+        
+        assert exc_info.value.identifier == "nonexistent-id"
+    
+    def test_show_in_folder_failure(self, output_service, mock_output_repository, sample_output):
+        """Test folder showing failure."""
+        mock_output_repository.get_output_by_id.return_value = sample_output
+        mock_output_repository.show_file_in_folder.return_value = False
+        
+        result = output_service.show_in_folder("output-1")
+        
+        assert result is False

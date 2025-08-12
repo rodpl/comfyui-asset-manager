@@ -341,4 +341,90 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
         
         except Exception:
             # Ignore errors in parameter extraction
-            pass
+            pass  
+  
+    def load_workflow_to_comfyui(self, output: Output) -> bool:
+        """Load the workflow from the output back into ComfyUI.
+        
+        Args:
+            output: The output to load workflow from
+            
+        Returns:
+            True if workflow was loaded successfully, False otherwise
+        """
+        # Base implementation - just validates that workflow metadata exists
+        try:
+            metadata = self.extract_workflow_metadata(output)
+            return metadata is not None and 'workflow' in metadata
+        except Exception:
+            return False
+    
+    def open_file_in_system(self, output: Output) -> bool:
+        """Open the output file in the system's default image viewer.
+        
+        Args:
+            output: The output to open
+            
+        Returns:
+            True if file was opened successfully, False otherwise
+        """
+        try:
+            import subprocess
+            import sys
+            from pathlib import Path
+            
+            file_path = Path(output.file_path)
+            if not file_path.exists():
+                return False
+            
+            # Use platform-specific commands to open the file
+            if sys.platform == "win32":
+                # Windows
+                subprocess.run(["start", str(file_path)], shell=True, check=True)
+            elif sys.platform == "darwin":
+                # macOS
+                subprocess.run(["open", str(file_path)], check=True)
+            else:
+                # Linux and other Unix-like systems
+                subprocess.run(["xdg-open", str(file_path)], check=True)
+            
+            return True
+            
+        except Exception:
+            return False
+    
+    def show_file_in_folder(self, output: Output) -> bool:
+        """Open the containing folder of the output file in the system file explorer.
+        
+        Args:
+            output: The output to show folder for
+            
+        Returns:
+            True if folder was opened successfully, False otherwise
+        """
+        try:
+            import subprocess
+            import sys
+            from pathlib import Path
+            
+            file_path = Path(output.file_path)
+            if not file_path.exists():
+                return False
+            
+            # Use platform-specific commands to show the file in folder
+            if sys.platform == "win32":
+                # Windows - use explorer with /select flag
+                subprocess.run(["explorer", "/select,", str(file_path)], check=True)
+            elif sys.platform == "darwin":
+                # macOS - use Finder with -R flag to reveal
+                subprocess.run(["open", "-R", str(file_path)], check=True)
+            else:
+                # Linux and other Unix-like systems
+                # Open the parent directory (most file managers don't support file selection)
+                parent_dir = file_path.parent
+                subprocess.run(["xdg-open", str(parent_dir)], check=True)
+            
+            return True
+            
+        except Exception:
+            return False

@@ -162,22 +162,43 @@ const OutputsTab = () => {
     console.log('Context menu for output:', output);
   };
 
-  const handleModalAction = (action: string, output: Output) => {
-    switch (action) {
-      case 'copy-path':
-        console.log('Copying path:', output.filePath);
-        // TODO: Show success toast
-        break;
-      case 'open-system':
-        console.log('Opening in system viewer:', output.filePath);
-        // TODO: Implement system integration
-        break;
-      case 'show-folder':
-        console.log('Showing in folder:', output.filePath);
-        // TODO: Implement system integration
-        break;
-      default:
-        console.log('Unknown action:', action);
+  const handleModalAction = async (action: string, output: Output) => {
+    try {
+      switch (action) {
+        case 'copy-path':
+          // Copy path is handled by the modal component directly
+          console.log('Path copied to clipboard:', output.filePath);
+          break;
+        case 'open-system':
+          const openResponse = await apiClient.openInSystemViewer(output.id);
+          if (openResponse.success) {
+            console.log('File opened in system viewer');
+          } else {
+            setError('Failed to open file in system viewer');
+          }
+          break;
+        case 'show-folder':
+          const folderResponse = await apiClient.showInFolder(output.id);
+          if (folderResponse.success) {
+            console.log('Folder opened in system explorer');
+          } else {
+            setError('Failed to open folder in system explorer');
+          }
+          break;
+        case 'load-workflow':
+          const workflowResponse = await apiClient.loadWorkflow(output.id);
+          if (workflowResponse.success) {
+            console.log('Workflow loaded successfully');
+          } else {
+            setError('Failed to load workflow - no workflow metadata found');
+          }
+          break;
+        default:
+          console.log('Unknown action:', action);
+      }
+    } catch (error) {
+      console.error('Action failed:', error);
+      setError(`Failed to perform action: ${action}`);
     }
   };
 

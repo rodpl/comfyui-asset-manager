@@ -61,6 +61,9 @@ class WebAPIAdapter:
         app.router.add_get('/asset_manager/outputs', self.get_outputs)
         app.router.add_get('/asset_manager/outputs/{output_id}', self.get_output_details)
         app.router.add_post('/asset_manager/outputs/refresh', self.refresh_outputs)
+        app.router.add_post('/asset_manager/outputs/{output_id}/load-workflow', self.load_workflow)
+        app.router.add_post('/asset_manager/outputs/{output_id}/open-system', self.open_system)
+        app.router.add_post('/asset_manager/outputs/{output_id}/show-folder', self.show_folder)
     
     async def get_folders(self, request: Request) -> Response:
         """Handle GET /asset_manager/folders endpoint.
@@ -398,6 +401,13 @@ class WebAPIAdapter:
         Returns:
             JSON response with list of outputs
         """
+        if self._output_management is None:
+            return web.json_response({
+                "success": False,
+                "error": "Output management service not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
         try:
             query_params = request.query
             
@@ -463,6 +473,13 @@ class WebAPIAdapter:
         Returns:
             JSON response with output details
         """
+        if self._output_management is None:
+            return web.json_response({
+                "success": False,
+                "error": "Output management service not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
         try:
             output_id = request.match_info['output_id']
             output = self._output_management.get_output_details(output_id)
@@ -492,6 +509,13 @@ class WebAPIAdapter:
         Returns:
             JSON response with refreshed list of outputs
         """
+        if self._output_management is None:
+            return web.json_response({
+                "success": False,
+                "error": "Output management service not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
         try:
             outputs = self._output_management.refresh_outputs()
             output_data = [output.to_dict() for output in outputs]
@@ -505,6 +529,135 @@ class WebAPIAdapter:
             
         except ValidationError as e:
             return self._handle_validation_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def load_workflow(self, request: Request) -> Response:
+        """Handle POST /asset_manager/outputs/{output_id}/load-workflow endpoint.
+        
+        Loads the workflow from the specified output back into ComfyUI.
+        
+        Args:
+            request: The HTTP request with output_id in path
+            
+        Returns:
+            JSON response indicating success or failure
+        """
+        if self._output_management is None:
+            return web.json_response({
+                "success": False,
+                "error": "Output management service not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            output_id = request.match_info['output_id']
+            success = self._output_management.load_workflow(output_id)
+            
+            if success:
+                return web.json_response({
+                    "success": True,
+                    "message": "Workflow loaded successfully"
+                })
+            else:
+                return web.json_response({
+                    "success": False,
+                    "error": "Failed to load workflow - no workflow metadata found",
+                    "error_type": "workflow_not_found"
+                }, status=404)
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except NotFoundError as e:
+            return self._handle_not_found_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def open_system(self, request: Request) -> Response:
+        """Handle POST /asset_manager/outputs/{output_id}/open-system endpoint.
+        
+        Opens the output file in the system's default image viewer.
+        
+        Args:
+            request: The HTTP request with output_id in path
+            
+        Returns:
+            JSON response indicating success or failure
+        """
+        if self._output_management is None:
+            return web.json_response({
+                "success": False,
+                "error": "Output management service not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            output_id = request.match_info['output_id']
+            success = self._output_management.open_in_system_viewer(output_id)
+            
+            if success:
+                return web.json_response({
+                    "success": True,
+                    "message": "File opened in system viewer"
+                })
+            else:
+                return web.json_response({
+                    "success": False,
+                    "error": "Failed to open file in system viewer",
+                    "error_type": "system_operation_failed"
+                }, status=500)
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except NotFoundError as e:
+            return self._handle_not_found_error(e)
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def show_folder(self, request: Request) -> Response:
+        """Handle POST /asset_manager/outputs/{output_id}/show-folder endpoint.
+        
+        Opens the containing folder of the output file in the system file explorer.
+        
+        Args:
+            request: The HTTP request with output_id in path
+            
+        Returns:
+            JSON response indicating success or failure
+        """
+        if self._output_management is None:
+            return web.json_response({
+                "success": False,
+                "error": "Output management service not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            output_id = request.match_info['output_id']
+            success = self._output_management.show_in_folder(output_id)
+            
+            if success:
+                return web.json_response({
+                    "success": True,
+                    "message": "Folder opened in system explorer"
+                })
+            else:
+                return web.json_response({
+                    "success": False,
+                    "error": "Failed to open folder in system explorer",
+                    "error_type": "system_operation_failed"
+                }, status=500)
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except NotFoundError as e:
+            return self._handle_not_found_error(e)
         except DomainError as e:
             return self._handle_domain_error(e)
         except Exception as e:

@@ -301,6 +301,17 @@ export class ApiClient {
   }
 
   /**
+   * POST request
+   */
+  private async post<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+      ...options,
+    });
+  }
+
+  /**
    * PUT request
    */
   private async put<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<T> {
@@ -427,6 +438,27 @@ export class ApiClient {
       method: 'POST',
       ...options,
     });
+  }
+
+  /**
+   * Load workflow from output back into ComfyUI
+   */
+  async loadWorkflow(outputId: string, options?: RequestOptions): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(`/outputs/${encodeURIComponent(outputId)}/load-workflow`, undefined, options);
+  }
+
+  /**
+   * Open output file in system viewer
+   */
+  async openInSystemViewer(outputId: string, options?: RequestOptions): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(`/outputs/${encodeURIComponent(outputId)}/open-system`, undefined, options);
+  }
+
+  /**
+   * Show output file in folder
+   */
+  async showInFolder(outputId: string, options?: RequestOptions): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(`/outputs/${encodeURIComponent(outputId)}/show-folder`, undefined, options);
   }
 
   /**

@@ -179,6 +179,10 @@ const OutputModal = ({
     onAction("show-folder", output);
   };
 
+  const handleLoadWorkflow = () => {
+    onAction("load-workflow", output);
+  };
+
   return (
     <div
       className="output-modal-backdrop"
@@ -394,6 +398,16 @@ const OutputModal = ({
             <div className="output-modal-section">
               <h4>Actions</h4>
               <div className="output-modal-actions">
+                {output.workflowMetadata && output.workflowMetadata.workflow && (
+                  <button
+                    className="action-button primary"
+                    onClick={handleLoadWorkflow}
+                    title="Load workflow back into ComfyUI"
+                  >
+                    <i className="pi pi-play"></i>
+                    Load Workflow
+                  </button>
+                )}
                 <button
                   className="action-button primary"
                   onClick={handleOpenSystem}
