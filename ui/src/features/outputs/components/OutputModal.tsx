@@ -36,7 +36,7 @@ const OutputModal = ({
       setPosition({ x: 0, y: 0 });
       setIsDragging(false);
     }
-  }, [output, output.id]);
+  }, [output]);
 
   // Find current output index for navigation
   const currentIndex = output
