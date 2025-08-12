@@ -343,14 +343,32 @@ const OutputModal = ({
               <div className="output-modal-section">
                 <h4>Workflow Metadata</h4>
                 <div className="output-modal-details">
-                  {output.workflowMetadata.prompt && (
-                    <div className="detail-row">
-                      <span className="detail-label">Prompt:</span>
-                      <span className="detail-value workflow-prompt">
-                        {output.workflowMetadata.prompt}
-                      </span>
-                    </div>
-                  )}
+                  {(() => {
+                    const wm: any = output.workflowMetadata as any;
+                    const rawPrompt = wm?.prompt;
+                    const positivePrompt = wm?.positive_prompt;
+                    // Prefer explicit positive_prompt if available
+                    let promptText: string | undefined;
+                    if (typeof positivePrompt === 'string') {
+                      promptText = positivePrompt;
+                    } else if (typeof rawPrompt === 'string') {
+                      promptText = rawPrompt;
+                    } else if (rawPrompt && typeof rawPrompt === 'object') {
+                      // Fallback: stringify minimal summary to avoid React rendering objects
+                      try {
+                        const json = JSON.stringify(rawPrompt);
+                        promptText = json.length > 1000 ? json.slice(0, 1000) + '…' : json;
+                      } catch {
+                        promptText = undefined;
+                      }
+                    }
+                    return promptText ? (
+                      <div className="detail-row">
+                        <span className="detail-label">Prompt:</span>
+                        <span className="detail-value workflow-prompt">{promptText}</span>
+                      </div>
+                    ) : null;
+                  })()}
                   {output.workflowMetadata.model && (
                     <div className="detail-row">
                       <span className="detail-label">Model:</span>
@@ -367,14 +385,12 @@ const OutputModal = ({
                       </span>
                     </div>
                   )}
-                  {output.workflowMetadata.cfg && (
+                  {(output.workflowMetadata as any).cfg !== undefined || (output.workflowMetadata as any).cfg_scale !== undefined ? (
                     <div className="detail-row">
                       <span className="detail-label">CFG Scale:</span>
-                      <span className="detail-value">
-                        {output.workflowMetadata.cfg}
-                      </span>
+                      <span className="detail-value">{((output.workflowMetadata as any).cfg ?? (output.workflowMetadata as any).cfg_scale) as any}</span>
                     </div>
-                  )}
+                  ) : null}
                   {output.workflowMetadata.sampler && (
                     <div className="detail-row">
                       <span className="detail-label">Sampler:</span>
