@@ -152,6 +152,10 @@ const OutputsTab = () => {
     setIsModalOpen(true);
   };
 
+  const handleModalNavigate = (output: Output) => {
+    setSelectedOutput(output);
+  };
+
   const handleContextMenu = (output: Output, event: React.MouseEvent) => {
     event.preventDefault();
     // TODO: Implement context menu functionality
@@ -286,6 +290,8 @@ return (
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onAction={handleModalAction}
+          outputs={sortedOutputs}
+          onNavigate={handleModalNavigate}
         />
       )}
     </div>
