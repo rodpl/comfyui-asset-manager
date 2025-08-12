@@ -8,20 +8,38 @@ import { Output, OutputResponse } from '../types';
  * Convert OutputResponse from API to Output for frontend use
  */
 export const convertOutputResponse = (response: OutputResponse): Output => {
+  // Accept both camelCase and snake_case, and prefer HTTP-friendly URLs when provided
+  const anyResp = response as unknown as Record<string, any>;
+
+  const filePath: string | undefined =
+    anyResp.filePath || anyResp.file_url || anyResp.fileUrl || anyResp.file_path;
+
+  const thumbnailPath: string | undefined =
+    anyResp.thumbnailPath || anyResp.thumbnail_url || anyResp.thumbnailUrl || anyResp.thumbnail_path;
+
+  const fileSizeRaw = anyResp.fileSize ?? anyResp.file_size;
+  const createdAtRaw = anyResp.createdAt ?? anyResp.created_at;
+  const modifiedAtRaw = anyResp.modifiedAt ?? anyResp.modified_at;
+  const imageWidthRaw = anyResp.imageWidth ?? anyResp.image_width;
+  const imageHeightRaw = anyResp.imageHeight ?? anyResp.image_height;
+  const fileFormatRaw = anyResp.fileFormat ?? anyResp.file_format;
+  const workflowMetadataRaw = anyResp.workflowMetadata ?? anyResp.workflow_metadata;
+
   return {
-    id: response.id,
-    filename: response.filename,
-    filePath: response.filePath,
-    fileSize: typeof (response as any).fileSize === 'number' && isFinite((response as any).fileSize)
-      ? (response as any).fileSize
-      : 0,
-    createdAt: new Date(response.createdAt),
-    modifiedAt: new Date(response.modifiedAt),
-    imageWidth: response.imageWidth,
-    imageHeight: response.imageHeight,
-    fileFormat: response.fileFormat,
-    thumbnailPath: response.thumbnailPath,
-    workflowMetadata: response.workflowMetadata || {}
+    id: anyResp.id,
+    filename: anyResp.filename,
+    filePath: filePath || '',
+    fileSize:
+      typeof fileSizeRaw === 'number' && isFinite(fileSizeRaw)
+        ? fileSizeRaw
+        : 0,
+    createdAt: new Date(createdAtRaw),
+    modifiedAt: new Date(modifiedAtRaw),
+    imageWidth: imageWidthRaw,
+    imageHeight: imageHeightRaw,
+    fileFormat: fileFormatRaw,
+    thumbnailPath: thumbnailPath || undefined,
+    workflowMetadata: (workflowMetadataRaw as Record<string, any>) || {},
   };
 };
 
