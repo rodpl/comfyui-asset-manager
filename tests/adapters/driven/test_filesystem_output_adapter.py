@@ -332,3 +332,197 @@ class TestFilesystemOutputAdapter:
         found_formats = {output.file_format for output in outputs}
         assert 'png' in found_formats
         assert 'jpeg' in found_formats
+    
+    @patch('subprocess.run')
+    def test_open_file_in_system_success(self, mock_subprocess, adapter, sample_image_path):
+        """Test successfully opening file in system viewer."""
+        mock_subprocess.return_value = None  # subprocess.run returns None on success
+        
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        result = adapter.open_file_in_system(output)
+        
+        assert result is True
+        mock_subprocess.assert_called_once()
+        
+        # Check that the correct command was called based on platform
+        call_args = mock_subprocess.call_args[0][0]
+        assert sample_image_path in str(call_args)
+    
+    @patch('subprocess.run')
+    def test_open_file_in_system_failure(self, mock_subprocess, adapter, sample_image_path):
+        """Test handling failure when opening file in system viewer."""
+        mock_subprocess.side_effect = Exception("Command failed")
+        
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        result = adapter.open_file_in_system(output)
+        
+        assert result is False
+    
+    def test_open_file_in_system_nonexistent_file(self, adapter):
+        """Test opening non-existent file in system viewer."""
+        fake_output = Output(
+            id="fake_id",
+            filename="nonexistent.png",
+            file_path="/path/to/nonexistent.png",
+            file_size=1000,
+            created_at=datetime.now(),
+            modified_at=datetime.now(),
+            image_width=512,
+            image_height=512,
+            file_format="png"
+        )
+        
+        result = adapter.open_file_in_system(fake_output)
+        assert result is False
+    
+    @patch('subprocess.run')
+    def test_show_file_in_folder_success(self, mock_subprocess, adapter, sample_image_path):
+        """Test successfully showing file in folder."""
+        mock_subprocess.return_value = None  # subprocess.run returns None on success
+        
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        result = adapter.show_file_in_folder(output)
+        
+        assert result is True
+        mock_subprocess.assert_called_once()
+        
+        # Check that the correct command was called
+        call_args = mock_subprocess.call_args[0][0]
+        # Should contain either the file path or its parent directory
+        assert sample_image_path in str(call_args) or str(Path(sample_image_path).parent) in str(call_args)
+    
+    @patch('subprocess.run')
+    def test_show_file_in_folder_failure(self, mock_subprocess, adapter, sample_image_path):
+        """Test handling failure when showing file in folder."""
+        mock_subprocess.side_effect = Exception("Command failed")
+        
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        result = adapter.show_file_in_folder(output)
+        
+        assert result is False
+    
+    def test_show_file_in_folder_nonexistent_file(self, adapter):
+        """Test showing non-existent file in folder."""
+        fake_output = Output(
+            id="fake_id",
+            filename="nonexistent.png",
+            file_path="/path/to/nonexistent.png",
+            file_size=1000,
+            created_at=datetime.now(),
+            modified_at=datetime.now(),
+            image_width=512,
+            image_height=512,
+            file_format="png"
+        )
+        
+        result = adapter.show_file_in_folder(fake_output)
+        assert result is False
+    
+    @patch('sys.platform', 'win32')
+    @patch('subprocess.run')
+    def test_open_file_in_system_windows(self, mock_subprocess, adapter, sample_image_path):
+        """Test opening file in system viewer on Windows."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        adapter.open_file_in_system(output)
+        
+        call_args = mock_subprocess.call_args[0][0]
+        assert call_args[0] == "start"
+        assert sample_image_path in str(call_args)
+    
+    @patch('sys.platform', 'darwin')
+    @patch('subprocess.run')
+    def test_open_file_in_system_macos(self, mock_subprocess, adapter, sample_image_path):
+        """Test opening file in system viewer on macOS."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        adapter.open_file_in_system(output)
+        
+        call_args = mock_subprocess.call_args[0][0]
+        assert call_args[0] == "open"
+        assert sample_image_path in str(call_args)
+    
+    @patch('sys.platform', 'linux')
+    @patch('subprocess.run')
+    def test_open_file_in_system_linux(self, mock_subprocess, adapter, sample_image_path):
+        """Test opening file in system viewer on Linux."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        adapter.open_file_in_system(output)
+        
+        call_args = mock_subprocess.call_args[0][0]
+        assert call_args[0] == "xdg-open"
+        assert sample_image_path in str(call_args)
+    
+    @patch('sys.platform', 'win32')
+    @patch('subprocess.run')
+    def test_show_file_in_folder_windows(self, mock_subprocess, adapter, sample_image_path):
+        """Test showing file in folder on Windows."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        adapter.show_file_in_folder(output)
+        
+        call_args = mock_subprocess.call_args[0][0]
+        assert call_args[0] == "explorer"
+        assert "/select," in call_args
+        assert sample_image_path in str(call_args)
+    
+    @patch('sys.platform', 'darwin')
+    @patch('subprocess.run')
+    def test_show_file_in_folder_macos(self, mock_subprocess, adapter, sample_image_path):
+        """Test showing file in folder on macOS."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        adapter.show_file_in_folder(output)
+        
+        call_args = mock_subprocess.call_args[0][0]
+        assert call_args[0] == "open"
+        assert "-R" in call_args
+        assert sample_image_path in str(call_args)
+    
+    @patch('sys.platform', 'linux')
+    @patch('subprocess.run')
+    def test_show_file_in_folder_linux(self, mock_subprocess, adapter, sample_image_path):
+        """Test showing file in folder on Linux."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        adapter.show_file_in_folder(output)
+        
+        call_args = mock_subprocess.call_args[0][0]
+        assert call_args[0] == "xdg-open"
+        # On Linux, we open the parent directory
+        assert str(Path(sample_image_path).parent) in str(call_args)
+    
+    def test_load_workflow_to_comfyui_with_metadata(self, adapter, sample_image_with_metadata):
+        """Test loading workflow when metadata is available."""
+        outputs = adapter.scan_output_directory()
+        output = next(o for o in outputs if o.filename == "test_with_metadata.png")
+        
+        result = adapter.load_workflow_to_comfyui(output)
+        
+        # Base implementation just checks if workflow metadata exists
+        assert result is True
+    
+    def test_load_workflow_to_comfyui_without_metadata(self, adapter, sample_image_path):
+        """Test loading workflow when no metadata is available."""
+        outputs = adapter.scan_output_directory()
+        output = outputs[0]
+        
+        result = adapter.load_workflow_to_comfyui(output)
+        
+        # Should return False when no workflow metadata exists
+        assert result is False

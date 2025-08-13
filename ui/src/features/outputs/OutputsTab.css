@@ -637,3 +637,75 @@
     padding: 6px 8px;
   }
 }
+/* 
+Context Menu Styles */
+.output-context-menu {
+  background-color: var(--cam-secondary-color);
+  border: 1px solid var(--cam-border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  padding: 4px 0;
+  outline: none;
+  user-select: none;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: var(--cam-text-color);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: default;
+}
+
+.context-menu-button {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.context-menu-button:hover,
+.context-menu-button:focus {
+  background-color: var(--cam-primary-color);
+  color: white;
+  outline: none;
+}
+
+.context-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--cam-muted-text-color);
+  pointer-events: none;
+}
+
+.context-menu-filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.context-menu-separator {
+  height: 1px;
+  background-color: var(--cam-border-color);
+  margin: 4px 0;
+}
+
+.context-menu-item i {
+  font-size: 0.9rem;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Ensure context menu appears above modals and other overlays */
+.output-context-menu {
+  z-index: 100001 !important;
+}
