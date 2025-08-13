@@ -173,6 +173,7 @@ const OutputModal = ({
   };
 
   const handleCopyPath = () => {
+    if (!output) return;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(output.filePath);
       onAction('copy-path', output);
@@ -180,10 +181,12 @@ const OutputModal = ({
   };
 
   const handleOpenSystem = () => {
+    if (!output) return;
     onAction('open-system', output);
   };
 
   const handleShowFolder = () => {
+    if (!output) return;
     onAction('show-folder', output);
   };
 
@@ -207,6 +210,154 @@ const OutputModal = ({
           message: response.message || 'Workflow loaded successfully into ComfyUI'
         });
         
+        // Attempt to also load the visual workflow into ComfyUI canvas (best-effort)
+        try {
+          const metadata: any = output.workflowMetadata as any;
+          const graphData = metadata?.workflow;
+          if (graphData && typeof window !== 'undefined') {
+            const w = window as any;
+            const candidates = [w.app, w.App, w.comfy?.app, w.comfyApp, w.COMFY?.app];
+            let applied = false;
+            for (const app of candidates) {
+              if (!app) continue;
+              if (typeof app.loadGraphData === 'function') {
+                app.loadGraphData(graphData, true);
+                applied = true;
+                break;
+              }
+              if (app.graph && typeof app.graph.configure === 'function') {
+                app.graph.configure(graphData);
+                if (app.graph.setDirty) {
+                  try { app.graph.setDirty(true, true); } catch {}
+                }
+                if (app.canvas && typeof app.canvas.draw === 'function') {
+                  try { app.canvas.draw(true, true); } catch {}
+                }
+                applied = true;
+                break;
+              }
+            }
+            if (!applied && w.LiteGraph && w.graph && typeof w.graph.configure === 'function') {
+              try {
+                w.graph.configure(graphData);
+                if (w.graph.setDirty) w.graph.setDirty(true, true);
+              } catch {}
+            }
+
+            // After graph is applied, attempt to overwrite node widgets from metadata
+            try {
+              const applyWidget = (node: any, names: string[], value: any) => {
+                if (value === undefined || value === null) return false;
+                let changed = false;
+                const lname = (s: string) => String(s || '').toLowerCase();
+                if (Array.isArray(node.widgets)) {
+                  for (const wgt of node.widgets) {
+                    if (names.map(lname).includes(lname(wgt.name))) {
+                      if (wgt.value !== value) {
+                        wgt.value = value;
+                        changed = true;
+                      }
+                    }
+                  }
+                }
+                if (Array.isArray(node.widgets_values) && node.widgets_values.length > 0) {
+                  // Heuristic: first widget often corresponds to primary value
+                  if (names.some(n => lname(n).includes('text')) && typeof value === 'string') {
+                    node.widgets_values[0] = value;
+                    changed = true;
+                  }
+                  if (names.some(n => ['seed','steps','cfg','cfg_scale','sampler','sampler_name','scheduler'].includes(lname(n)))) {
+                    // Soft sync by name index if present
+                  }
+                }
+                return changed;
+              };
+
+              const getApp = () => w.app || w.App || w.comfy?.app || w.comfyApp || w.COMFY?.app;
+              const app = getApp();
+              const graph = app?.graph || w.graph || app?.canvas?.graph;
+              if (graph && Array.isArray(graph._nodes || graph.nodes)) {
+                const nodes = (graph.findNodesByType ? (type: string) => graph.findNodesByType(type) : undefined);
+                const allNodes: any[] = (graph._nodes || graph.nodes) as any[];
+                const byId = (id: number) => allNodes?.find((n) => Number(n?.id) === Number(id));
+
+                // Overwrite CLIPTextEncode prompts
+                const positivePrompt: string | undefined = metadata?.positive_prompt;
+                const negativePrompt: string | undefined = metadata?.negative_prompt;
+
+                // Prefer authoritative mapping from metadata.prompt via KSampler inputs
+                const promptMap: any = metadata?.prompt && typeof metadata.prompt === 'object' ? metadata.prompt : undefined;
+                let posNodeId: number | undefined;
+                let negNodeId: number | undefined;
+                if (promptMap) {
+                  const samplerEntry = Object.entries(promptMap).find(([, v]: any) => v && (v.class_type === 'KSampler' || v.class_type === 'KSamplerAdvanced')) as any;
+                  if (samplerEntry) {
+                    const [, sampler] = samplerEntry;
+                    const p = sampler?.inputs?.positive?.[0];
+                    const n = sampler?.inputs?.negative?.[0];
+                    if (p !== undefined) posNodeId = Number(p);
+                    if (n !== undefined) negNodeId = Number(n);
+                  }
+                }
+
+                if (positivePrompt && posNodeId !== undefined) {
+                  const node = byId(posNodeId);
+                  if (node) applyWidget(node, ['text'], positivePrompt);
+                }
+                if (negativePrompt && negNodeId !== undefined) {
+                  const node = byId(negNodeId);
+                  if (node) applyWidget(node, ['text'], negativePrompt);
+                }
+
+                // Fallback heuristic if mapping unavailable: update by type
+                if ((positivePrompt || negativePrompt)) {
+                  let clipNodes: any[] = [];
+                  if (nodes) clipNodes = nodes('CLIPTextEncode') || [];
+                  else clipNodes = allNodes.filter((n: any) => (n?.type || '').toLowerCase() === 'cliptextencode');
+                  if (clipNodes.length) {
+                    if (positivePrompt && posNodeId === undefined) applyWidget(clipNodes[0], ['text'], positivePrompt);
+                    if (negativePrompt && clipNodes.length > 1 && negNodeId === undefined) applyWidget(clipNodes[1], ['text'], negativePrompt);
+                  }
+                }
+
+                // Overwrite KSampler parameters
+                const kDefaults = {
+                  seed: metadata?.seed,
+                  steps: metadata?.steps,
+                  cfg: (metadata?.cfg_scale ?? metadata?.cfg),
+                  sampler_name: metadata?.sampler,
+                  scheduler: metadata?.scheduler,
+                };
+                let ksamplerNodes: any[] = [];
+                if (nodes) ksamplerNodes = nodes('KSampler') || [];
+                else ksamplerNodes = allNodes.filter((n: any) => (n?.type || '').toLowerCase() === 'ksampler');
+                for (const ks of ksamplerNodes) {
+                  applyWidget(ks, ['seed'], kDefaults.seed);
+                  applyWidget(ks, ['steps'], kDefaults.steps);
+                  applyWidget(ks, ['cfg', 'cfg_scale'], kDefaults.cfg);
+                  applyWidget(ks, ['sampler', 'sampler_name'], kDefaults.sampler_name);
+                  applyWidget(ks, ['scheduler'], kDefaults.scheduler);
+                }
+
+                // Overwrite CheckpointLoaderSimple model
+                if (typeof metadata?.model === 'string' && metadata.model) {
+                  let ckptNodes: any[] = [];
+                  if (nodes) ckptNodes = nodes('CheckpointLoaderSimple') || [];
+                  else ckptNodes = allNodes.filter((n: any) => (n?.type || '').toLowerCase() === 'checkpointloadersimple');
+                  for (const c of ckptNodes) {
+                    applyWidget(c, ['ckpt_name', 'model', 'checkpoint'], metadata.model);
+                  }
+                }
+
+                try { if (graph.setDirty) graph.setDirty(true, true); } catch {}
+                try { if (app?.canvas?.draw) app.canvas.draw(true, true); } catch {}
+              }
+            } catch {}
+          }
+        } catch {
+          // Swallow UI injection errors; backend load already succeeded
+        }
+
         // Also call the parent action handler for any additional handling
         onAction('load-workflow', output);
       } else {
