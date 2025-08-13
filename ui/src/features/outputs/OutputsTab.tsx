@@ -57,7 +57,7 @@ const OutputsTab = () => {
             sortBy: sortField,
             ascending: ascending,
           },
-          requestOptions as any
+          requestOptions
         );
 
         const outputs = convertOutputResponseArray(response.data);
@@ -143,7 +143,7 @@ const OutputsTab = () => {
         ? { timeout: 10, retry: { maxRetries: 0, delay: 0, backoff: false } }
         : undefined;
 
-      const response = await apiClient.refreshOutputs(requestOptions as unknown);
+      const response = await apiClient.refreshOutputs(requestOptions);
       const outputs = convertOutputResponseArray(response.data);
       setOutputs(outputs);
     } catch (err) {
