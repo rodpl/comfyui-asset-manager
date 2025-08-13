@@ -19,7 +19,7 @@ test.describe('Outputs tab - resilient UI checks', () => {
     await outputs.expectGalleryStable();
   });
 
-  test('refresh does not remove already visible thumbnails', async ({ page }) => {
+  test('refresh preserves the same thumbnails (same filenames before and after)', async ({ page }) => {
     await page.goto('/');
     const app = new AppPageObject(page);
     await app.openAppFromSidebar();
@@ -30,19 +30,26 @@ test.describe('Outputs tab - resilient UI checks', () => {
     await outputs.expectGalleryStable();
 
     const beforeThumbs = await outputs.getThumbnailCount();
+    const beforeNames = await outputs.getFilenames();
     if (beforeThumbs === 0) {
       test.skip();
     }
 
     await outputs.refresh();
-    // TDD: podczas odświeżania miniatury nie powinny znikać (galeria nie powinna być odmontowana)
+    // During refresh the gallery remains mounted
     await expect(outputs.loading).toBeVisible();
-    // Dopuszczamy fallback ikonę, ale karty nie mogą spaść do zera
+    // Accept fallback icons, but cards must not drop to zero
     const afterCardsSoon = await outputs.getCardCount();
     expect(afterCardsSoon).toBeGreaterThan(0);
     await outputs.waitForLoadingEnd();
     const afterThumbs = await outputs.getThumbnailCount();
-    // Po zakończeniu ładowania miniatury powinny być znów widoczne przynajmniej częściowo
+    const afterNames = await outputs.getFilenames();
+    // After refresh, the same filenames should still be displayed (order-insensitive subset check)
+    const beforeSet = new Set(beforeNames);
+    const afterSet = new Set(afterNames);
+    for (const name of beforeSet) {
+      expect(afterSet.has(name)).toBeTruthy();
+    }
     expect(afterThumbs).toBeGreaterThan(0);
   });
 });

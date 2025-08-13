@@ -13,6 +13,7 @@ export class OutputsPageObject {
   readonly loading: Locator;
   readonly thumbnailImages: Locator;
   readonly outputCards: Locator;
+  readonly filenameNodes: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -27,6 +28,9 @@ export class OutputsPageObject {
     this.loading = page.locator('.outputs-loading');
     this.thumbnailImages = this.gallery.locator('img');
     this.outputCards = this.gallery.locator('.output-card, .output-list-item');
+    this.filenameNodes = this.gallery.locator(
+      '.output-card .output-card-filename, .output-list-item .output-list-filename'
+    );
   }
 
   async expectToolbarVisible(): Promise<void> {
@@ -78,6 +82,17 @@ export class OutputsPageObject {
 
   async getCardCount(): Promise<number> {
     return this.outputCards.count();
+  }
+
+  async getFilenames(): Promise<string[]> {
+    const count = await this.filenameNodes.count();
+    const names: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const txt = (await this.filenameNodes.nth(i).textContent()) || '';
+      const t = txt.trim();
+      if (t) names.push(t);
+    }
+    return names;
   }
 
   async waitForLoadingStart(timeoutMs: number = 2000): Promise<void> {
