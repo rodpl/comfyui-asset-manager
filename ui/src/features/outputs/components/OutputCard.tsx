@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatFileSize, formatDate } from '../utils/outputUtils';
 import '../OutputsTab.css';
 import { Output, ViewMode } from '../types';
@@ -18,6 +18,8 @@ const OutputCard = ({ output, viewMode, onClick, onContextMenu }: OutputCardProp
     }
   };
 
+  const [imageError, setImageError] = useState(false);
+
   if (viewMode === 'list') {
     return (
       <div
@@ -30,18 +32,13 @@ const OutputCard = ({ output, viewMode, onClick, onContextMenu }: OutputCardProp
         aria-label={`Output ${output.filename}`}
       >
         <div className="output-list-thumbnail">
-          {output.thumbnailPath ? (
+          {output.thumbnailPath && !imageError ? (
             <img
               src={output.thumbnailPath}
               alt={output.filename}
               style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
-              onError={(e) => {
-                // Fallback to icon if thumbnail fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.parentElement!.innerHTML =
-                  '<i class="pi pi-image" style="font-size: 1.2rem;"></i>';
-              }}
+              onLoad={() => { /* keep node stable */ }}
+              onError={() => setImageError(true)}
             />
           ) : (
             <i className="pi pi-image" style={{ fontSize: '1.2rem' }}></i>
@@ -85,18 +82,13 @@ const OutputCard = ({ output, viewMode, onClick, onContextMenu }: OutputCardProp
       aria-label={`Output ${output.filename}`}
     >
       <div className="output-card-image">
-        {output.thumbnailPath ? (
+        {output.thumbnailPath && !imageError ? (
           <img
             src={output.thumbnailPath}
             alt={output.filename}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={(e) => {
-              // Fallback to icon if thumbnail fails to load
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              target.parentElement!.innerHTML =
-                '<i class="pi pi-image" style="font-size: 2rem; opacity: 0.5;"></i>';
-            }}
+            onLoad={() => { /* keep node stable */ }}
+            onError={() => setImageError(true)}
           />
         ) : (
           <i className="pi pi-image" style={{ fontSize: '2rem', opacity: 0.5 }}></i>

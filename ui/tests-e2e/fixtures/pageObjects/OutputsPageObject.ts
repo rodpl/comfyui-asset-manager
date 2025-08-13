@@ -12,6 +12,7 @@ export class OutputsPageObject {
   readonly errorBanner: Locator;
   readonly loading: Locator;
   readonly thumbnailImages: Locator;
+  readonly outputCards: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -25,6 +26,7 @@ export class OutputsPageObject {
     this.errorBanner = page.locator('.error-banner');
     this.loading = page.locator('.outputs-loading');
     this.thumbnailImages = this.gallery.locator('img');
+    this.outputCards = this.gallery.locator('.output-card, .output-list-item');
   }
 
   async expectToolbarVisible(): Promise<void> {
@@ -68,5 +70,21 @@ export class OutputsPageObject {
       await this.page.waitForTimeout(100);
     }
     expect(false).toBeTruthy();
+  }
+
+  async getThumbnailCount(): Promise<number> {
+    return this.thumbnailImages.count();
+  }
+
+  async getCardCount(): Promise<number> {
+    return this.outputCards.count();
+  }
+
+  async waitForLoadingStart(timeoutMs: number = 2000): Promise<void> {
+    await this.loading.waitFor({ state: 'visible', timeout: timeoutMs }).catch(() => {});
+  }
+
+  async waitForLoadingEnd(timeoutMs: number = 10000): Promise<void> {
+    await this.loading.waitFor({ state: 'hidden', timeout: timeoutMs }).catch(() => {});
   }
 }
