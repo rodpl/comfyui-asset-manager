@@ -1,7 +1,7 @@
-import React, { useEffect, useCallback, useState, useRef } from "react";
-import { formatFileSize, formatDate } from "../utils/outputUtils";
-import "../OutputsTab.css";
-import { Output } from "../types";
+import React, { useEffect, useCallback, useState, useRef } from 'react';
+import { formatFileSize, formatDate } from '../utils/outputUtils';
+import '../OutputsTab.css';
+import { Output } from '../types';
 
 export interface OutputModalProps {
   output: Output | null;
@@ -39,9 +39,7 @@ const OutputModal = ({
   }, [output]);
 
   // Find current output index for navigation
-  const currentIndex = output
-    ? outputs.findIndex((o) => o.id === output.id)
-    : -1;
+  const currentIndex = output ? outputs.findIndex((o) => o.id === output.id) : -1;
   const canNavigatePrev = currentIndex > 0;
   const canNavigateNext = currentIndex < outputs.length - 1;
 
@@ -73,33 +71,26 @@ const OutputModal = ({
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onClose();
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.key === 'ArrowLeft') {
         event.preventDefault();
         navigateToPrevious();
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === 'ArrowRight') {
         event.preventDefault();
         navigateToNext();
-      } else if (event.key === "=" || event.key === "+") {
+      } else if (event.key === '=' || event.key === '+') {
         event.preventDefault();
         handleZoomIn();
-      } else if (event.key === "-") {
+      } else if (event.key === '-') {
         event.preventDefault();
         handleZoomOut();
-      } else if (event.key === "0") {
+      } else if (event.key === '0') {
         event.preventDefault();
         handleZoomReset();
       }
     },
-    [
-      onClose,
-      navigateToPrevious,
-      navigateToNext,
-      handleZoomIn,
-      handleZoomOut,
-      handleZoomReset,
-    ]
+    [onClose, navigateToPrevious, navigateToNext, handleZoomIn, handleZoomOut, handleZoomReset]
   );
 
   const handleWheel = useCallback((event: React.WheelEvent) => {
@@ -142,15 +133,15 @@ const OutputModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "unset";
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen, handleKeyDown]);
 
@@ -167,20 +158,20 @@ const OutputModal = ({
   const handleCopyPath = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(output.filePath);
-      onAction("copy-path", output);
+      onAction('copy-path', output);
     }
   };
 
   const handleOpenSystem = () => {
-    onAction("open-system", output);
+    onAction('open-system', output);
   };
 
   const handleShowFolder = () => {
-    onAction("show-folder", output);
+    onAction('show-folder', output);
   };
 
   const handleLoadWorkflow = () => {
-    onAction("load-workflow", output);
+    onAction('load-workflow', output);
   };
 
   return (
@@ -196,11 +187,7 @@ const OutputModal = ({
           <h3 id="output-modal-title" className="output-modal-title">
             {output.filename}
           </h3>
-          <button
-            className="output-modal-close"
-            onClick={onClose}
-            aria-label="Close modal"
-          >
+          <button className="output-modal-close" onClick={onClose} aria-label="Close modal">
             <i className="pi pi-times"></i>
           </button>
         </div>
@@ -215,8 +202,7 @@ const OutputModal = ({
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
             style={{
-              cursor:
-                scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
+              cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
             }}
           >
             {/* Navigation arrows */}
@@ -281,15 +267,15 @@ const OutputModal = ({
                 transform: `scale(${scale}) translate(${position.x / scale}px, ${
                   position.y / scale
                 }px)`,
-                transformOrigin: "center center",
-                transition: isDragging ? "none" : "transform 0.1s ease-out",
+                transformOrigin: 'center center',
+                transition: isDragging ? 'none' : 'transform 0.1s ease-out',
               }}
               onError={(e) => {
                 // Fallback if full image fails to load
                 const target = e.target as HTMLImageElement;
-                target.src = output.thumbnailPath || "";
+                target.src = output.thumbnailPath || '';
                 if (!output.thumbnailPath) {
-                  target.style.display = "none";
+                  target.style.display = 'none';
                   target.parentElement!.innerHTML = `
                     <div class="output-modal-image-error">
                       <i class="pi pi-exclamation-triangle" style="font-size: 3rem; opacity: 0.5;"></i>
@@ -314,27 +300,19 @@ const OutputModal = ({
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">File Size:</span>
-                  <span className="detail-value">
-                    {formatFileSize(output.fileSize)}
-                  </span>
+                  <span className="detail-value">{formatFileSize(output.fileSize)}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Format:</span>
-                  <span className="detail-value">
-                    {output.fileFormat.toUpperCase()}
-                  </span>
+                  <span className="detail-value">{output.fileFormat.toUpperCase()}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Created:</span>
-                  <span className="detail-value">
-                    {formatDate(output.createdAt)}
-                  </span>
+                  <span className="detail-value">{formatDate(output.createdAt)}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Modified:</span>
-                  <span className="detail-value">
-                    {formatDate(output.modifiedAt)}
-                  </span>
+                  <span className="detail-value">{formatDate(output.modifiedAt)}</span>
                 </div>
               </div>
             </div>
@@ -372,39 +350,37 @@ const OutputModal = ({
                   {output.workflowMetadata.model && (
                     <div className="detail-row">
                       <span className="detail-label">Model:</span>
-                      <span className="detail-value">
-                        {output.workflowMetadata.model}
-                      </span>
+                      <span className="detail-value">{output.workflowMetadata.model}</span>
                     </div>
                   )}
                   {output.workflowMetadata.steps && (
                     <div className="detail-row">
                       <span className="detail-label">Steps:</span>
-                      <span className="detail-value">
-                        {output.workflowMetadata.steps}
-                      </span>
+                      <span className="detail-value">{output.workflowMetadata.steps}</span>
                     </div>
                   )}
-                  {(output.workflowMetadata as any).cfg !== undefined || (output.workflowMetadata as any).cfg_scale !== undefined ? (
+                  {(output.workflowMetadata as any).cfg !== undefined ||
+                  (output.workflowMetadata as any).cfg_scale !== undefined ? (
                     <div className="detail-row">
                       <span className="detail-label">CFG Scale:</span>
-                      <span className="detail-value">{((output.workflowMetadata as any).cfg ?? (output.workflowMetadata as any).cfg_scale) as any}</span>
+                      <span className="detail-value">
+                        {
+                          ((output.workflowMetadata as any).cfg ??
+                            (output.workflowMetadata as any).cfg_scale) as any
+                        }
+                      </span>
                     </div>
                   ) : null}
                   {output.workflowMetadata.sampler && (
                     <div className="detail-row">
                       <span className="detail-label">Sampler:</span>
-                      <span className="detail-value">
-                        {output.workflowMetadata.sampler}
-                      </span>
+                      <span className="detail-value">{output.workflowMetadata.sampler}</span>
                     </div>
                   )}
                   {output.workflowMetadata.seed && (
                     <div className="detail-row">
                       <span className="detail-label">Seed:</span>
-                      <span className="detail-value">
-                        {output.workflowMetadata.seed}
-                      </span>
+                      <span className="detail-value">{output.workflowMetadata.seed}</span>
                     </div>
                   )}
                 </div>

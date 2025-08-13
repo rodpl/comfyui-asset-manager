@@ -18,6 +18,7 @@ A powerful ComfyUI extension that brings comprehensive asset management directly
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Development](#development)
+- [End-to-End Testing (Playwright)](#end-to-end-testing-playwright)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -162,6 +163,55 @@ pnpm run test
 pnpm run lint
 pnpm run format
 ```
+
+## End-to-End Testing (Playwright)
+
+These E2E tests target an already running ComfyUI at `http://localhost:8188` and do not start any local dev server. The tests use the PageObject pattern for pages (tabs) and ComponentObject pattern for reusable UI components.
+
+Prerequisites:
+
+- ComfyUI running locally at `http://localhost:8188` with the extension installed
+- Frontend built so ComfyUI can load the extension assets
+
+Build frontend:
+
+```bash
+cd ui
+pnpm install
+pnpm build
+```
+
+Install Playwright browsers:
+
+```bash
+pnpm --filter ./ui e2e:install
+```
+
+Run E2E tests (against the running ComfyUI instance):
+
+```bash
+PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e
+```
+
+Useful subsets:
+
+```bash
+# Only outputs suite
+PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e -g "Outputs tab"
+
+# Only local assets suite
+PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e -g "Local Assets"
+```
+
+Notes:
+
+- The HTML report is generated but not auto-opened. To open the last report:
+
+```bash
+pnpm --filter ./ui exec playwright show-report
+```
+
+- Global setup waits for the server at `PLAYWRIGHT_BASE_URL` to be reachable before tests start.
 
 ### Python Backend Testing
 

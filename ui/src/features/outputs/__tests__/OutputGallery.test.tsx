@@ -31,7 +31,12 @@ const mockOutputs: Output[] = [
 
 // Mock OutputCard component
 vi.mock('../components/OutputCard', () => ({
-  default: ({ output, onClick, onContextMenu, viewMode }: {
+  default: ({
+    output,
+    onClick,
+    onContextMenu,
+    viewMode,
+  }: {
     output: Output;
     onClick: () => void;
     onContextMenu: (event: React.MouseEvent) => void;
@@ -77,9 +82,9 @@ describe('OutputGallery', () => {
     render(<OutputGallery {...defaultProps} viewMode="list" />);
 
     expect(screen.getByRole('grid')).toHaveClass('outputs-gallery', 'outputs-list');
-    
+
     const cards = screen.getAllByTestId(/output-card-/);
-    cards.forEach(card => {
+    cards.forEach((card) => {
       expect(card).toHaveAttribute('data-view-mode', 'list');
     });
   });
@@ -88,9 +93,13 @@ describe('OutputGallery', () => {
     render(<OutputGallery {...defaultProps} outputs={[]} />);
 
     expect(screen.getByText('No Outputs Found')).toBeInTheDocument();
-    expect(screen.getByText('No generated images were found in your output directory.')).toBeInTheDocument();
-    expect(screen.getByText('Generate some images with ComfyUI to see them here!')).toBeInTheDocument();
-    
+    expect(
+      screen.getByText('No generated images were found in your output directory.')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Generate some images with ComfyUI to see them here!')
+    ).toBeInTheDocument();
+
     // Should show empty state icon
     const emptyStateIcon = document.querySelector('.pi-images');
     expect(emptyStateIcon).toBeInTheDocument();
@@ -120,7 +129,7 @@ describe('OutputGallery', () => {
   it('renders all provided outputs', () => {
     render(<OutputGallery {...defaultProps} />);
 
-    mockOutputs.forEach(output => {
+    mockOutputs.forEach((output) => {
       expect(screen.getByTestId(`output-card-${output.id}`)).toBeInTheDocument();
       expect(screen.getByText(output.filename)).toBeInTheDocument();
     });
@@ -131,8 +140,8 @@ describe('OutputGallery', () => {
 
     const cards = screen.getAllByTestId(/output-card-/);
     expect(cards).toHaveLength(mockOutputs.length);
-    
-    cards.forEach(card => {
+
+    cards.forEach((card) => {
       expect(card).toHaveAttribute('data-view-mode', 'list');
     });
   });
@@ -146,13 +155,13 @@ describe('OutputGallery', () => {
 
   it('applies correct CSS classes based on view mode', () => {
     const { rerender } = render(<OutputGallery {...defaultProps} viewMode="grid" />);
-    
+
     let gallery = screen.getByRole('grid');
     expect(gallery).toHaveClass('outputs-gallery', 'outputs-grid');
     expect(gallery).not.toHaveClass('outputs-list');
 
     rerender(<OutputGallery {...defaultProps} viewMode="list" />);
-    
+
     gallery = screen.getByRole('grid');
     expect(gallery).toHaveClass('outputs-gallery', 'outputs-list');
     expect(gallery).not.toHaveClass('outputs-grid');

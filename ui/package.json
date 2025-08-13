@@ -14,7 +14,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest --watch",
-    "test:ci": "vitest run --reporter=dot --silent"
+    "test:ci": "vitest run --reporter=dot --silent",
+    "e2e": "playwright test --config=playwright.config.ts",
+    "e2e:ui": "playwright test --ui --config=playwright.config.ts",
+    "e2e:install": "playwright install --with-deps chromium firefox webkit"
   },
   "dependencies": {
     "i18next": "^23.10.2",
@@ -35,6 +38,8 @@
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.6.0",
     "@vitest/ui": "^3.2.4",
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.9.0",
     "eslint": "^9.30.1",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",

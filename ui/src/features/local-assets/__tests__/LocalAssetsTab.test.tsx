@@ -70,14 +70,14 @@ describe('LocalAssetsTab Integration', () => {
   beforeEach(() => {
     user = userEvent.setup();
     vi.clearAllMocks();
-    
+
     // Mock fetch for tags API
     ((globalThis as any).fetch as any).mockResolvedValue({
       ok: true,
       json: async () => ({
         success: true,
-        data: ['character', 'style', 'anime', 'realistic']
-      })
+        data: ['character', 'style', 'anime', 'realistic'],
+      }),
     });
   });
 

@@ -26,7 +26,8 @@ const OutputsTab = () => {
 
       // Consume one-off setTimeout mock in tests to prevent unhandled errors from the test harness
       try {
-        const isTest = typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
+        const isTest =
+          typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
         if (isTest && typeof globalThis.setTimeout === 'function') {
           // The test "handles error state" throws on first setTimeout call
           // Call inside try/catch to swallow that injected error
@@ -40,7 +41,8 @@ const OutputsTab = () => {
         // Convert sortBy to API format
         const [sortField, sortOrder] = sortBy.split('-');
         const ascending = sortOrder === 'asc';
-        const isTest = typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
+        const isTest =
+          typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
         const requestOptions = isTest
           ? { timeout: 10, retry: { maxRetries: 0, delay: 0, backoff: false } }
           : undefined;
@@ -52,7 +54,7 @@ const OutputsTab = () => {
           },
           requestOptions as any
         );
-        
+
         const outputs = convertOutputResponseArray(response.data);
         setOutputs(outputs);
       } catch (err) {
@@ -126,7 +128,8 @@ const OutputsTab = () => {
     setError(null);
 
     try {
-      const isTest = typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
+      const isTest =
+        typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
       const requestOptions = isTest
         ? { timeout: 10, retry: { maxRetries: 0, delay: 0, backoff: false } }
         : undefined;
@@ -202,7 +205,7 @@ const OutputsTab = () => {
     }
   };
 
-return (
+  return (
     <div className="tab-panel" role="tabpanel" aria-labelledby="outputs-tab">
       <div className="tab-panel-header">
         <h3 id="outputs-tab">{t('tabs.outputs')}</h3>

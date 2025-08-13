@@ -15,7 +15,10 @@ export const convertOutputResponse = (response: OutputResponse): Output => {
     anyResp.filePath || anyResp.file_url || anyResp.fileUrl || anyResp.file_path;
 
   const thumbnailPath: string | undefined =
-    anyResp.thumbnailPath || anyResp.thumbnail_url || anyResp.thumbnailUrl || anyResp.thumbnail_path;
+    anyResp.thumbnailPath ||
+    anyResp.thumbnail_url ||
+    anyResp.thumbnailUrl ||
+    anyResp.thumbnail_path;
 
   const fileSizeRaw = anyResp.fileSize ?? anyResp.file_size;
   const createdAtRaw = anyResp.createdAt ?? anyResp.created_at;
@@ -29,10 +32,7 @@ export const convertOutputResponse = (response: OutputResponse): Output => {
     id: anyResp.id,
     filename: anyResp.filename,
     filePath: filePath || '',
-    fileSize:
-      typeof fileSizeRaw === 'number' && isFinite(fileSizeRaw)
-        ? fileSizeRaw
-        : 0,
+    fileSize: typeof fileSizeRaw === 'number' && isFinite(fileSizeRaw) ? fileSizeRaw : 0,
     createdAt: new Date(createdAtRaw),
     modifiedAt: new Date(modifiedAtRaw),
     imageWidth: imageWidthRaw,

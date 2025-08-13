@@ -23,7 +23,11 @@ vi.mock('../../services/api', () => ({
     stopHealthCheck: vi.fn(),
   },
   ApiClientError: class extends Error {
-    constructor(message: string, public status?: number, public code?: string) {
+    constructor(
+      message: string,
+      public status?: number,
+      public code?: string
+    ) {
       super(message);
       this.name = 'ApiClientError';
     }
@@ -54,7 +58,7 @@ const TestComponent: React.FC = () => {
       <div data-testid="selected-folder">{state.selectedFolder || 'none'}</div>
       <div data-testid="search-query">{state.searchQuery}</div>
       <div data-testid="online-status">{state.isOnline.toString()}</div>
-      
+
       <button onClick={loadFolders} data-testid="load-folders">
         Load Folders
       </button>
@@ -178,7 +182,9 @@ describe('AssetManagerContext', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('error-folders')).toHaveTextContent('Cannot load folders while offline');
+        expect(screen.getByTestId('error-folders')).toHaveTextContent(
+          'Cannot load folders while offline'
+        );
       });
 
       expect(mockApiClient.getFolders).not.toHaveBeenCalled();
@@ -401,9 +407,9 @@ describe('AssetManagerContext', () => {
       // Access batchOperations through a test component
       const TestBatchComponent: React.FC = () => {
         const { batchOperations } = useAssetManager();
-        
+
         React.useEffect(() => {
-          batchOperations(operations, 2).then(results => {
+          batchOperations(operations, 2).then((results) => {
             expect(results).toEqual(['result1', 'result2', 'result3', 'result4']);
           });
         }, [batchOperations]);
@@ -429,9 +435,9 @@ describe('AssetManagerContext', () => {
 
       const TestBatchComponent: React.FC = () => {
         const { batchOperations } = useAssetManager();
-        
+
         React.useEffect(() => {
-          batchOperations(operations, 2).then(results => {
+          batchOperations(operations, 2).then((results) => {
             // Should only include successful results
             expect(results).toEqual(['success', 'success2']);
           });
@@ -482,7 +488,9 @@ describe('AssetManagerContext', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByTestId('error-folders')).toHaveTextContent('Cannot load folders while offline');
+        expect(screen.getByTestId('error-folders')).toHaveTextContent(
+          'Cannot load folders while offline'
+        );
       });
 
       // Come back online (should auto-retry)

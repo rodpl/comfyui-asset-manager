@@ -419,46 +419,75 @@ export class ApiClient {
 
     const queryString = params.toString();
     const endpoint = queryString ? `/outputs?${queryString}` : '/outputs';
-    
+
     return this.get<{ data: OutputResponse[]; count: number; filters: any }>(endpoint, options);
   }
 
   /**
    * Get detailed information about a specific output
    */
-  async getOutputDetails(outputId: string, options?: RequestOptions): Promise<{ data: OutputResponse }> {
+  async getOutputDetails(
+    outputId: string,
+    options?: RequestOptions
+  ): Promise<{ data: OutputResponse }> {
     return this.get<{ data: OutputResponse }>(`/outputs/${encodeURIComponent(outputId)}`, options);
   }
 
   /**
    * Refresh outputs by rescanning the output directory
    */
-  async refreshOutputs(options?: RequestOptions): Promise<{ data: OutputResponse[]; count: number; message: string }> {
-    return this.request<{ data: OutputResponse[]; count: number; message: string }>('/outputs/refresh', {
-      method: 'POST',
-      ...options,
-    });
+  async refreshOutputs(
+    options?: RequestOptions
+  ): Promise<{ data: OutputResponse[]; count: number; message: string }> {
+    return this.request<{ data: OutputResponse[]; count: number; message: string }>(
+      '/outputs/refresh',
+      {
+        method: 'POST',
+        ...options,
+      }
+    );
   }
 
   /**
    * Load workflow from output back into ComfyUI
    */
-  async loadWorkflow(outputId: string, options?: RequestOptions): Promise<{ success: boolean; message: string }> {
-    return this.post<{ success: boolean; message: string }>(`/outputs/${encodeURIComponent(outputId)}/load-workflow`, undefined, options);
+  async loadWorkflow(
+    outputId: string,
+    options?: RequestOptions
+  ): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(
+      `/outputs/${encodeURIComponent(outputId)}/load-workflow`,
+      undefined,
+      options
+    );
   }
 
   /**
    * Open output file in system viewer
    */
-  async openInSystemViewer(outputId: string, options?: RequestOptions): Promise<{ success: boolean; message: string }> {
-    return this.post<{ success: boolean; message: string }>(`/outputs/${encodeURIComponent(outputId)}/open-system`, undefined, options);
+  async openInSystemViewer(
+    outputId: string,
+    options?: RequestOptions
+  ): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(
+      `/outputs/${encodeURIComponent(outputId)}/open-system`,
+      undefined,
+      options
+    );
   }
 
   /**
    * Show output file in folder
    */
-  async showInFolder(outputId: string, options?: RequestOptions): Promise<{ success: boolean; message: string }> {
-    return this.post<{ success: boolean; message: string }>(`/outputs/${encodeURIComponent(outputId)}/show-folder`, undefined, options);
+  async showInFolder(
+    outputId: string,
+    options?: RequestOptions
+  ): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(
+      `/outputs/${encodeURIComponent(outputId)}/show-folder`,
+      undefined,
+      options
+    );
   }
 
   /**

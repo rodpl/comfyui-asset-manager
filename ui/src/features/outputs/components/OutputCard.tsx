@@ -10,12 +10,7 @@ export interface OutputCardProps {
   onContextMenu: (event: React.MouseEvent) => void;
 }
 
-const OutputCard = ({
-  output,
-  viewMode,
-  onClick,
-  onContextMenu
-}: OutputCardProps) => {
+const OutputCard = ({ output, viewMode, onClick, onContextMenu }: OutputCardProps) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -44,7 +39,8 @@ const OutputCard = ({
                 // Fallback to icon if thumbnail fails to load
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
-                target.parentElement!.innerHTML = '<i class="pi pi-image" style="font-size: 1.2rem;"></i>';
+                target.parentElement!.innerHTML =
+                  '<i class="pi pi-image" style="font-size: 1.2rem;"></i>';
               }}
             />
           ) : (
@@ -56,7 +52,8 @@ const OutputCard = ({
             {output.filename}
           </div>
           <div className="output-list-meta">
-            {formatDate(output.createdAt)} • {output.imageWidth}×{output.imageHeight} • {formatFileSize(output.fileSize)}
+            {formatDate(output.createdAt)} • {output.imageWidth}×{output.imageHeight} •{' '}
+            {formatFileSize(output.fileSize)}
           </div>
         </div>
         <div className="output-list-actions">
@@ -97,7 +94,8 @@ const OutputCard = ({
               // Fallback to icon if thumbnail fails to load
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
-              target.parentElement!.innerHTML = '<i class="pi pi-image" style="font-size: 2rem; opacity: 0.5;"></i>';
+              target.parentElement!.innerHTML =
+                '<i class="pi pi-image" style="font-size: 2rem; opacity: 0.5;"></i>';
             }}
           />
         ) : (
@@ -133,12 +131,8 @@ const OutputCard = ({
           {output.filename}
         </div>
         <div className="output-card-meta">
-          <span className="output-card-date">
-            {formatDate(output.createdAt)}
-          </span>
-          <span className="output-card-size">
-            {formatFileSize(output.fileSize)}
-          </span>
+          <span className="output-card-date">{formatDate(output.createdAt)}</span>
+          <span className="output-card-size">{formatFileSize(output.fileSize)}</span>
         </div>
         <div className="output-card-dimensions">
           {output.imageWidth}×{output.imageHeight}
