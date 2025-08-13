@@ -1,5 +1,7 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { formatFileSize, formatDate } from '../utils/outputUtils';
+import { apiClient } from '../../../services/api';
+import ConfirmationDialog from './ConfirmationDialog';
 import '../OutputsTab.css';
 import { Output } from '../types';
 
@@ -29,12 +31,23 @@ const OutputModal = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Workflow loading state
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isLoadingWorkflow, setIsLoadingWorkflow] = useState(false);
+  const [workflowFeedback, setWorkflowFeedback] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
   // Reset zoom and pan when output changes
   useEffect(() => {
     if (output) {
       setScale(1);
       setPosition({ x: 0, y: 0 });
       setIsDragging(false);
+      setWorkflowFeedback(null);
+      setShowConfirmDialog(false);
+      setIsLoadingWorkflow(false);
     }
   }, [output]);
 
@@ -171,8 +184,54 @@ const OutputModal = ({
   };
 
   const handleLoadWorkflow = () => {
-    onAction('load-workflow', output);
+    setShowConfirmDialog(true);
   };
+
+  const handleConfirmLoadWorkflow = async () => {
+    if (!output) return;
+
+    setShowConfirmDialog(false);
+    setIsLoadingWorkflow(true);
+    setWorkflowFeedback(null);
+
+    try {
+      const response = await apiClient.loadWorkflow(output.id);
+      
+      if (response.success) {
+        setWorkflowFeedback({
+          type: 'success',
+          message: response.message || 'Workflow loaded successfully into ComfyUI'
+        });
+        
+        // Also call the parent action handler for any additional handling
+        onAction('load-workflow', output);
+      } else {
+        throw new Error(response.message || 'Failed to load workflow');
+      }
+    } catch (error) {
+      console.error('Failed to load workflow:', error);
+      setWorkflowFeedback({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to load workflow. Please try again.'
+      });
+    } finally {
+      setIsLoadingWorkflow(false);
+    }
+  };
+
+  const handleCancelLoadWorkflow = () => {
+    setShowConfirmDialog(false);
+  };
+
+  // Clear feedback after 5 seconds
+  useEffect(() => {
+    if (workflowFeedback) {
+      const timer = setTimeout(() => {
+        setWorkflowFeedback(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [workflowFeedback]);
 
   return (
     <div
@@ -366,7 +425,7 @@ const OutputModal = ({
                       <span className="detail-value">
                         {
                           ((output.workflowMetadata as any).cfg ??
-                            (output.workflowMetadata as any).cfg_scale) as any
+                            (output.workflowMetadata as any).cfg_scale) as unknown
                         }
                       </span>
                     </div>
@@ -391,14 +450,25 @@ const OutputModal = ({
               <h4>Actions</h4>
               <div className="output-modal-actions">
                 {output.workflowMetadata && output.workflowMetadata.workflow && (
-                  <button
-                    className="action-button primary"
-                    onClick={handleLoadWorkflow}
-                    title="Load workflow back into ComfyUI"
-                  >
-                    <i className="pi pi-play"></i>
-                    Load Workflow
-                  </button>
+                  <div>
+                    <button
+                      className={`action-button primary workflow-loading-button ${
+                        isLoadingWorkflow ? 'loading' : ''
+                      }`}
+                      onClick={handleLoadWorkflow}
+                      disabled={isLoadingWorkflow}
+                      title="Load workflow back into ComfyUI"
+                    >
+                      <i className={`pi ${isLoadingWorkflow ? 'pi-spin pi-spinner' : 'pi-play'}`}></i>
+                      {isLoadingWorkflow ? 'Loading...' : 'Load Workflow'}
+                    </button>
+                    {workflowFeedback && (
+                      <div className={`workflow-action-feedback ${workflowFeedback.type}`}>
+                        <i className={`pi ${workflowFeedback.type === 'success' ? 'pi-check' : 'pi-exclamation-triangle'}`}></i>
+                        {workflowFeedback.message}
+                      </div>
+                    )}
+                  </div>
                 )}
                 <button
                   className="action-button primary"
@@ -429,6 +499,18 @@ const OutputModal = ({
           </div>
         </div>
       </div>
+
+      {/* Workflow Loading Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showConfirmDialog}
+        title="Load Workflow"
+        message={`Are you sure you want to load the workflow from "${output?.filename}" into ComfyUI? This will replace your current workflow.`}
+        confirmText="Load Workflow"
+        cancelText="Cancel"
+        onConfirm={handleConfirmLoadWorkflow}
+        onCancel={handleCancelLoadWorkflow}
+        type="warning"
+      />
     </div>
   );
 };

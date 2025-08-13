@@ -708,4 +708,175 @@ Context Menu Styles */
 /* Ensure context menu appears above modals and other overlays */
 .output-context-menu {
   z-index: 100001 !important;
+}/* Co
+nfirmation Dialog Styles */
+.confirmation-dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.confirmation-dialog-container {
+  background-color: var(--cam-secondary-color);
+  border: 1px solid var(--cam-border-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: confirmationDialogSlideIn 0.2s ease-out;
+}
+
+@keyframes confirmationDialogSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.confirmation-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--cam-border-color);
+}
+
+.confirmation-dialog-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-dialog-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cam-text-color);
+}
+
+.confirmation-dialog-content {
+  padding: 20px 24px;
+}
+
+.confirmation-dialog-message {
+  margin: 0;
+  color: var(--cam-text-color);
+  line-height: 1.5;
+}
+
+.confirmation-dialog-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px 20px;
+  justify-content: flex-end;
+}
+
+.confirmation-dialog-button {
+  padding: 8px 16px;
+  border: 1px solid var(--cam-border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.confirmation-dialog-cancel {
+  background-color: transparent;
+  color: var(--cam-muted-text-color);
+}
+
+.confirmation-dialog-cancel:hover {
+  background-color: var(--cam-hover-color);
+  color: var(--cam-text-color);
+}
+
+.confirmation-dialog-confirm {
+  background-color: var(--cam-primary-color);
+  color: white;
+  border-color: var(--cam-primary-color);
+}
+
+.confirmation-dialog-confirm:hover {
+  background-color: var(--cam-primary-hover-color);
+  border-color: var(--cam-primary-hover-color);
+}
+
+/* Workflow Loading States */
+.workflow-loading-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.workflow-loading-button.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.workflow-loading-button.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: workflowLoadingShimmer 1.5s infinite;
+}
+
+@keyframes workflowLoadingShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Error and Success States */
+.workflow-action-feedback {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workflow-action-feedback.success {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.workflow-action-feedback.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.workflow-action-feedback i {
+  font-size: 1rem;
 }
