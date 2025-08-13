@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { OutputModal } from '../components';
+import { resetBodyScrollLock } from '../../../utils/bodyScrollLock';
 import { Output } from '../types';
 
 // Mock the mockData module
@@ -68,11 +69,10 @@ describe('OutputModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock body style to test overflow changes
-    Object.defineProperty(document.body.style, 'overflow', {
-      writable: true,
-      value: 'unset',
-    });
+    // Reset body overflow before each test
+    document.body.style.overflow = 'unset';
+    // Reset body scroll lock internal counter
+    resetBodyScrollLock();
 
     // Mock clipboard API
     Object.assign(navigator, {
@@ -294,27 +294,27 @@ describe('OutputModal', () => {
     it('sets body overflow to hidden when modal opens', () => {
       render(<OutputModal {...defaultProps} />);
 
-      expect(document.body.style.overflow).toBe('hidden');
+      return waitFor(() => expect(document.body.style.overflow).toBe('hidden'));
     });
 
     it('resets body overflow when modal closes', () => {
       const { rerender } = render(<OutputModal {...defaultProps} />);
 
-      expect(document.body.style.overflow).toBe('hidden');
+      return waitFor(() => expect(document.body.style.overflow).toBe('hidden')).then(() => {
+        rerender(<OutputModal {...defaultProps} isOpen={false} />);
 
-      rerender(<OutputModal {...defaultProps} isOpen={false} />);
-
-      expect(document.body.style.overflow).toBe('unset');
+        return waitFor(() => expect(document.body.style.overflow).toBe('unset'));
+      });
     });
 
     it('resets body overflow on unmount', () => {
       const { unmount } = render(<OutputModal {...defaultProps} />);
 
-      expect(document.body.style.overflow).toBe('hidden');
+      return waitFor(() => expect(document.body.style.overflow).toBe('hidden')).then(() => {
+        unmount();
 
-      unmount();
-
-      expect(document.body.style.overflow).toBe('unset');
+        expect(document.body.style.overflow).toBe('unset');
+      });
     });
   });
 

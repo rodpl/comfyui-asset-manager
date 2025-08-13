@@ -1,9 +1,10 @@
-import React from 'react';
+// React import removed to align with new JSX runtime
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import OutputModal from '../OutputModal';
 import { apiClient } from '../../../../services/api';
 import { Output } from '../../types';
+import { resetBodyScrollLock } from '../../../../utils/bodyScrollLock';
 
 // Mock the API client
 vi.mock('../../../../services/api', () => ({
@@ -58,6 +59,7 @@ describe('OutputModal - Workflow Loading', () => {
     vi.clearAllMocks();
     // Reset DOM
     document.body.innerHTML = '';
+    resetBodyScrollLock();
   });
 
   afterEach(() => {

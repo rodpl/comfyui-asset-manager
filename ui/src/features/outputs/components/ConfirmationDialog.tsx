@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '../../../utils/bodyScrollLock';
 
 export interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -32,14 +33,15 @@ const ConfirmationDialog = ({
 
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      lockBodyScroll();
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+        unlockBodyScroll();
+      };
     }
-
+    // If not open, do not alter body scroll lock (parent may control it)
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
     };
   }, [isOpen, onConfirm, onCancel]);
 

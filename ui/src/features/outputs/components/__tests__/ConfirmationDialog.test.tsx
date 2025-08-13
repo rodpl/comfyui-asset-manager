@@ -1,7 +1,8 @@
-import React from 'react';
+// React import removed to align with new JSX runtime when not needed
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import ConfirmationDialog from '../ConfirmationDialog';
+import { resetBodyScrollLock } from '../../../../utils/bodyScrollLock';
 
 describe('ConfirmationDialog', () => {
   const defaultProps = {
@@ -14,6 +15,7 @@ describe('ConfirmationDialog', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    resetBodyScrollLock();
   });
 
   it('renders when open', () => {

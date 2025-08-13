@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react';
+import React, { useLayoutEffect, useCallback, useState, useRef } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '../../../utils/bodyScrollLock';
 import { formatFileSize, formatDate } from '../utils/outputUtils';
 import { apiClient } from '../../../services/api';
 import ConfirmationDialog from './ConfirmationDialog';
@@ -30,7 +31,18 @@ const OutputModal = ({
   const [lastPanPosition, setLastPanPosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  // Manage body overflow using layout effect for immediate synchronization
+  useLayoutEffect(() => {
+    if (isOpen && !!output) {
+      lockBodyScroll();
+    } else {
+      unlockBodyScroll();
+    }
+    return () => {
+      unlockBodyScroll();
+    };
+  }, [isOpen, output]);
+  
   // Workflow loading state
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isLoadingWorkflow, setIsLoadingWorkflow] = useState(false);
@@ -40,7 +52,7 @@ const OutputModal = ({
   } | null>(null);
 
   // Reset zoom and pan when output changes
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (output) {
       setScale(1);
       setPosition({ x: 0, y: 0 });
@@ -144,23 +156,15 @@ const OutputModal = ({
     setIsDragging(false);
   }, []);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
+  useLayoutEffect(() => {
+    // Attach keydown handler while mounted
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, handleKeyDown]);
+  }, [handleKeyDown]);
 
-  if (!isOpen || !output) {
-    return null;
-  }
+  // Note: Do not early return before hooks; render null conditionally at the end
 
   const handleBackdropClick = (event: React.MouseEvent) => {
     if (event.target === event.currentTarget) {
@@ -224,7 +228,7 @@ const OutputModal = ({
   };
 
   // Clear feedback after 5 seconds
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (workflowFeedback) {
       const timer = setTimeout(() => {
         setWorkflowFeedback(null);
@@ -233,7 +237,7 @@ const OutputModal = ({
     }
   }, [workflowFeedback]);
 
-  return (
+  return (!isOpen || !output) ? null : (
     <div
       className="output-modal-backdrop"
       onClick={handleBackdropClick}
@@ -424,8 +428,7 @@ const OutputModal = ({
                       <span className="detail-label">CFG Scale:</span>
                       <span className="detail-value">
                         {
-                          ((output.workflowMetadata as any).cfg ??
-                            (output.workflowMetadata as any).cfg_scale) as unknown
+                          (output.workflowMetadata as any).cfg ?? (output.workflowMetadata as any).cfg_scale
                         }
                       </span>
                     </div>
