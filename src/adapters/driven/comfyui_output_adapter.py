@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import datetime
@@ -309,30 +310,54 @@ class ComfyUIOutputAdapter(FilesystemOutputAdapter):
             output: The output to get workflow for
             
         Returns:
-            Workflow data ready for ComfyUI loading, or None if not available
+            Workflow data (ComfyUI "prompt" format) ready for loading, or None if not available
         """
         metadata = self.extract_workflow_metadata(output)
-        if not metadata or 'workflow' not in metadata:
+        if not metadata:
             return None
-        
+
+        # 1) Prefer explicit prompt data (already in the format expected by /prompt)
         try:
-            workflow_data = metadata['workflow']
-            
-            # Validate that the workflow data is in the correct format
-            if isinstance(workflow_data, dict):
-                # Basic validation - check if it has the expected structure
-                has_nodes = any(
-                    isinstance(v, dict) and 'class_type' in v 
-                    for v in workflow_data.values()
-                )
-                
-                if has_nodes:
-                    return workflow_data
-        
+            prompt_data = metadata.get('prompt')
+            # Some sources may store JSON as string
+            if isinstance(prompt_data, str):
+                try:
+                    prompt_data = json.loads(prompt_data)
+                except Exception:
+                    prompt_data = None
+            if isinstance(prompt_data, dict) and self._is_valid_prompt(prompt_data):
+                return prompt_data
+        except Exception:
+            # Fallback to other strategies below
+            pass
+
+        # 2) Fallback: some images store a mapping-like "workflow" already in prompt shape
+        try:
+            workflow_like = metadata.get('workflow')
+            if isinstance(workflow_like, dict) and self._is_valid_prompt(workflow_like):
+                return workflow_like
         except Exception:
             pass
-        
+
+        # 3) Optional: conversion from LiteGraph-style workflow (nodes/links) could be attempted here.
+        # For now, if we cannot obtain a valid prompt-shaped dict, return None to allow upstream fallbacks.
         return None
+
+    def _is_valid_prompt(self, data: Dict[str, Any]) -> bool:
+        """Validate that the provided data matches ComfyUI prompt shape.
+
+        A minimal validation: it must be a non-empty dict and contain at least
+        one node value that is a dict with a 'class_type' field.
+        """
+        try:
+            if not isinstance(data, dict) or not data:
+                return False
+            for node in data.values():
+                if isinstance(node, dict) and 'class_type' in node:
+                    return True
+            return False
+        except Exception:
+            return False
     
     def load_workflow_to_comfyui(self, output: Output) -> bool:
         """Load the workflow from the output back into ComfyUI.
