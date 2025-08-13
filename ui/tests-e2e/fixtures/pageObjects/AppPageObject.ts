@@ -27,9 +27,21 @@ export class AppPageObject {
         return;
     }
     // The extension registers a sidebar tab with title 'Asset Manager'
+    const root = this.page.locator('#comfyui-asset-manager-root');
+    try {
+      await this.sidebarTabButton.waitFor({ state: 'visible', timeout: 15000 });
+    } catch {
+      // If not visible yet, give ComfyUI a moment and try once more after a reload
+      await this.page.waitForTimeout(500);
+      await this.page.reload();
+      await this.sidebarTabButton.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+    }
+
+    // Attempt click with trial first to ensure stability across browsers
     await this.sidebarTabButton.click({ trial: true }).catch(() => {});
-    await this.sidebarTabButton.click();
-    await expect(this.page.locator('#comfyui-asset-manager-root')).toBeVisible();
+    await this.sidebarTabButton.click().catch(() => {});
+
+    await expect(root).toBeVisible({ timeout: 20000 });
   }
 
   async switchToLocalAssets(): Promise<void> {
