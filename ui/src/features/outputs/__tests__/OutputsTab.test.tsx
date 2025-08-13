@@ -48,6 +48,57 @@ vi.mock('../components', () => ({
         <button onClick={onClose}>Close</button>
       </div>
     ) : null,
+  OutputToolbar: ({
+    viewMode,
+    onViewModeChange,
+    sortBy,
+    onSortChange,
+    onRefresh,
+    loading,
+  }: {
+    viewMode: string;
+    onViewModeChange: (mode: string) => void;
+    sortBy: string;
+    onSortChange: (sortBy: string) => void;
+    onRefresh: () => void;
+    loading?: boolean;
+  }) => (
+    <div data-testid="output-toolbar">
+      <button
+        data-testid="grid-view-button"
+        className={viewMode === 'grid' ? 'active' : ''}
+        onClick={() => onViewModeChange('grid')}
+      >
+        Grid
+      </button>
+      <button
+        data-testid="list-view-button"
+        className={viewMode === 'list' ? 'active' : ''}
+        onClick={() => onViewModeChange('list')}
+      >
+        List
+      </button>
+      <select
+        data-testid="sort-select"
+        value={sortBy}
+        onChange={(e) => onSortChange(e.target.value)}
+      >
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="name-asc">Name A-Z</option>
+        <option value="name-desc">Name Z-A</option>
+        <option value="size-desc">Largest First</option>
+        <option value="size-asc">Smallest First</option>
+      </select>
+      <button
+        data-testid="refresh-button"
+        onClick={onRefresh}
+        disabled={loading}
+      >
+        Refresh
+      </button>
+    </div>
+  ),
 }));
 
 // Mock the mockData

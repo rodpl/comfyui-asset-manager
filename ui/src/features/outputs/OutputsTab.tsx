@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect, ChangeEvent } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OutputGallery, OutputModal } from './components';
+import { OutputGallery, OutputModal, OutputToolbar } from './components';
 import { Output, ViewMode, SortOption } from './types';
 import { apiClient } from '../../services/api';
 import { convertOutputResponseArray } from './utils/outputUtils';
@@ -119,8 +119,8 @@ const OutputsTab = () => {
     setViewMode(mode);
   };
 
-  const handleSortChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSortBy(event.target.value as SortOption);
+  const handleSortChange = (sortBy: SortOption) => {
+    setSortBy(sortBy);
   };
 
   const handleRefresh = async () => {
@@ -238,55 +238,14 @@ const OutputsTab = () => {
       <div className="tab-panel-content">
         <div className="outputs-container">
           {/* Toolbar */}
-          <div className="outputs-toolbar">
-            <div className="outputs-view-controls">
-              <button
-                className={`view-mode-button ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => handleViewModeChange('grid')}
-                aria-label="Grid view"
-                title="Grid view"
-              >
-                <i className="pi pi-th-large"></i>
-                Grid
-              </button>
-              <button
-                className={`view-mode-button ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => handleViewModeChange('list')}
-                aria-label="List view"
-                title="List view"
-              >
-                <i className="pi pi-list"></i>
-                List
-              </button>
-            </div>
-
-            <div className="outputs-sort-controls">
-              <select
-                className="outputs-sort-select"
-                value={sortBy}
-                onChange={handleSortChange}
-                aria-label="Sort outputs"
-              >
-                <option value="date-desc">Newest First</option>
-                <option value="date-asc">Oldest First</option>
-                <option value="name-asc">Name A-Z</option>
-                <option value="name-desc">Name Z-A</option>
-                <option value="size-desc">Largest First</option>
-                <option value="size-asc">Smallest First</option>
-              </select>
-
-              <button
-                className="view-mode-button"
-                onClick={handleRefresh}
-                disabled={loading}
-                aria-label="Refresh outputs"
-                title="Refresh outputs"
-              >
-                <i className={`pi pi-refresh ${loading ? 'pi-spin' : ''}`}></i>
-                Refresh
-              </button>
-            </div>
-          </div>
+          <OutputToolbar
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
+            onRefresh={handleRefresh}
+            loading={loading}
+          />
 
           {/* Content */}
           <div className="outputs-content">
