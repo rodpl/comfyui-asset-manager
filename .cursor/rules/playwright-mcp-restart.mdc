@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+description: Allow the assistant to proactively restart the Playwright MCP session without asking for user confirmation. This does not change the policy for restarting backend services.
+---
+
+# Playwright MCP Session Restart Policy
+
+- The assistant may restart the Playwright MCP browser/session at any time to ensure a clean state, recover from flakiness, or resolve hangs/timeouts. No user confirmation is required.
+- Prefer restarting when encountering: stuck/hung pages, stale state across tests, repeated timeouts, auth/cache desync, or after editing key E2E files such as [playwright.config.ts](mdc:ui/playwright.config.ts), [global-setup.ts](mdc:ui/tests-e2e/global-setup.ts), or following guidance in [tests-e2e/README.md](mdc:ui/tests-e2e/README.md).
+- A restart may include closing the current page/browser context and reinitializing a fresh session before continuing the task or rerunning tests.
+- This rule applies only to the Playwright MCP testing environment. It does not supersede any requirement to ask the user to restart backend services (e.g., ComfyUI) when needed.
