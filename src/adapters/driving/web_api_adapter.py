@@ -629,7 +629,13 @@ class WebAPIAdapter:
         
         try:
             outputs = self._output_management.refresh_outputs()
-            output_data = [output.to_dict() for output in outputs]
+            # Match the shape of GET /outputs by including HTTP URLs
+            output_data = []
+            for output in outputs:
+                dto = output.to_dict()
+                dto['file_url'] = f"/asset_manager/outputs/{output.id}/file"
+                dto['thumbnail_url'] = f"/asset_manager/outputs/{output.id}/thumbnail"
+                output_data.append(dto)
             
             return web.json_response({
                 "success": True,
