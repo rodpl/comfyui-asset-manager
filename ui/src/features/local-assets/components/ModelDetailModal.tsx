@@ -68,21 +68,27 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
     onAddToWorkflow(model);
   }, [model, onAddToWorkflow]);
 
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      if (isEditingMetadata) {
-        setIsEditingMetadata(false);
-      } else {
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
         onClose();
       }
-    }
-  }, [onClose, isEditingMetadata]);
+    },
+    [onClose]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isEditingMetadata) {
+          setIsEditingMetadata(false);
+        } else {
+          onClose();
+        }
+      }
+    },
+    [onClose, isEditingMetadata]
+  );
 
   // Fetch available tags when modal opens
   useEffect(() => {
@@ -105,22 +111,25 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
     }
   };
 
-  const handleMetadataSave = useCallback(async (metadata: { tags: string[]; description: string; rating: number }) => {
-    if (!onUpdateMetadata) return;
-    
-    setMetadataLoading(true);
-    try {
-      await onUpdateMetadata(model.id, metadata);
-      setIsEditingMetadata(false);
-      // Refresh available tags after saving
-      await fetchAvailableTags();
-    } catch (error) {
-      console.error('Failed to update metadata:', error);
-      // TODO: Show error message to user
-    } finally {
-      setMetadataLoading(false);
-    }
-  }, [model.id, onUpdateMetadata]);
+  const handleMetadataSave = useCallback(
+    async (metadata: { tags: string[]; description: string; rating: number }) => {
+      if (!onUpdateMetadata) return;
+
+      setMetadataLoading(true);
+      try {
+        await onUpdateMetadata(model.id, metadata);
+        setIsEditingMetadata(false);
+        // Refresh available tags after saving
+        await fetchAvailableTags();
+      } catch (error) {
+        console.error('Failed to update metadata:', error);
+        // TODO: Show error message to user
+      } finally {
+        setMetadataLoading(false);
+      }
+    },
+    [model.id, onUpdateMetadata]
+  );
 
   const handleMetadataCancel = useCallback(() => {
     setIsEditingMetadata(false);
@@ -129,8 +138,8 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="modal-backdrop" 
+    <div
+      className="modal-backdrop"
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       role="dialog"
@@ -142,10 +151,12 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
         <div className="modal-header">
           <div className="modal-title-section">
             <i className={`${getModelTypeIcon(model.modelType)} model-type-icon`}></i>
-            <h2 id="modal-title" className="modal-title">{model.name}</h2>
+            <h2 id="modal-title" className="modal-title">
+              {model.name}
+            </h2>
             <span className="model-type-badge">{model.modelType.toUpperCase()}</span>
           </div>
-          <button 
+          <button
             className="modal-close-button"
             onClick={onClose}
             aria-label={t('modelDetail.close')}
@@ -184,11 +195,7 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
               <div className="details-tab">
                 <div className="model-preview">
                   {model.thumbnail ? (
-                    <img 
-                      src={model.thumbnail} 
-                      alt={model.name}
-                      className="model-preview-image"
-                    />
+                    <img src={model.thumbnail} alt={model.name} className="model-preview-image" />
                   ) : (
                     <div className="model-preview-placeholder">
                       <i className={`${getModelTypeIcon(model.modelType)} preview-icon`}></i>
@@ -209,11 +216,13 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                             onClick={() => copyToClipboard(model.name, 'name')}
                             title={t('modelDetail.copyName')}
                           >
-                            <i className={copySuccess === 'name' ? 'pi pi-check' : 'pi pi-copy'}></i>
+                            <i
+                              className={copySuccess === 'name' ? 'pi pi-check' : 'pi pi-copy'}
+                            ></i>
                           </button>
                         </div>
                       </div>
-                      
+
                       <div className="info-item">
                         <label>{t('modelDetail.filePath')}:</label>
                         <div className="info-value">
@@ -223,7 +232,9 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                             onClick={() => copyToClipboard(model.filePath, 'path')}
                             title={t('modelDetail.copyPath')}
                           >
-                            <i className={copySuccess === 'path' ? 'pi pi-check' : 'pi pi-copy'}></i>
+                            <i
+                              className={copySuccess === 'path' ? 'pi pi-check' : 'pi pi-copy'}
+                            ></i>
                           </button>
                         </div>
                       </div>
@@ -247,7 +258,9 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                             onClick={() => copyToClipboard(model.hash, 'hash')}
                             title={t('modelDetail.copyHash')}
                           >
-                            <i className={copySuccess === 'hash' ? 'pi pi-check' : 'pi pi-copy'}></i>
+                            <i
+                              className={copySuccess === 'hash' ? 'pi pi-check' : 'pi pi-copy'}
+                            ></i>
                           </button>
                         </div>
                       </div>
@@ -275,7 +288,10 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                         <div className="metadata-stats">
                           <div className="stat">
                             <i className="pi pi-download"></i>
-                            <span>{model.externalMetadata.civitai.downloadCount.toLocaleString()} {t('modelDetail.downloads')}</span>
+                            <span>
+                              {model.externalMetadata.civitai.downloadCount.toLocaleString()}{' '}
+                              {t('modelDetail.downloads')}
+                            </span>
                           </div>
                           <div className="stat">
                             <i className="pi pi-star"></i>
@@ -289,7 +305,9 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                         {model.externalMetadata.civitai.tags.length > 0 && (
                           <div className="tags">
                             {model.externalMetadata.civitai.tags.map((tag, index) => (
-                              <span key={index} className="tag">{tag}</span>
+                              <span key={index} className="tag">
+                                {tag}
+                              </span>
                             ))}
                           </div>
                         )}
@@ -304,15 +322,23 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                         {t('modelDetail.huggingfaceInfo')}
                       </h3>
                       <div className="external-metadata">
-                        <p className="description">{model.externalMetadata.huggingface.description}</p>
+                        <p className="description">
+                          {model.externalMetadata.huggingface.description}
+                        </p>
                         <div className="metadata-stats">
                           <div className="stat">
                             <i className="pi pi-download"></i>
-                            <span>{model.externalMetadata.huggingface.downloads.toLocaleString()} {t('modelDetail.downloads')}</span>
+                            <span>
+                              {model.externalMetadata.huggingface.downloads.toLocaleString()}{' '}
+                              {t('modelDetail.downloads')}
+                            </span>
                           </div>
                           <div className="stat">
                             <i className="pi pi-heart"></i>
-                            <span>{model.externalMetadata.huggingface.likes.toLocaleString()} {t('modelDetail.likes')}</span>
+                            <span>
+                              {model.externalMetadata.huggingface.likes.toLocaleString()}{' '}
+                              {t('modelDetail.likes')}
+                            </span>
                           </div>
                           <div className="stat">
                             <i className="pi pi-code"></i>
@@ -322,7 +348,9 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                         {model.externalMetadata.huggingface.tags.length > 0 && (
                           <div className="tags">
                             {model.externalMetadata.huggingface.tags.map((tag, index) => (
-                              <span key={index} className="tag">{tag}</span>
+                              <span key={index} className="tag">
+                                {tag}
+                              </span>
                             ))}
                           </div>
                         )}
@@ -349,7 +377,7 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                       </button>
                     )}
                   </div>
-                  
+
                   {isEditingMetadata ? (
                     <MetadataEditor
                       initialMetadata={model.userMetadata}
@@ -368,7 +396,7 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                               <p>{model.userMetadata.description}</p>
                             </div>
                           )}
-                          
+
                           {model.userMetadata.rating > 0 && (
                             <div className="metadata-item">
                               <label>{t('modelDetail.rating')}:</label>
@@ -388,7 +416,9 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                               <label>{t('modelDetail.userTags')}:</label>
                               <div className="tags">
                                 {model.userMetadata.tags.map((tag, index) => (
-                                  <span key={index} className="tag user-tag">{tag}</span>
+                                  <span key={index} className="tag user-tag">
+                                    {tag}
+                                  </span>
                                 ))}
                               </div>
                             </div>
@@ -434,14 +464,11 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                 <div className="info-section">
                   <h3>{t('modelDetail.quickActions')}</h3>
                   <div className="action-buttons">
-                    <button 
-                      className="action-button primary"
-                      onClick={handleAddToWorkflow}
-                    >
+                    <button className="action-button primary" onClick={handleAddToWorkflow}>
                       <i className="pi pi-plus"></i>
                       {t('modelDetail.addToWorkflow')}
                     </button>
-                    <button 
+                    <button
                       className="action-button"
                       onClick={() => copyToClipboard(model.filePath, 'workflow-path')}
                     >

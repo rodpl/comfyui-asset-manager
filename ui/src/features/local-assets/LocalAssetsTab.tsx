@@ -270,15 +270,14 @@ const LocalAssetsTab: React.FC = () => {
     async (modelId: string, metadata: { tags: string[]; description: string; rating: number }) => {
       try {
         const updatedModel = await apiClient.updateModelMetadata(modelId, metadata);
-        
+
         // Update the selected model if it's the one being updated
         if (selectedModel && selectedModel.id === modelId) {
           setSelectedModel(updatedModel);
         }
-        
+
         // TODO: Update the models list in the current folder
         // This would require refactoring to use real API data instead of mock data
-        
       } catch (err) {
         console.error('Error updating model metadata:', err);
         setError(t('localAssets.errors.metadataUpdateFailed'));

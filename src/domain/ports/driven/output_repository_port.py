@@ -90,3 +90,39 @@ class OutputRepositoryPort(ABC):
             Dictionary containing workflow metadata, or None if extraction failed
         """
         pass
+    
+    @abstractmethod
+    def load_workflow_to_comfyui(self, output: Output) -> bool:
+        """Load the workflow from the output back into ComfyUI.
+        
+        Args:
+            output: The output to load workflow from
+            
+        Returns:
+            True if workflow was loaded successfully, False otherwise
+        """
+        pass
+    
+    @abstractmethod
+    def open_file_in_system(self, output: Output) -> bool:
+        """Open the output file in the system's default image viewer.
+        
+        Args:
+            output: The output to open
+            
+        Returns:
+            True if file was opened successfully, False otherwise
+        """
+        pass
+    
+    @abstractmethod
+    def show_file_in_folder(self, output: Output) -> bool:
+        """Open the containing folder of the output file in the system file explorer.
+        
+        Args:
+            output: The output to show folder for
+            
+        Returns:
+            True if folder was opened successfully, False otherwise
+        """
+        pass

@@ -110,3 +110,51 @@ class OutputManagementPort(ABC):
             ValidationError: If sort_by is invalid
         """
         pass
+    
+    @abstractmethod
+    def load_workflow(self, output_id: str) -> bool:
+        """Load the workflow from the specified output back into ComfyUI.
+        
+        Args:
+            output_id: The ID of the output to load workflow from
+            
+        Returns:
+            True if workflow was loaded successfully, False otherwise
+            
+        Raises:
+            ValidationError: If output_id is invalid
+            NotFoundError: If output is not found
+        """
+        pass
+    
+    @abstractmethod
+    def open_in_system_viewer(self, output_id: str) -> bool:
+        """Open the output file in the system's default image viewer.
+        
+        Args:
+            output_id: The ID of the output to open
+            
+        Returns:
+            True if file was opened successfully, False otherwise
+            
+        Raises:
+            ValidationError: If output_id is invalid
+            NotFoundError: If output is not found
+        """
+        pass
+    
+    @abstractmethod
+    def show_in_folder(self, output_id: str) -> bool:
+        """Open the containing folder of the output file in the system file explorer.
+        
+        Args:
+            output_id: The ID of the output to show folder for
+            
+        Returns:
+            True if folder was opened successfully, False otherwise
+            
+        Raises:
+            ValidationError: If output_id is invalid
+            NotFoundError: If output is not found
+        """
+        pass

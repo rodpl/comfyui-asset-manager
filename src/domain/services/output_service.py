@@ -247,3 +247,81 @@ class OutputService(OutputManagementPort):
             pass
         
         return output
+    
+    def load_workflow(self, output_id: str) -> bool:
+        """Load the workflow from the specified output back into ComfyUI.
+        
+        Args:
+            output_id: The ID of the output to load workflow from
+            
+        Returns:
+            True if workflow was loaded successfully, False otherwise
+            
+        Raises:
+            ValidationError: If output_id is invalid
+            NotFoundError: If output is not found
+        """
+        if not output_id or not output_id.strip():
+            raise ValidationError("output_id cannot be empty", "output_id")
+        
+        output = self._output_repository.get_output_by_id(output_id.strip())
+        if output is None:
+            raise NotFoundError("Output", output_id)
+        
+        try:
+            return self._output_repository.load_workflow_to_comfyui(output)
+        except Exception:
+            # If workflow loading fails, return False rather than raising
+            return False
+    
+    def open_in_system_viewer(self, output_id: str) -> bool:
+        """Open the output file in the system's default image viewer.
+        
+        Args:
+            output_id: The ID of the output to open
+            
+        Returns:
+            True if file was opened successfully, False otherwise
+            
+        Raises:
+            ValidationError: If output_id is invalid
+            NotFoundError: If output is not found
+        """
+        if not output_id or not output_id.strip():
+            raise ValidationError("output_id cannot be empty", "output_id")
+        
+        output = self._output_repository.get_output_by_id(output_id.strip())
+        if output is None:
+            raise NotFoundError("Output", output_id)
+        
+        try:
+            return self._output_repository.open_file_in_system(output)
+        except Exception:
+            # If system operation fails, return False rather than raising
+            return False
+    
+    def show_in_folder(self, output_id: str) -> bool:
+        """Open the containing folder of the output file in the system file explorer.
+        
+        Args:
+            output_id: The ID of the output to show folder for
+            
+        Returns:
+            True if folder was opened successfully, False otherwise
+            
+        Raises:
+            ValidationError: If output_id is invalid
+            NotFoundError: If output is not found
+        """
+        if not output_id or not output_id.strip():
+            raise ValidationError("output_id cannot be empty", "output_id")
+        
+        output = self._output_repository.get_output_by_id(output_id.strip())
+        if output is None:
+            raise NotFoundError("Output", output_id)
+        
+        try:
+            return self._output_repository.show_file_in_folder(output)
+        except Exception:
+            # If system operation fails, return False rather than raising
+            return False

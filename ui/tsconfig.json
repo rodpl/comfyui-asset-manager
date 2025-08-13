@@ -21,8 +21,8 @@
     "noFallthroughCasesInSwitch": true,
     
     /* Testing */
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node", "@playwright/test" ]
   },
-  "include": ["src"],
+  "include": ["src", "tests-e2e", "playwright.config.ts", "playwright.env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

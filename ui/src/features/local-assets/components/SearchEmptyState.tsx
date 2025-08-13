@@ -28,14 +28,10 @@ const SearchEmptyState: React.FC<SearchEmptyStateProps> = ({
             <line x1="8" y1="11" x2="16" y2="11" />
           </svg>
         </div>
-        
-        <h3 className="search-empty-title">
-          {t('search.noResults.title')}
-        </h3>
-        
-        <p className="search-empty-description">
-          {t('search.noResults.description')}
-        </p>
+
+        <h3 className="search-empty-title">{t('search.noResults.title')}</h3>
+
+        <p className="search-empty-description">{t('search.noResults.description')}</p>
 
         <div className="search-empty-suggestions">
           <h4>{t('search.noResults.suggestions')}</h4>
@@ -48,18 +44,12 @@ const SearchEmptyState: React.FC<SearchEmptyStateProps> = ({
 
         <div className="search-empty-actions">
           {searchQuery && (
-            <button
-              className="search-empty-button primary"
-              onClick={onClearSearch}
-            >
+            <button className="search-empty-button primary" onClick={onClearSearch}>
               {t('search.clear')}
             </button>
           )}
           {hasFilters && (
-            <button
-              className="search-empty-button secondary"
-              onClick={onClearFilters}
-            >
+            <button className="search-empty-button secondary" onClick={onClearFilters}>
               {t('search.clearFilters')}
             </button>
           )}

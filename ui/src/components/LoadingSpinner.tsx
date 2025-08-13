@@ -32,11 +32,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   );
 
   if (overlay) {
-    return (
-      <div className={containerClass}>
-        {spinner}
-      </div>
-    );
+    return <div className={containerClass}>{spinner}</div>;
   }
 
   return spinner;

@@ -26,7 +26,8 @@ const OutputsTab = () => {
 
       // Consume one-off setTimeout mock in tests to prevent unhandled errors from the test harness
       try {
-        const isTest = typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
+        const isTest =
+          typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
         if (isTest && typeof globalThis.setTimeout === 'function') {
           // The test "handles error state" throws on first setTimeout call
           // Call inside try/catch to swallow that injected error
@@ -40,7 +41,8 @@ const OutputsTab = () => {
         // Convert sortBy to API format
         const [sortField, sortOrder] = sortBy.split('-');
         const ascending = sortOrder === 'asc';
-        const isTest = typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
+        const isTest =
+          typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
         const requestOptions = isTest
           ? { timeout: 10, retry: { maxRetries: 0, delay: 0, backoff: false } }
           : undefined;
@@ -52,7 +54,7 @@ const OutputsTab = () => {
           },
           requestOptions as any
         );
-        
+
         const outputs = convertOutputResponseArray(response.data);
         setOutputs(outputs);
       } catch (err) {
@@ -126,7 +128,8 @@ const OutputsTab = () => {
     setError(null);
 
     try {
-      const isTest = typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
+      const isTest =
+        typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test';
       const requestOptions = isTest
         ? { timeout: 10, retry: { maxRetries: 0, delay: 0, backoff: false } }
         : undefined;
@@ -152,32 +155,57 @@ const OutputsTab = () => {
     setIsModalOpen(true);
   };
 
+  const handleModalNavigate = (output: Output) => {
+    setSelectedOutput(output);
+  };
+
   const handleContextMenu = (output: Output, event: React.MouseEvent) => {
     event.preventDefault();
     // TODO: Implement context menu functionality
     console.log('Context menu for output:', output);
   };
 
-  const handleModalAction = (action: string, output: Output) => {
-    switch (action) {
-      case 'copy-path':
-        console.log('Copying path:', output.filePath);
-        // TODO: Show success toast
-        break;
-      case 'open-system':
-        console.log('Opening in system viewer:', output.filePath);
-        // TODO: Implement system integration
-        break;
-      case 'show-folder':
-        console.log('Showing in folder:', output.filePath);
-        // TODO: Implement system integration
-        break;
-      default:
-        console.log('Unknown action:', action);
+  const handleModalAction = async (action: string, output: Output) => {
+    try {
+      switch (action) {
+        case 'copy-path':
+          // Copy path is handled by the modal component directly
+          console.log('Path copied to clipboard:', output.filePath);
+          break;
+        case 'open-system':
+          const openResponse = await apiClient.openInSystemViewer(output.id);
+          if (openResponse.success) {
+            console.log('File opened in system viewer');
+          } else {
+            setError('Failed to open file in system viewer');
+          }
+          break;
+        case 'show-folder':
+          const folderResponse = await apiClient.showInFolder(output.id);
+          if (folderResponse.success) {
+            console.log('Folder opened in system explorer');
+          } else {
+            setError('Failed to open folder in system explorer');
+          }
+          break;
+        case 'load-workflow':
+          const workflowResponse = await apiClient.loadWorkflow(output.id);
+          if (workflowResponse.success) {
+            console.log('Workflow loaded successfully');
+          } else {
+            setError('Failed to load workflow - no workflow metadata found');
+          }
+          break;
+        default:
+          console.log('Unknown action:', action);
+      }
+    } catch (error) {
+      console.error('Action failed:', error);
+      setError(`Failed to perform action: ${action}`);
     }
   };
 
-return (
+  return (
     <div className="tab-panel" role="tabpanel" aria-labelledby="outputs-tab">
       <div className="tab-panel-header">
         <h3 id="outputs-tab">{t('tabs.outputs')}</h3>
@@ -262,19 +290,20 @@ return (
 
           {/* Content */}
           <div className="outputs-content">
-            {loading ? (
+            {loading && (
               <div className="outputs-loading">
                 <LoadingSpinner />
-                <span style={{ marginLeft: '12px' }}>Loading outputs...</span>
+                <span style={{ marginLeft: '12px' }}>
+                  {sortedOutputs.length > 0 ? 'Refreshing outputs...' : 'Loading outputs...'}
+                </span>
               </div>
-            ) : (
-              <OutputGallery
-                outputs={sortedOutputs}
-                viewMode={viewMode}
-                onOutputSelect={handleOutputSelect}
-                onContextMenu={handleContextMenu}
-              />
             )}
+            <OutputGallery
+              outputs={sortedOutputs}
+              viewMode={viewMode}
+              onOutputSelect={handleOutputSelect}
+              onContextMenu={handleContextMenu}
+            />
           </div>
         </div>
       </div>
@@ -286,6 +315,8 @@ return (
           isOpen={isModalOpen}
           onClose={handleModalClose}
           onAction={handleModalAction}
+          outputs={sortedOutputs}
+          onNavigate={handleModalNavigate}
         />
       )}
     </div>

@@ -115,7 +115,9 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
         <div className="model-card-header">
           <h4 className="model-name p-card-title" title={model.name}>
             {searchQuery ? (
-              <span dangerouslySetInnerHTML={{ __html: highlightSearchTerms(model.name, searchQuery) }} />
+              <span
+                dangerouslySetInnerHTML={{ __html: highlightSearchTerms(model.name, searchQuery) }}
+              />
             ) : (
               model.name
             )}
@@ -155,7 +157,13 @@ const ModelGridSkeleton: React.FC<{ count?: number }> = ({ count = 12 }) => {
   );
 };
 
-const ModelGrid: React.FC<ModelGridProps> = ({ models, loading, onModelSelect, onModelDrag, searchQuery }) => {
+const ModelGrid: React.FC<ModelGridProps> = ({
+  models,
+  loading,
+  onModelSelect,
+  onModelDrag,
+  searchQuery,
+}) => {
   const { t } = useTranslation();
 
   if (loading) {

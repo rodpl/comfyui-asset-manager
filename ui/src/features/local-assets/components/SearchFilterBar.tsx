@@ -110,6 +110,8 @@ const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
               value={localSearchQuery}
               onChange={handleSearchInputChange}
               disabled={loading}
+              aria-label={t('search.placeholder')}
+              data-testid="search-input"
             />
             {localSearchQuery && (
               <button

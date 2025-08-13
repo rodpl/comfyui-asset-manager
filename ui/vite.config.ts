@@ -55,5 +55,11 @@ export default defineConfig(({ mode }) => ({
     setupFiles: './src/setupTests.ts',
     reporters: ['default', 'junit'],
     outputFile: 'test-results/junit.xml',
+    exclude: [
+      'tests-e2e/**',
+      'playwright-report/**',
+      'blob-report/**',
+      'node_modules/**',
+    ],
   },
 }));

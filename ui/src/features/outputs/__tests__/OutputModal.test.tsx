@@ -10,13 +10,14 @@ vi.mock('../mockData', () => ({
     if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${bytes} B`;
   },
-  formatDate: (date: Date) => date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }),
+  formatDate: (date: Date) =>
+    date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
 }));
 
 const mockOutput: Output = {
@@ -36,8 +37,8 @@ const mockOutput: Output = {
     steps: 20,
     cfg: 7.5,
     sampler: 'DPM++ 2M Karras',
-    seed: 123456789
-  }
+    seed: 123456789,
+  },
 };
 
 const mockOutputWithoutMetadata: Output = {
@@ -47,12 +48,22 @@ const mockOutputWithoutMetadata: Output = {
   workflowMetadata: undefined,
 };
 
+const mockOutput3: Output = {
+  ...mockOutput,
+  id: 'output-3',
+  filename: 'third-image.png',
+};
+
+const mockOutputs: Output[] = [mockOutput, mockOutputWithoutMetadata, mockOutput3];
+
 describe('OutputModal', () => {
   const defaultProps = {
     output: mockOutput,
     isOpen: true,
     onClose: vi.fn(),
     onAction: vi.fn(),
+    outputs: mockOutputs,
+    onNavigate: vi.fn(),
   };
 
   beforeEach(() => {
@@ -62,7 +73,7 @@ describe('OutputModal', () => {
       writable: true,
       value: 'unset',
     });
-    
+
     // Mock clipboard API
     Object.assign(navigator, {
       clipboard: {
@@ -180,6 +191,44 @@ describe('OutputModal', () => {
       fireEvent.keyDown(document, { key: 'Enter' });
 
       expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('navigates to previous output when left arrow is pressed', () => {
+      const onNavigate = vi.fn();
+      // Use second output so we can navigate to previous
+      render(<OutputModal {...defaultProps} output={mockOutputs[1]} onNavigate={onNavigate} />);
+
+      fireEvent.keyDown(document, { key: 'ArrowLeft' });
+
+      expect(onNavigate).toHaveBeenCalledWith(mockOutputs[0]); // Previous output
+    });
+
+    it('navigates to next output when right arrow is pressed', () => {
+      const onNavigate = vi.fn();
+      // Use first output so we can navigate to next
+      render(<OutputModal {...defaultProps} output={mockOutputs[0]} onNavigate={onNavigate} />);
+
+      fireEvent.keyDown(document, { key: 'ArrowRight' });
+
+      expect(onNavigate).toHaveBeenCalledWith(mockOutputs[1]); // Next output
+    });
+
+    it('does not navigate when at first output and left arrow pressed', () => {
+      const onNavigate = vi.fn();
+      render(<OutputModal {...defaultProps} output={mockOutputs[0]} onNavigate={onNavigate} />);
+
+      fireEvent.keyDown(document, { key: 'ArrowLeft' });
+
+      expect(onNavigate).not.toHaveBeenCalled();
+    });
+
+    it('does not navigate when at last output and right arrow pressed', () => {
+      const onNavigate = vi.fn();
+      render(<OutputModal {...defaultProps} output={mockOutputs[2]} onNavigate={onNavigate} />);
+
+      fireEvent.keyDown(document, { key: 'ArrowRight' });
+
+      expect(onNavigate).not.toHaveBeenCalled();
     });
 
     it('calls onAction with copy-path when copy button is clicked', () => {
@@ -313,6 +362,148 @@ describe('OutputModal', () => {
     });
   });
 
+  describe('Navigation Controls', () => {
+    it('shows navigation buttons when there are multiple outputs', () => {
+      // Use middle output so both navigation buttons show
+      render(<OutputModal {...defaultProps} output={mockOutputs[1]} />);
+
+      expect(screen.getByLabelText('Previous image')).toBeInTheDocument();
+      expect(screen.getByLabelText('Next image')).toBeInTheDocument();
+    });
+
+    it('hides previous button when at first output', () => {
+      render(<OutputModal {...defaultProps} output={mockOutputs[0]} />);
+
+      expect(screen.queryByLabelText('Previous image')).not.toBeInTheDocument();
+      expect(screen.getByLabelText('Next image')).toBeInTheDocument();
+    });
+
+    it('hides next button when at last output', () => {
+      render(<OutputModal {...defaultProps} output={mockOutputs[2]} />);
+
+      expect(screen.getByLabelText('Previous image')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Next image')).not.toBeInTheDocument();
+    });
+
+    it('calls onNavigate when navigation buttons are clicked', () => {
+      const onNavigate = vi.fn();
+      render(<OutputModal {...defaultProps} output={mockOutputs[0]} onNavigate={onNavigate} />);
+
+      const nextButton = screen.getByLabelText('Next image');
+      fireEvent.click(nextButton);
+
+      expect(onNavigate).toHaveBeenCalledWith(mockOutputs[1]);
+    });
+
+    it('hides navigation buttons when outputs array is empty', () => {
+      render(<OutputModal {...defaultProps} outputs={[]} />);
+
+      expect(screen.queryByLabelText('Previous image')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Next image')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Zoom Controls', () => {
+    it('displays zoom controls', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      expect(screen.getByLabelText('Zoom in')).toBeInTheDocument();
+      expect(screen.getByLabelText('Zoom out')).toBeInTheDocument();
+      expect(screen.getByLabelText('Reset zoom')).toBeInTheDocument();
+      expect(screen.getByText('100%')).toBeInTheDocument();
+    });
+
+    it('updates zoom level when zoom buttons are clicked', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      const zoomInButton = screen.getByLabelText('Zoom in');
+      fireEvent.click(zoomInButton);
+
+      expect(screen.getByText('120%')).toBeInTheDocument();
+    });
+
+    it('resets zoom when reset button is clicked', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      const zoomInButton = screen.getByLabelText('Zoom in');
+      const resetButton = screen.getByLabelText('Reset zoom');
+
+      fireEvent.click(zoomInButton);
+      expect(screen.getByText('120%')).toBeInTheDocument();
+
+      fireEvent.click(resetButton);
+      expect(screen.getByText('100%')).toBeInTheDocument();
+    });
+
+    it('disables zoom out button at minimum zoom', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      const zoomOutButton = screen.getByLabelText('Zoom out');
+
+      // Click zoom out multiple times to reach minimum
+      for (let i = 0; i < 20; i++) {
+        fireEvent.click(zoomOutButton);
+      }
+
+      expect(zoomOutButton).toBeDisabled();
+    });
+
+    it('disables zoom in button at maximum zoom', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      const zoomInButton = screen.getByLabelText('Zoom in');
+
+      // Click zoom in multiple times to reach maximum
+      for (let i = 0; i < 20; i++) {
+        fireEvent.click(zoomInButton);
+      }
+
+      expect(zoomInButton).toBeDisabled();
+    });
+  });
+
+  describe('Keyboard Zoom Controls', () => {
+    it('zooms in when + key is pressed', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      fireEvent.keyDown(document, { key: '+' });
+
+      expect(screen.getByText('120%')).toBeInTheDocument();
+    });
+
+    it('zooms in when = key is pressed', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      fireEvent.keyDown(document, { key: '=' });
+
+      expect(screen.getByText('120%')).toBeInTheDocument();
+    });
+
+    it('zooms out when - key is pressed', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      // First zoom in
+      fireEvent.keyDown(document, { key: '+' });
+      expect(screen.getByText('120%')).toBeInTheDocument();
+
+      // Then zoom out
+      fireEvent.keyDown(document, { key: '-' });
+      expect(screen.getByText('100%')).toBeInTheDocument();
+    });
+
+    it('resets zoom when 0 key is pressed', () => {
+      render(<OutputModal {...defaultProps} />);
+
+      // First zoom in
+      fireEvent.keyDown(document, { key: '+' });
+      expect(screen.getByText('120%')).toBeInTheDocument();
+
+      // Then reset
+      fireEvent.keyDown(document, { key: '0' });
+      expect(screen.getByText('100%')).toBeInTheDocument();
+    });
+  });
+
   describe('Error Handling', () => {
     it('handles missing workflow metadata fields gracefully', () => {
       const partialMetadataOutput = {
@@ -320,7 +511,7 @@ describe('OutputModal', () => {
         workflowMetadata: {
           prompt: 'Test prompt',
           // Missing other fields
-        }
+        },
       };
 
       render(<OutputModal {...defaultProps} output={partialMetadataOutput} />);
@@ -335,7 +526,7 @@ describe('OutputModal', () => {
         workflowMetadata: {
           prompt: '',
           model: 'Test Model',
-        }
+        },
       };
 
       render(<OutputModal {...defaultProps} output={emptyMetadataOutput} />);
@@ -352,13 +543,27 @@ describe('OutputModal', () => {
           steps: 0,
           cfg: 0,
           seed: 0,
-        }
+        },
       };
 
       render(<OutputModal {...defaultProps} output={zeroMetadataOutput} />);
 
       // The zero values should be rendered but not in proper detail rows since they're empty
       expect(screen.getByText('Workflow Metadata')).toBeInTheDocument();
+    });
+
+    it('resets zoom and pan when output changes', () => {
+      const { rerender } = render(<OutputModal {...defaultProps} />);
+
+      // Zoom in first
+      fireEvent.keyDown(document, { key: '+' });
+      expect(screen.getByText('120%')).toBeInTheDocument();
+
+      // Change output
+      rerender(<OutputModal {...defaultProps} output={mockOutputs[2]} />);
+
+      // Should reset to 100%
+      expect(screen.getByText('100%')).toBeInTheDocument();
     });
   });
 });

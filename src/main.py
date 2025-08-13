@@ -106,10 +106,18 @@ class AssetManagerApplication:
         self.register_routes(app)
         
         # Add middleware for error handling and logging
-        app.middlewares.append(self._error_middleware)
+        @web.middleware
+        async def error_middleware(request, handler):
+            return await self._error_middleware(request, handler)
+        
+        app.middlewares.append(error_middleware)
         
         if self.config.debug:
-            app.middlewares.append(self._logging_middleware)
+            @web.middleware
+            async def logging_middleware(request, handler):
+                return await self._logging_middleware(request, handler)
+            
+            app.middlewares.append(logging_middleware)
         
         self._web_app = app
         return app

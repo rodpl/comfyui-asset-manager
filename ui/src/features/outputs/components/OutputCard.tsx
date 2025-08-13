@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatFileSize, formatDate } from '../utils/outputUtils';
 import '../OutputsTab.css';
 import { Output, ViewMode } from '../types';
@@ -10,18 +10,15 @@ export interface OutputCardProps {
   onContextMenu: (event: React.MouseEvent) => void;
 }
 
-const OutputCard = ({
-  output,
-  viewMode,
-  onClick,
-  onContextMenu
-}: OutputCardProps) => {
+const OutputCard = ({ output, viewMode, onClick, onContextMenu }: OutputCardProps) => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onClick();
     }
   };
+
+  const [imageError, setImageError] = useState(false);
 
   if (viewMode === 'list') {
     return (
@@ -35,17 +32,13 @@ const OutputCard = ({
         aria-label={`Output ${output.filename}`}
       >
         <div className="output-list-thumbnail">
-          {output.thumbnailPath ? (
+          {output.thumbnailPath && !imageError ? (
             <img
               src={output.thumbnailPath}
               alt={output.filename}
               style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
-              onError={(e) => {
-                // Fallback to icon if thumbnail fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.parentElement!.innerHTML = '<i class="pi pi-image" style="font-size: 1.2rem;"></i>';
-              }}
+              onLoad={() => { /* keep node stable */ }}
+              onError={() => setImageError(true)}
             />
           ) : (
             <i className="pi pi-image" style={{ fontSize: '1.2rem' }}></i>
@@ -56,7 +49,8 @@ const OutputCard = ({
             {output.filename}
           </div>
           <div className="output-list-meta">
-            {formatDate(output.createdAt)} • {output.imageWidth}×{output.imageHeight} • {formatFileSize(output.fileSize)}
+            {formatDate(output.createdAt)} • {output.imageWidth}×{output.imageHeight} •{' '}
+            {formatFileSize(output.fileSize)}
           </div>
         </div>
         <div className="output-list-actions">
@@ -88,17 +82,13 @@ const OutputCard = ({
       aria-label={`Output ${output.filename}`}
     >
       <div className="output-card-image">
-        {output.thumbnailPath ? (
+        {output.thumbnailPath && !imageError ? (
           <img
             src={output.thumbnailPath}
             alt={output.filename}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={(e) => {
-              // Fallback to icon if thumbnail fails to load
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = '<i class="pi pi-image" style="font-size: 2rem; opacity: 0.5;"></i>';
-            }}
+            onLoad={() => { /* keep node stable */ }}
+            onError={() => setImageError(true)}
           />
         ) : (
           <i className="pi pi-image" style={{ fontSize: '2rem', opacity: 0.5 }}></i>
@@ -133,12 +123,8 @@ const OutputCard = ({
           {output.filename}
         </div>
         <div className="output-card-meta">
-          <span className="output-card-date">
-            {formatDate(output.createdAt)}
-          </span>
-          <span className="output-card-size">
-            {formatFileSize(output.fileSize)}
-          </span>
+          <span className="output-card-date">{formatDate(output.createdAt)}</span>
+          <span className="output-card-size">{formatFileSize(output.fileSize)}</span>
         </div>
         <div className="output-card-dimensions">
           {output.imageWidth}×{output.imageHeight}

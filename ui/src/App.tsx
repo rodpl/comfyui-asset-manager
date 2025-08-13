@@ -62,7 +62,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <nav className="tab-navigation" role="tablist">
+      <nav className="tab-navigation" role="tablist" data-testid="am-tablist">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -72,6 +72,7 @@ const App: React.FC = () => {
             aria-controls={`tabpanel-${tab.id}`}
             className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
             onClick={() => handleTabChange(tab.id)}
+            data-testid={`tab-${tab.id}`}
           >
             {tab.icon && <i className={tab.icon} aria-hidden="true"></i>}
             <span>{t(tab.labelKey)}</span>

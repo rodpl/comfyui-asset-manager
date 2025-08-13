@@ -58,17 +58,14 @@ export const filterModels = (
 
   // Apply model type filter
   if (filters.modelTypes.length > 0) {
-    filteredModels = filteredModels.filter((model) =>
-      filters.modelTypes.includes(model.modelType)
-    );
+    filteredModels = filteredModels.filter((model) => filters.modelTypes.includes(model.modelType));
   }
 
   // Apply file size filter
   if (filters.fileSizeRange) {
     filteredModels = filteredModels.filter(
       (model) =>
-        model.fileSize >= filters.fileSizeRange!.min &&
-        model.fileSize <= filters.fileSizeRange!.max
+        model.fileSize >= filters.fileSizeRange!.min && model.fileSize <= filters.fileSizeRange!.max
     );
   }
 
@@ -76,8 +73,7 @@ export const filterModels = (
   if (filters.dateRange) {
     filteredModels = filteredModels.filter(
       (model) =>
-        model.modifiedAt >= filters.dateRange!.start &&
-        model.modifiedAt <= filters.dateRange!.end
+        model.modifiedAt >= filters.dateRange!.start && model.modifiedAt <= filters.dateRange!.end
     );
   }
 

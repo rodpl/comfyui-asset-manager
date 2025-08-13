@@ -22,7 +22,7 @@ const MetadataEditor: React.FC<MetadataEditorProps> = ({
   loading = false,
 }) => {
   const { t } = useTranslation();
-  
+
   const [tags, setTags] = useState<string[]>(initialMetadata?.tags || []);
   const [description, setDescription] = useState(initialMetadata?.description || '');
   const [rating, setRating] = useState(initialMetadata?.rating || 0);
@@ -40,9 +40,8 @@ const MetadataEditor: React.FC<MetadataEditorProps> = ({
   // Filter tag suggestions based on input
   useEffect(() => {
     if (tagInput.trim()) {
-      const filtered = availableTags.filter(tag =>
-        tag.toLowerCase().includes(tagInput.toLowerCase()) &&
-        !tags.includes(tag)
+      const filtered = availableTags.filter(
+        (tag) => tag.toLowerCase().includes(tagInput.toLowerCase()) && !tags.includes(tag)
       );
       setFilteredSuggestions(filtered);
       setShowTagSuggestions(filtered.length > 0);
@@ -52,37 +51,46 @@ const MetadataEditor: React.FC<MetadataEditorProps> = ({
     }
   }, [tagInput, availableTags, tags]);
 
-  const handleAddTag = useCallback((tag: string) => {
-    const trimmedTag = tag.trim();
-    if (trimmedTag && !tags.includes(trimmedTag)) {
-      setTags(prev => [...prev, trimmedTag]);
-      setTagInput('');
-      setShowTagSuggestions(false);
-    }
-  }, [tags]);
+  const handleAddTag = useCallback(
+    (tag: string) => {
+      const trimmedTag = tag.trim();
+      if (trimmedTag && !tags.includes(trimmedTag)) {
+        setTags((prev) => [...prev, trimmedTag]);
+        setTagInput('');
+        setShowTagSuggestions(false);
+      }
+    },
+    [tags]
+  );
 
   const handleRemoveTag = useCallback((tagToRemove: string) => {
-    setTags(prev => prev.filter(tag => tag !== tagToRemove));
+    setTags((prev) => prev.filter((tag) => tag !== tagToRemove));
   }, []);
 
-  const handleTagInputKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (filteredSuggestions.length > 0) {
-        handleAddTag(filteredSuggestions[0]);
-      } else if (tagInput.trim()) {
-        handleAddTag(tagInput);
+  const handleTagInputKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (filteredSuggestions.length > 0) {
+          handleAddTag(filteredSuggestions[0]);
+        } else if (tagInput.trim()) {
+          handleAddTag(tagInput);
+        }
+      } else if (e.key === 'Escape') {
+        setShowTagSuggestions(false);
+      } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
+        handleRemoveTag(tags[tags.length - 1]);
       }
-    } else if (e.key === 'Escape') {
-      setShowTagSuggestions(false);
-    } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
-      handleRemoveTag(tags[tags.length - 1]);
-    }
-  }, [tagInput, filteredSuggestions, tags, handleAddTag, handleRemoveTag]);
+    },
+    [tagInput, filteredSuggestions, tags, handleAddTag, handleRemoveTag]
+  );
 
-  const handleRatingClick = useCallback((newRating: number) => {
-    setRating(newRating === rating ? 0 : newRating);
-  }, [rating]);
+  const handleRatingClick = useCallback(
+    (newRating: number) => {
+      setRating(newRating === rating ? 0 : newRating);
+    },
+    [rating]
+  );
 
   const handleSave = useCallback(() => {
     onSave({
@@ -216,11 +224,7 @@ const MetadataEditor: React.FC<MetadataEditorProps> = ({
           onClick={handleSave}
           disabled={loading || !hasChanges()}
         >
-          {loading ? (
-            <i className="pi pi-spin pi-spinner"></i>
-          ) : (
-            <i className="pi pi-check"></i>
-          )}
+          {loading ? <i className="pi pi-spin pi-spinner"></i> : <i className="pi pi-check"></i>}
           {t('metadataEditor.save')}
         </button>
       </div>
