@@ -290,19 +290,20 @@ const OutputsTab = () => {
 
           {/* Content */}
           <div className="outputs-content">
-            {loading ? (
+            {loading && (
               <div className="outputs-loading">
                 <LoadingSpinner />
-                <span style={{ marginLeft: '12px' }}>Loading outputs...</span>
+                <span style={{ marginLeft: '12px' }}>
+                  {sortedOutputs.length > 0 ? 'Refreshing outputs...' : 'Loading outputs...'}
+                </span>
               </div>
-            ) : (
-              <OutputGallery
-                outputs={sortedOutputs}
-                viewMode={viewMode}
-                onOutputSelect={handleOutputSelect}
-                onContextMenu={handleContextMenu}
-              />
             )}
+            <OutputGallery
+              outputs={sortedOutputs}
+              viewMode={viewMode}
+              onOutputSelect={handleOutputSelect}
+              onContextMenu={handleContextMenu}
+            />
           </div>
         </div>
       </div>

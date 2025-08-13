@@ -11,6 +11,7 @@ export class OutputsPageObject {
   readonly emptyState: Locator;
   readonly errorBanner: Locator;
   readonly loading: Locator;
+  readonly thumbnailImages: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -23,6 +24,7 @@ export class OutputsPageObject {
     this.emptyState = page.locator('.outputs-empty-state');
     this.errorBanner = page.locator('.error-banner');
     this.loading = page.locator('.outputs-loading');
+    this.thumbnailImages = this.gallery.locator('img');
   }
 
   async expectToolbarVisible(): Promise<void> {

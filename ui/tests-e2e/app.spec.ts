@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { AppPageObject } from './fixtures/pageObjects/app.po';
+import { AppPageObject } from './fixtures/pageObjects/AppPageObject';
 
 test.describe('Asset Manager tab mounting', () => {
   test('mounts inside ComfyUI without managing its own server', async ({ page }) => {

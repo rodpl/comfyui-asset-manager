@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import { AppPageObject } from './fixtures/pageObjects/app.po';
-import { LocalAssetsPageObject } from './fixtures/pageObjects/local-assets.po';
+import { AppPageObject } from './fixtures/pageObjects/AppPageObject';
+import { LocalAssetsPageObject } from './fixtures/pageObjects/LocalAssetsPageObject';
 import { SearchFilterBarComponentObject } from './fixtures/components/SearchFilterBar.component';
 
 test.describe('Local Assets tab - resilient interactions', () => {
