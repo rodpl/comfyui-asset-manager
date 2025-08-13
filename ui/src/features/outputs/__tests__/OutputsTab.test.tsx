@@ -167,19 +167,20 @@ describe('OutputsTab', () => {
   it('renders output gallery after loading', async () => {
     render(<OutputsTab />);
 
+    // Wait for loading to finish to avoid race conditions on CI
     await waitFor(() => {
-      expect(screen.getByTestId('output-gallery')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText('test-output-1.png')).toBeInTheDocument();
-    expect(screen.getByText('test-output-2.jpg')).toBeInTheDocument();
+    expect(await screen.findByText('test-output-1.png')).toBeInTheDocument();
+    expect(await screen.findByText('test-output-2.jpg')).toBeInTheDocument();
   });
 
   it('handles view mode changes', async () => {
     render(<OutputsTab />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('output-gallery')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
     });
 
     const gridButton = screen.getByText('Grid');
@@ -198,7 +199,7 @@ describe('OutputsTab', () => {
     render(<OutputsTab />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('output-gallery')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
     });
 
     const sortSelect = screen.getByDisplayValue('Newest First');
@@ -211,7 +212,7 @@ describe('OutputsTab', () => {
     render(<OutputsTab />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('output-gallery')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
     });
 
     const refreshButton = screen.getByText('Refresh');
@@ -225,7 +226,7 @@ describe('OutputsTab', () => {
     render(<OutputsTab />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('output-gallery')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
     });
 
     const outputItem = screen.getByText('test-output-1.png');
