@@ -1,7 +1,8 @@
 """Output service implementing output management operations."""
 
-from typing import List, Optional
-from datetime import datetime
+from typing import List, Optional, Dict, Any
+from datetime import datetime, timedelta
+import threading
 
 from ..ports.driving.output_management_port import OutputManagementPort
 from ..ports.driven.output_repository_port import OutputRepositoryPort
@@ -16,13 +17,18 @@ class OutputService(OutputManagementPort):
     and implements the OutputManagementPort interface.
     """
     
-    def __init__(self, output_repository: OutputRepositoryPort):
+    def __init__(self, output_repository: OutputRepositoryPort, cache_ttl_seconds: int = 300):
         """Initialize the output service.
         
         Args:
             output_repository: Repository for output data access
+            cache_ttl_seconds: Time-to-live for cache entries in seconds (default: 5 minutes)
         """
         self._output_repository = output_repository
+        self._cache_ttl = timedelta(seconds=cache_ttl_seconds)
+        self._cache: Dict[str, Any] = {}
+        self._cache_timestamps: Dict[str, datetime] = {}
+        self._cache_lock = threading.RLock()
     
     def get_all_outputs(self) -> List[Output]:
         """Get all outputs from the output directory.
@@ -33,6 +39,13 @@ class OutputService(OutputManagementPort):
         Raises:
             ValidationError: If output directory configuration is invalid
         """
+        cache_key = "all_outputs"
+        
+        # Check cache first
+        cached_outputs = self._get_from_cache(cache_key)
+        if cached_outputs is not None:
+            return cached_outputs
+        
         try:
             outputs = self._output_repository.scan_output_directory()
             
@@ -41,6 +54,9 @@ class OutputService(OutputManagementPort):
             for output in outputs:
                 enriched_output = self._enrich_output(output)
                 enriched_outputs.append(enriched_output)
+            
+            # Cache the results
+            self._set_cache(cache_key, enriched_outputs)
             
             return enriched_outputs
         except IOError as e:
@@ -79,8 +95,10 @@ class OutputService(OutputManagementPort):
         Raises:
             ValidationError: If output directory configuration is invalid
         """
-        # This is essentially the same as get_all_outputs, but explicitly
-        # indicates a fresh scan rather than potentially cached results
+        # Clear cache to force fresh scan
+        self._clear_cache()
+        
+        # Get fresh outputs (will populate cache)
         return self.get_all_outputs()
     
     def get_outputs_by_date_range(
@@ -109,6 +127,13 @@ class OutputService(OutputManagementPort):
         if start_date > end_date:
             raise ValidationError("start_date cannot be after end_date", "date_range")
         
+        cache_key = f"date_range_{start_date.isoformat()}_{end_date.isoformat()}"
+        
+        # Check cache first
+        cached_outputs = self._get_from_cache(cache_key)
+        if cached_outputs is not None:
+            return cached_outputs
+        
         outputs = self._output_repository.get_outputs_by_date_range(start_date, end_date)
         
         # Enrich outputs with thumbnails and metadata
@@ -116,6 +141,9 @@ class OutputService(OutputManagementPort):
         for output in outputs:
             enriched_output = self._enrich_output(output)
             enriched_outputs.append(enriched_output)
+        
+        # Cache the results
+        self._set_cache(cache_key, enriched_outputs)
         
         return enriched_outputs
     
@@ -144,6 +172,13 @@ class OutputService(OutputManagementPort):
                 "file_format"
             )
         
+        cache_key = f"format_{normalized_format}"
+        
+        # Check cache first
+        cached_outputs = self._get_from_cache(cache_key)
+        if cached_outputs is not None:
+            return cached_outputs
+        
         outputs = self._output_repository.get_outputs_by_format(normalized_format)
         
         # Enrich outputs with thumbnails and metadata
@@ -151,6 +186,9 @@ class OutputService(OutputManagementPort):
         for output in outputs:
             enriched_output = self._enrich_output(output)
             enriched_outputs.append(enriched_output)
+        
+        # Cache the results
+        self._set_cache(cache_key, enriched_outputs)
         
         return enriched_outputs
     
@@ -325,3 +363,58 @@ class OutputService(OutputManagementPort):
         except Exception:
             # If system operation fails, return False rather than raising
             return False
+    
+    def _get_from_cache(self, key: str) -> Optional[List[Output]]:
+        """Get data from cache if it exists and is not expired.
+        
+        Args:
+            key: Cache key
+            
+        Returns:
+            Cached data if valid, None otherwise
+        """
+        with self._cache_lock:
+            if key not in self._cache:
+                return None
+            
+            # Check if cache entry has expired
+            timestamp = self._cache_timestamps.get(key)
+            if timestamp is None:
+                return None
+            
+            if datetime.now() - timestamp > self._cache_ttl:
+                # Cache expired, remove it
+                del self._cache[key]
+                del self._cache_timestamps[key]
+                return None
+            
+            return self._cache[key]
+    
+    def _set_cache(self, key: str, data: List[Output]) -> None:
+        """Set data in cache with current timestamp.
+        
+        Args:
+            key: Cache key
+            data: Data to cache
+        """
+        with self._cache_lock:
+            self._cache[key] = data
+            self._cache_timestamps[key] = datetime.now()
+    
+    def _clear_cache(self) -> None:
+        """Clear all cached data."""
+        with self._cache_lock:
+            self._cache.clear()
+            self._cache_timestamps.clear()
+    
+    def _invalidate_cache_key(self, key: str) -> None:
+        """Invalidate a specific cache key.
+        
+        Args:
+            key: Cache key to invalidate
+        """
+        with self._cache_lock:
+            if key in self._cache:
+                del self._cache[key]
+            if key in self._cache_timestamps:
+                del self._cache_timestamps[key]
