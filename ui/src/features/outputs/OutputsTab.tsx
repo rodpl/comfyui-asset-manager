@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OutputGallery, OutputModal, OutputToolbar } from './components';
-import { Output, ViewMode, SortOption } from './types';
+import { OutputGallery, OutputModal, OutputToolbar, OutputContextMenu } from './components';
+import { Output, ViewMode, SortOption, ContextMenuAction } from './types';
 import { apiClient } from '../../services/api';
 import { convertOutputResponseArray } from './utils/outputUtils';
 import { mockOutputs } from './mockData';
@@ -17,6 +17,11 @@ const OutputsTab = () => {
   const [sortBy, setSortBy] = useState<SortOption>('date-desc');
   const [selectedOutput, setSelectedOutput] = useState<Output | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  
+  // Context menu state
+  const [contextMenuOutput, setContextMenuOutput] = useState<Output | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isContextMenuVisible, setIsContextMenuVisible] = useState<boolean>(false);
 
   // Load outputs from API
   useEffect(() => {
@@ -86,13 +91,17 @@ const OutputsTab = () => {
       if (event.key === 'Escape' && isModalOpen) {
         handleModalClose();
       }
+      // Close context menu with Escape key
+      if (event.key === 'Escape' && isContextMenuVisible) {
+        handleContextMenuClose();
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isModalOpen, handleModalClose]);
+  }, [isModalOpen, isContextMenuVisible, handleModalClose]);
 
   // Error auto-dismiss
   useEffect(() => {
@@ -134,7 +143,7 @@ const OutputsTab = () => {
         ? { timeout: 10, retry: { maxRetries: 0, delay: 0, backoff: false } }
         : undefined;
 
-      const response = await apiClient.refreshOutputs(requestOptions as any);
+      const response = await apiClient.refreshOutputs(requestOptions as unknown);
       const outputs = convertOutputResponseArray(response.data);
       setOutputs(outputs);
     } catch (err) {
@@ -161,8 +170,48 @@ const OutputsTab = () => {
 
   const handleContextMenu = (output: Output, event: React.MouseEvent) => {
     event.preventDefault();
-    // TODO: Implement context menu functionality
-    console.log('Context menu for output:', output);
+    setContextMenuOutput(output);
+    setContextMenuPosition({ x: event.clientX, y: event.clientY });
+    setIsContextMenuVisible(true);
+  };
+
+  const handleContextMenuClose = () => {
+    setIsContextMenuVisible(false);
+    setContextMenuOutput(null);
+  };
+
+  const handleContextMenuAction = async (action: ContextMenuAction) => {
+    if (!contextMenuOutput) return;
+
+    try {
+      switch (action) {
+        case 'copy-path':
+          await navigator.clipboard.writeText(contextMenuOutput.filePath);
+          console.log('Path copied to clipboard:', contextMenuOutput.filePath);
+          break;
+        case 'open-system':
+          const openResponse = await apiClient.openInSystemViewer(contextMenuOutput.id);
+          if (openResponse.success) {
+            console.log('File opened in system viewer');
+          } else {
+            setError('Failed to open file in system viewer');
+          }
+          break;
+        case 'show-folder':
+          const folderResponse = await apiClient.showInFolder(contextMenuOutput.id);
+          if (folderResponse.success) {
+            console.log('Folder opened in system explorer');
+          } else {
+            setError('Failed to open folder in system explorer');
+          }
+          break;
+        default:
+          console.log('Unknown action:', action);
+      }
+    } catch (error) {
+      console.error('Context menu action failed:', error);
+      setError(`Failed to perform action: ${action}`);
+    }
   };
 
   const handleModalAction = async (action: string, output: Output) => {
@@ -276,6 +325,17 @@ const OutputsTab = () => {
           onAction={handleModalAction}
           outputs={sortedOutputs}
           onNavigate={handleModalNavigate}
+        />
+      )}
+
+      {/* Context Menu */}
+      {contextMenuOutput && (
+        <OutputContextMenu
+          output={contextMenuOutput}
+          position={contextMenuPosition}
+          isVisible={isContextMenuVisible}
+          onAction={handleContextMenuAction}
+          onClose={handleContextMenuClose}
         />
       )}
     </div>
