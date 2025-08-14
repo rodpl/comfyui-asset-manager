@@ -82,6 +82,7 @@
     },
     "period": {
       "allTime": "All Time",
+      "alltime": "All Time",
       "year": "This Year",
       "month": "This Month",
       "week": "This Week",

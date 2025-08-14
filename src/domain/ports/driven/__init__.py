@@ -5,11 +5,16 @@ from .folder_repository_port import FolderRepositoryPort
 from .external_metadata_port import ExternalMetadataPort
 from .cache_port import CachePort
 from .output_repository_port import OutputRepositoryPort
+from .external_model_port import ExternalModelPort, ExternalAPIError, RateLimitError, PlatformUnavailableError
 
 __all__ = [
     "ModelRepositoryPort",
     "FolderRepositoryPort", 
     "ExternalMetadataPort",
     "CachePort",
-    "OutputRepositoryPort"
+    "OutputRepositoryPort",
+    "ExternalModelPort",
+    "ExternalAPIError",
+    "RateLimitError",
+    "PlatformUnavailableError"
 ]

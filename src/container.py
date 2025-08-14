@@ -10,6 +10,7 @@ from .domain.services.model_service import ModelService
 from .domain.services.folder_service import FolderService
 from .domain.services.metadata_service import MetadataService
 from .domain.services.output_service import OutputService
+from .domain.services.external_model_service import ExternalModelService
 
 # Driving adapters
 from .adapters.driving.web_api_adapter import WebAPIAdapter
@@ -21,6 +22,7 @@ from .adapters.driven.civitai_metadata_adapter import CivitAIMetadataAdapter
 from .adapters.driven.huggingface_metadata_adapter import HuggingFaceMetadataAdapter
 from .adapters.driven.file_cache_adapter import FileCacheAdapter
 from .adapters.driven.comfyui_output_adapter import ComfyUIOutputAdapter
+from .adapters.driven.combined_external_model_adapter import CombinedExternalModelAdapter
 
 
 logger = logging.getLogger(__name__)
@@ -49,11 +51,13 @@ class DIContainer:
         self._output_repository: Optional[ComfyUIOutputAdapter] = None
         self._civitai_adapter: Optional[CivitAIMetadataAdapter] = None
         self._huggingface_adapter: Optional[HuggingFaceMetadataAdapter] = None
+        self._external_model_adapter: Optional[CombinedExternalModelAdapter] = None
         
         self._metadata_service: Optional[MetadataService] = None
         self._model_service: Optional[ModelService] = None
         self._folder_service: Optional[FolderService] = None
         self._output_service: Optional[OutputService] = None
+        self._external_model_service: Optional[ExternalModelService] = None
         
         self._web_api_adapter: Optional[WebAPIAdapter] = None
     
@@ -151,6 +155,26 @@ class DIContainer:
         
         return self._huggingface_adapter
     
+    def get_external_model_adapter(self) -> Optional[CombinedExternalModelAdapter]:
+        """Get external model adapter instance.
+        
+        Returns:
+            Combined external model adapter if external APIs are enabled, None otherwise
+        """
+        if not (self._config.external_apis.civitai_enabled or self._config.external_apis.huggingface_enabled):
+            return None
+        
+        if self._external_model_adapter is None:
+            logger.info("Initializing combined external model adapter")
+            self._external_model_adapter = CombinedExternalModelAdapter(
+                timeout=max(
+                    self._config.external_apis.civitai_timeout,
+                    self._config.external_apis.huggingface_timeout
+                )
+            )
+        
+        return self._external_model_adapter
+    
     def get_output_repository(self) -> ComfyUIOutputAdapter:
         """Get output repository adapter instance.
         
@@ -228,6 +252,22 @@ class DIContainer:
         
         return self._output_service
     
+    def get_external_model_service(self) -> Optional[ExternalModelService]:
+        """Get external model service instance.
+        
+        Returns:
+            External model service if external APIs are enabled, None otherwise
+        """
+        external_model_adapter = self.get_external_model_adapter()
+        if not external_model_adapter:
+            return None
+        
+        if self._external_model_service is None:
+            logger.info("Initializing external model service")
+            self._external_model_service = ExternalModelService(external_model_adapter)
+        
+        return self._external_model_service
+    
     # Driving adapters
     
     def get_web_api_adapter(self) -> WebAPIAdapter:
@@ -242,10 +282,13 @@ class DIContainer:
             folder_service = self.get_folder_service()
             output_service = self.get_output_service()
             
+            external_model_service = self.get_external_model_service()
+            
             self._web_api_adapter = WebAPIAdapter(
                 model_management=model_service,
                 folder_management=folder_service,
-                output_management=output_service
+                output_management=output_service,
+                external_model_management=external_model_service
             )
         
         return self._web_api_adapter

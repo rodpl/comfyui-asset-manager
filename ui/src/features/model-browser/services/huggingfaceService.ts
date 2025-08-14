@@ -13,8 +13,8 @@ import {
   ExternalModelError
 } from '../types';
 
-// HuggingFace API configuration
-const HUGGINGFACE_BASE_URL = 'https://huggingface.co/api';
+// HuggingFace API configuration (proxied via backend to avoid CORS)
+const HUGGINGFACE_BASE_URL = '/asset_manager/proxy/huggingface';
 const DEFAULT_LIMIT = 20;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
@@ -44,9 +44,37 @@ export class HuggingFaceService {
       const url = `${HUGGINGFACE_BASE_URL}/models?${searchParams.toString()}`;
 
       const response = await this.fetchWithRetry(url);
-      const data: HuggingFaceSearchResponse = await response.json();
+      const data: HuggingFaceSearchResponse | HuggingFaceModelResponse[] = await response.json();
 
-      return this.transformSearchResponse(data, params);
+      // Transform initial response
+      let result = this.transformSearchResponse(data, params);
+
+      // Best-effort enrichment to obtain thumbnails (search API often lacks file list)
+      const modelsNeedingThumb = result.models
+        .filter(m => !m.thumbnailUrl)
+        .slice(0, 12);
+
+      if (modelsNeedingThumb.length > 0) {
+        const enriched = await Promise.allSettled(
+          modelsNeedingThumb.map(m => this.getModelDetails(m.id))
+        );
+
+        const enrichedById = new Map<string, ExternalModel>();
+        enriched.forEach((p, idx) => {
+          if (p.status === 'fulfilled' && p.value) {
+            enrichedById.set(modelsNeedingThumb[idx].id, p.value);
+          }
+        });
+
+        if (enrichedById.size > 0) {
+          result = {
+            ...result,
+            models: result.models.map(m => enrichedById.get(m.id) || m),
+          };
+        }
+      }
+
+      return result;
     } catch (error) {
       throw this.handleError(error, 'searchModels');
     }
@@ -116,7 +144,9 @@ export class HuggingFaceService {
       }
 
       if (filters.direction) {
-        searchParams.append('direction', filters.direction);
+        // HuggingFace API expects -1 (desc) or 1 (asc)
+        const directionValue = filters.direction === 'desc' ? '-1' : '1';
+        searchParams.append('direction', directionValue);
       }
     }
 
@@ -146,18 +176,26 @@ export class HuggingFaceService {
    * Transform HuggingFace search response to our format
    */
   private transformSearchResponse(
-    data: HuggingFaceSearchResponse, 
+    data: HuggingFaceSearchResponse | HuggingFaceModelResponse[], 
     params: ModelSearchParams
   ): ModelSearchResponse {
-    const models = data.models.map(item => this.transformModelResponse(item));
     const limit = params.limit || DEFAULT_LIMIT;
     const currentOffset = params.offset || 0;
-    
+
+    // API sometimes returns an array of models directly
+    const items: HuggingFaceModelResponse[] = Array.isArray(data)
+      ? data
+      : (data?.models ?? []);
+
+    const models = items.map(item => this.transformModelResponse(item));
+    const numItemsOnPage = Array.isArray(data) ? items.length : (data?.numItemsOnPage ?? items.length);
+    const total = Array.isArray(data) ? (currentOffset + items.length) : (data?.numTotalItems ?? items.length);
+
     return {
       models,
-      total: data.numTotalItems,
-      hasMore: data.numItemsOnPage === limit && models.length === limit,
-      nextOffset: data.numItemsOnPage === limit ? currentOffset + limit : undefined
+      total,
+      hasMore: numItemsOnPage === limit && models.length === limit,
+      nextOffset: numItemsOnPage === limit ? currentOffset + limit : undefined
     };
   }
 
@@ -167,11 +205,12 @@ export class HuggingFaceService {
   private transformModelResponse(data: HuggingFaceModelResponse): ExternalModel {
     const compatibility = this.assessComfyUICompatibility(data);
     
+    const siblings = data.siblings || [];
     // Calculate total file size from siblings
-    const totalSize = data.siblings.reduce((sum, sibling) => sum + (sibling.size || 0), 0);
+    const totalSize = siblings.reduce((sum, sibling) => sum + (sibling.size || 0), 0);
     
     // Get the main model file (usually the largest or a specific format)
-    const modelFiles = data.siblings.filter(s => 
+    const modelFiles = siblings.filter(s => 
       s.rfilename.endsWith('.safetensors') || 
       s.rfilename.endsWith('.bin') || 
       s.rfilename.endsWith('.ckpt') ||
@@ -183,13 +222,26 @@ export class HuggingFaceService {
     // Extract file format from main file
     const fileFormat = mainFile ? mainFile.rfilename.split('.').pop() : undefined;
 
+    // Derive thumbnail URL from repo assets if available
+    const imageSiblings = siblings.filter(s => 
+      /\.(png|jpg|jpeg|webp)$/i.test(s.rfilename)
+    );
+    const preferredImage = imageSiblings.find(s => /thumbnail|preview|cover|logo/i.test(s.rfilename)) || imageSiblings[0];
+    const revision = data.sha || 'main';
+    const remoteThumb = preferredImage
+      ? `https://huggingface.co/${encodeURIComponent(data.id)}/resolve/${encodeURIComponent(revision)}/${preferredImage.rfilename.split('/').map(encodeURIComponent).join('/')}`
+      : undefined;
+    const thumbnailUrl = remoteThumb
+      ? `/asset_manager/proxy/huggingface/file?url=${encodeURIComponent(remoteThumb)}`
+      : undefined;
+
     return {
       id: data.id,
       name: data.id.split('/').pop() || data.id, // Use model name from ID
       description: this.extractDescription(data),
       author: data.author,
       platform: 'huggingface',
-      thumbnailUrl: undefined, // HuggingFace doesn't provide thumbnails in API
+      thumbnailUrl,
       tags: data.tags || [],
       downloadCount: data.downloads,
       rating: undefined, // HuggingFace uses likes instead of ratings
@@ -202,13 +254,13 @@ export class HuggingFaceService {
         languages: data.cardData?.language || [],
         datasets: data.cardData?.datasets || [],
         metrics: data.cardData?.metrics || [],
-        siblings: data.siblings.map(sibling => ({
+        siblings: siblings.map(sibling => ({
           rfilename: sibling.rfilename,
           size: sibling.size || 0
         })),
         comfyuiCompatible: compatibility.isCompatible,
         comfyuiModelType: compatibility.modelType,
-        supportedFormats: this.getSupportedFormats(data.siblings),
+        supportedFormats: this.getSupportedFormats(siblings),
         diffusionType: this.getDiffusionType(data)
       },
       comfyuiCompatibility: {

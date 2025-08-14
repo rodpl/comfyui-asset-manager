@@ -1,17 +1,22 @@
 """Web API adapter for handling HTTP requests (driving adapter)."""
 
 import json
+import inspect
 import os
 import mimetypes
 from typing import Dict, Any, Optional
 from aiohttp import web, hdrs
+import aiohttp
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response
 
 from ...domain.ports.driving.model_management_port import ModelManagementPort
 from ...domain.ports.driving.folder_management_port import FolderManagementPort
 from ...domain.ports.driving.output_management_port import OutputManagementPort
+from ...domain.ports.driving.external_model_management_port import ExternalModelManagementPort
 from ...domain.entities.base import ValidationError, NotFoundError, DomainError
+from ...domain.entities.external_model import ExternalPlatform
+from ...domain.ports.driven.external_model_port import ExternalAPIError, RateLimitError, PlatformUnavailableError
 
 
 class WebAPIAdapter:
@@ -26,6 +31,7 @@ class WebAPIAdapter:
         model_management: ModelManagementPort,
         folder_management: FolderManagementPort,
         output_management: Optional[OutputManagementPort] = None,
+        external_model_management: Optional[ExternalModelManagementPort] = None,
     ):
         """Initialize the Web API adapter.
         
@@ -33,10 +39,12 @@ class WebAPIAdapter:
             model_management: Port for model management operations
             folder_management: Port for folder management operations
             output_management: Port for output management operations
+            external_model_management: Port for external model management operations
         """
         self._model_management = model_management
         self._folder_management = folder_management
         self._output_management = output_management
+        self._external_model_management = external_model_management
     
     def register_routes(self, app: web.Application) -> None:
         """Register all API routes with the application.
@@ -69,6 +77,22 @@ class WebAPIAdapter:
         # Static file endpoints for serving output images and thumbnails
         app.router.add_get('/asset_manager/outputs/{output_id}/file', self.get_output_file)
         app.router.add_get('/asset_manager/outputs/{output_id}/thumbnail', self.get_output_thumbnail)
+        
+        # External model endpoints
+        app.router.add_get('/asset_manager/external/models', self.search_external_models)
+        app.router.add_get('/asset_manager/external/models/{platform}', self.search_external_models_platform)
+        app.router.add_get('/asset_manager/external/models/{platform}/{model_id}', self.get_external_model_details)
+        app.router.add_get('/asset_manager/external/popular', self.get_popular_external_models)
+        app.router.add_get('/asset_manager/external/recent', self.get_recent_external_models)
+        app.router.add_get('/asset_manager/external/platforms', self.get_supported_platforms)
+        app.router.add_get('/asset_manager/external/platforms/{platform}/info', self.get_platform_info)
+
+        # Proxy endpoints to avoid CORS for external APIs
+        app.router.add_get('/asset_manager/proxy/civitai/models', self.proxy_civitai_models)
+        app.router.add_get('/asset_manager/proxy/civitai/models/{model_id}', self.proxy_civitai_model_details)
+        app.router.add_get('/asset_manager/proxy/huggingface/models', self.proxy_huggingface_models)
+        app.router.add_get('/asset_manager/proxy/huggingface/models/{model_id}', self.proxy_huggingface_model_details)
+        app.router.add_get('/asset_manager/proxy/huggingface/file', self.proxy_huggingface_file)
     
     async def get_folders(self, request: Request) -> Response:
         """Handle GET /asset_manager/folders endpoint.
@@ -93,6 +117,182 @@ class WebAPIAdapter:
             
         except DomainError as e:
             return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    # Proxy handlers
+    async def proxy_civitai_models(self, request: Request) -> Response:
+        """Proxy GET /models to CivitAI API to bypass browser CORS.
+
+        Forwards query parameters transparently and returns the JSON response body.
+        """
+        base_url = 'https://civitai.com/api/v1/models'
+        query_string = request.query_string
+        url = f"{base_url}{'?' + query_string if query_string else ''}"
+
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    # Try to return JSON as-is; fall back to text
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'CivitAI proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_civitai_model_details(self, request: Request) -> Response:
+        """Proxy GET /models/{model_id} to CivitAI API to bypass browser CORS."""
+        model_id = request.match_info.get('model_id')
+        if not model_id:
+            return web.json_response({
+                'success': False,
+                'error': "Missing 'model_id'",
+                'error_type': 'validation_error'
+            }, status=400)
+
+        url = f'https://civitai.com/api/v1/models/{model_id}'
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'CivitAI proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_huggingface_models(self, request: Request) -> Response:
+        """Proxy GET /models to HuggingFace API to bypass browser CORS."""
+        base_url = 'https://huggingface.co/api/models'
+        query_string = request.query_string
+        url = f"{base_url}{'?' + query_string if query_string else ''}"
+
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'HuggingFace proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_huggingface_model_details(self, request: Request) -> Response:
+        """Proxy GET /models/{model_id} to HuggingFace API to bypass browser CORS."""
+        model_id = request.match_info.get('model_id')
+        if not model_id:
+            return web.json_response({
+                'success': False,
+                'error': "Missing 'model_id'",
+                'error_type': 'validation_error'
+            }, status=400)
+
+        url = f'https://huggingface.co/api/models/{model_id}'
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'HuggingFace proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_huggingface_file(self, request: Request) -> Response:
+        """Proxy arbitrary HuggingFace file URLs (e.g., thumbnails) to avoid CORS and hotlinking issues.
+
+        Query param: url (required) - absolute HuggingFace URL
+        """
+        target_url = request.query.get('url')
+        if not target_url or not target_url.startswith('https://huggingface.co/'):
+            return web.json_response({
+                'success': False,
+                'error': "Missing or invalid 'url'",
+                'error_type': 'validation_error'
+            }, status=400)
+
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0',
+            'Accept': '*/*'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(target_url, headers=headers) as resp:
+                    status = resp.status
+                    content = await resp.read()
+                    content_type = resp.headers.get('Content-Type', 'application/octet-stream')
+                    return web.Response(body=content, status=status, content_type=content_type, headers={
+                        'Cache-Control': 'public, max-age=3600'
+                    })
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'HuggingFace proxy file failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
         except Exception as e:
             return self._handle_unexpected_error(e)
     
@@ -777,5 +977,402 @@ class WebAPIAdapter:
             return self._handle_not_found_error(e)
         except DomainError as e:
             return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)    
+
+    # External Model Management Endpoints
+    
+    async def search_external_models(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/models endpoint.
+        
+        Search for models across all external platforms.
+        
+        Args:
+            request: The HTTP request with query parameters
+            
+        Returns:
+            JSON response with search results
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            # Parse query parameters
+            query = request.query.get('query', '')
+            limit = int(request.query.get('limit', '20'))
+            offset = int(request.query.get('offset', '0'))
+            
+            # Parse filters
+            filters = {}
+            if 'model_type' in request.query:
+                filters['model_type'] = request.query['model_type']
+            if 'sort' in request.query:
+                filters['sort'] = request.query['sort']
+            if 'comfyui_compatible' in request.query:
+                filters['comfyui_compatible'] = request.query['comfyui_compatible'].lower() == 'true'
+            
+            # Search across all platforms
+            result = await self._external_model_management.search_models(
+                platform=None,
+                query=query,
+                limit=limit,
+                offset=offset,
+                filters=filters
+            )
+            
+            return web.json_response({
+                "success": True,
+                "data": {
+                    "models": [model.to_dict() for model in result["models"]],
+                    "total": result["total"],
+                    "has_more": result["has_more"],
+                    "next_offset": result["next_offset"],
+                    "platforms_searched": result["platforms_searched"]
+                }
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except (ExternalAPIError, RateLimitError, PlatformUnavailableError) as e:
+            return web.json_response({
+                "success": False,
+                "error": str(e),
+                "error_type": "external_api_error"
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def search_external_models_platform(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/models/{platform} endpoint.
+        
+        Search for models on a specific external platform.
+        
+        Args:
+            request: The HTTP request with platform in path and query parameters
+            
+        Returns:
+            JSON response with search results
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            # Parse platform
+            platform_str = request.match_info['platform'].upper()
+            try:
+                platform = ExternalPlatform(platform_str.lower())
+            except ValueError:
+                return web.json_response({
+                    "success": False,
+                    "error": f"Unsupported platform: {platform_str}",
+                    "error_type": "invalid_platform"
+                }, status=400)
+            
+            # Parse query parameters
+            query = request.query.get('query', '')
+            limit = int(request.query.get('limit', '20'))
+            offset = int(request.query.get('offset', '0'))
+            
+            # Parse filters
+            filters = {}
+            if 'model_type' in request.query:
+                filters['model_type'] = request.query['model_type']
+            if 'sort' in request.query:
+                filters['sort'] = request.query['sort']
+            if 'comfyui_compatible' in request.query:
+                filters['comfyui_compatible'] = request.query['comfyui_compatible'].lower() == 'true'
+            
+            # Search on specific platform
+            result = await self._external_model_management.search_models(
+                platform=platform,
+                query=query,
+                limit=limit,
+                offset=offset,
+                filters=filters
+            )
+            
+            return web.json_response({
+                "success": True,
+                "data": {
+                    "models": [model.to_dict() for model in result["models"]],
+                    "total": result["total"],
+                    "has_more": result["has_more"],
+                    "next_offset": result["next_offset"],
+                    "platform": platform.value
+                }
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except (ExternalAPIError, RateLimitError, PlatformUnavailableError) as e:
+            return web.json_response({
+                "success": False,
+                "error": str(e),
+                "error_type": "external_api_error"
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_external_model_details(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/models/{platform}/{model_id} endpoint.
+        
+        Get detailed information about a specific external model.
+        
+        Args:
+            request: The HTTP request with platform and model_id in path
+            
+        Returns:
+            JSON response with model details
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            # Parse platform
+            platform_str = request.match_info['platform'].upper()
+            try:
+                platform = ExternalPlatform(platform_str.lower())
+            except ValueError:
+                return web.json_response({
+                    "success": False,
+                    "error": f"Unsupported platform: {platform_str}",
+                    "error_type": "invalid_platform"
+                }, status=400)
+            
+            model_id = request.match_info['model_id']
+            
+            # Get model details
+            model = await self._external_model_management.get_model_details(platform, model_id)
+            
+            return web.json_response({
+                "success": True,
+                "data": model.to_dict()
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except NotFoundError as e:
+            return self._handle_not_found_error(e)
+        except (ExternalAPIError, RateLimitError, PlatformUnavailableError) as e:
+            return web.json_response({
+                "success": False,
+                "error": str(e),
+                "error_type": "external_api_error"
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_popular_external_models(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/popular endpoint.
+        
+        Get popular models from external platforms.
+        
+        Args:
+            request: The HTTP request with query parameters
+            
+        Returns:
+            JSON response with popular models
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            # Parse query parameters
+            limit = int(request.query.get('limit', '20'))
+            model_type = request.query.get('model_type')
+            
+            platform = None
+            if 'platform' in request.query:
+                platform_str = request.query['platform'].upper()
+                try:
+                    platform = ExternalPlatform(platform_str.lower())
+                except ValueError:
+                    return web.json_response({
+                        "success": False,
+                        "error": f"Unsupported platform: {platform_str}",
+                        "error_type": "invalid_platform"
+                    }, status=400)
+            
+            # Get popular models
+            models = await self._external_model_management.get_popular_models(
+                platform=platform,
+                limit=limit,
+                model_type=model_type
+            )
+            
+            return web.json_response({
+                "success": True,
+                "data": {
+                    "models": [model.to_dict() for model in models],
+                    "count": len(models)
+                }
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except (ExternalAPIError, RateLimitError, PlatformUnavailableError) as e:
+            return web.json_response({
+                "success": False,
+                "error": str(e),
+                "error_type": "external_api_error"
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_recent_external_models(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/recent endpoint.
+        
+        Get recent models from external platforms.
+        
+        Args:
+            request: The HTTP request with query parameters
+            
+        Returns:
+            JSON response with recent models
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            # Parse query parameters
+            limit = int(request.query.get('limit', '20'))
+            model_type = request.query.get('model_type')
+            
+            platform = None
+            if 'platform' in request.query:
+                platform_str = request.query['platform'].upper()
+                try:
+                    platform = ExternalPlatform(platform_str.lower())
+                except ValueError:
+                    return web.json_response({
+                        "success": False,
+                        "error": f"Unsupported platform: {platform_str}",
+                        "error_type": "invalid_platform"
+                    }, status=400)
+            
+            # Get recent models
+            models = await self._external_model_management.get_recent_models(
+                platform=platform,
+                limit=limit,
+                model_type=model_type
+            )
+            
+            return web.json_response({
+                "success": True,
+                "data": {
+                    "models": [model.to_dict() for model in models],
+                    "count": len(models)
+                }
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
+        except (ExternalAPIError, RateLimitError, PlatformUnavailableError) as e:
+            return web.json_response({
+                "success": False,
+                "error": str(e),
+                "error_type": "external_api_error"
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_supported_platforms(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/platforms endpoint.
+        
+        Get list of supported external platforms.
+        
+        Args:
+            request: The HTTP request
+            
+        Returns:
+            JSON response with supported platforms
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            platforms = self._external_model_management.get_supported_platforms()
+            # Support AsyncMock or async implementations by awaiting if needed
+            if inspect.isawaitable(platforms):
+                platforms = await platforms
+            
+            return web.json_response({
+                "success": True,
+                "data": {
+                    "platforms": [platform.value for platform in platforms],
+                    "count": len(platforms)
+                }
+            })
+            
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def get_platform_info(self, request: Request) -> Response:
+        """Handle GET /asset_manager/external/platforms/{platform}/info endpoint.
+        
+        Get information about a specific platform.
+        
+        Args:
+            request: The HTTP request with platform in path
+            
+        Returns:
+            JSON response with platform information
+        """
+        if not self._external_model_management:
+            return web.json_response({
+                "success": False,
+                "error": "External model management not available",
+                "error_type": "service_unavailable"
+            }, status=503)
+        
+        try:
+            # Parse platform
+            platform_str = request.match_info['platform'].upper()
+            try:
+                platform = ExternalPlatform(platform_str.lower())
+            except ValueError:
+                return web.json_response({
+                    "success": False,
+                    "error": f"Unsupported platform: {platform_str}",
+                    "error_type": "invalid_platform"
+                }, status=400)
+            
+            # Get platform info
+            info = self._external_model_management.get_platform_info(platform)
+            # Support AsyncMock or async implementations by awaiting if needed
+            if inspect.isawaitable(info):
+                info = await info
+            
+            return web.json_response({
+                "success": True,
+                "data": info
+            })
+            
+        except ValidationError as e:
+            return self._handle_validation_error(e)
         except Exception as e:
             return self._handle_unexpected_error(e)

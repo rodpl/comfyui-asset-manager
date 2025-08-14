@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { ExternalModel, ComfyUIModelType } from '../types';
-import { MODEL_TYPE_DISPLAY_NAMES, MODEL_TYPE_COLORS } from '../constants';
+import { MODEL_TYPE_DISPLAY_NAMES, MODEL_TYPE_COLORS, HUGGINGFACE_LOGO_URL } from '../constants';
 import './ModelCard.css';
 
 export interface ModelCardProps {
@@ -144,6 +144,15 @@ const ModelCard: React.FC<ModelCardProps> = ({
           <img
             src={model.thumbnailUrl}
             alt={`${model.name} preview`}
+            className={`model-thumbnail ${imageLoading ? 'loading' : ''}`}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            loading="lazy"
+          />
+        ) : model.platform === 'huggingface' ? (
+          <img
+            src={HUGGINGFACE_LOGO_URL}
+            alt="HuggingFace"
             className={`model-thumbnail ${imageLoading ? 'loading' : ''}`}
             onLoad={handleImageLoad}
             onError={handleImageError}
