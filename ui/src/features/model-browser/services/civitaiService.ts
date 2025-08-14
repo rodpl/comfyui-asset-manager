@@ -10,7 +10,6 @@ import {
   CivitAISearchResponse,
   CivitAIFilters,
   ComfyUIModelType,
-  ComfyUICompatibility,
   ExternalModelError
 } from '../types';
 
@@ -358,14 +357,15 @@ export class CivitAIService {
    */
   private handleError(error: unknown, operation: string): ExternalModelError {
     console.error(`CivitAI API error in ${operation}:`, error);
+    const message = error instanceof Error ? error.message : String(error);
 
     return {
       code: 'CIVITAI_API_ERROR',
-      message: error.message || 'An error occurred while fetching data from CivitAI',
+      message: message || 'An error occurred while fetching data from CivitAI',
       platform: 'civitai',
       details: {
         operation,
-        originalError: error.toString()
+        originalError: String(error)
       }
     };
   }

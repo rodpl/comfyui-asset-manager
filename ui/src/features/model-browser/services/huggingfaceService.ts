@@ -10,7 +10,6 @@ import {
   HuggingFaceSearchResponse,
   HuggingFaceFilters,
   ComfyUIModelType,
-  ComfyUICompatibility,
   ExternalModelError
 } from '../types';
 
@@ -485,14 +484,15 @@ export class HuggingFaceService {
    */
   private handleError(error: unknown, operation: string): ExternalModelError {
     console.error(`HuggingFace API error in ${operation}:`, error);
+    const message = error instanceof Error ? error.message : String(error);
 
     return {
       code: 'HUGGINGFACE_API_ERROR',
-      message: error.message || 'An error occurred while fetching data from HuggingFace',
+      message: message || 'An error occurred while fetching data from HuggingFace',
       platform: 'huggingface',
       details: {
         operation,
-        originalError: error.toString()
+        originalError: String(error)
       }
     };
   }
