@@ -5,6 +5,11 @@ import { huggingfaceService } from '../services/huggingfaceService';
 import { DEFAULT_PAGE_SIZE, ERROR_MESSAGES } from '../constants';
 import ModelCard from './ModelCard';
 import HuggingFaceSearchFilterBar from './HuggingFaceSearchFilterBar';
+import { ModelGridSkeleton } from './ModelGridSkeleton';
+import { NoResultsEmptyState, ErrorEmptyState, OfflineEmptyState } from './EmptyState';
+import ModelBrowserErrorBoundary from './ModelBrowserErrorBoundary';
+import useOfflineDetection from '../hooks/useOfflineDetection';
+import useRetryMechanism from '../hooks/useRetryMechanism';
 import './HuggingFaceBrowser.css';
 
 export interface HuggingFaceBrowserProps {
@@ -43,6 +48,22 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
     task: ['text-to-image'],
   });
 
+  // Offline detection
+  const {
+    isFullyOnline,
+    hasConnectivityIssues,
+    connectionQuality,
+    retry: retryConnection,
+  } = useOfflineDetection({
+    endpoints: ['/asset_manager/external/models/huggingface'],
+    onOnline: () => {
+      // Auto-retry when coming back online
+      if (models.length === 0 && !loading.initial) {
+        loadModels(false);
+      }
+    },
+  });
+
   // Search parameters
   const searchParams = useMemo((): ModelSearchParams => ({
     query: searchQuery,
@@ -52,8 +73,50 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
     filters,
   }), [searchQuery, currentOffset, filters]);
 
-  // Load models function
+  // Create retry mechanism for loading models
+  const {
+    execute: executeLoadModels,
+    retry: retryLoadModels,
+    isRetrying,
+    statusMessage,
+    canRetry,
+    hasReachedMaxRetries,
+  } = useRetryMechanism(
+    async () => {
+      const params = {
+        ...searchParams,
+        offset: currentOffset,
+      };
+      return await huggingfaceService.searchModels(params);
+    },
+    {
+      maxRetries: 3,
+      onRetry: (attempt, error) => {
+        console.log(`HuggingFace retry attempt ${attempt}:`, error.message);
+      },
+      onMaxRetriesReached: (error) => {
+        console.error('HuggingFace max retries reached:', error);
+        setLoading(prev => ({
+          ...prev,
+          error: `Failed to load models after multiple attempts: ${error.message}`,
+        }));
+      },
+    }
+  );
+
+  // Load models function with enhanced error handling
   const loadModels = useCallback(async (isLoadMore = false) => {
+    // Check if we're offline
+    if (!isFullyOnline) {
+      setLoading(prev => ({
+        ...prev,
+        error: hasConnectivityIssues 
+          ? 'Connection issues detected. Please check your internet connection.'
+          : 'You are offline. Please check your internet connection.',
+      }));
+      return;
+    }
+
     try {
       setLoading(prev => ({
         ...prev,
@@ -61,6 +124,7 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
         error: null,
       }));
 
+      // Update search params for current request
       const params = {
         ...searchParams,
         offset: isLoadMore ? currentOffset : 0,
@@ -80,10 +144,14 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
 
     } catch (error) {
       console.error('Failed to load HuggingFace models:', error);
+      const errorMessage = error instanceof Error ? error.message : ERROR_MESSAGES.API_ERROR;
+      
       setLoading(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : ERROR_MESSAGES.API_ERROR,
+        error: errorMessage,
       }));
+
+      // Don't throw here - let the component handle the error state
     } finally {
       setLoading(prev => ({
         ...prev,
@@ -91,7 +159,7 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
         loadMore: false,
       }));
     }
-  }, [searchParams, currentOffset]);
+  }, [searchParams, currentOffset, isFullyOnline, hasConnectivityIssues]);
 
   // Load more models
   const loadMoreModels = useCallback(() => {
@@ -100,11 +168,18 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
     }
   }, [loadModels, loading.loadMore, hasMore]);
 
-  // Retry loading
-  const retryLoad = useCallback(() => {
+  // Enhanced retry function
+  const retryLoad = useCallback(async () => {
     setLoading(prev => ({ ...prev, error: null }));
-    loadModels(false);
-  }, [loadModels]);
+    
+    // First try to reconnect if offline
+    if (!isFullyOnline) {
+      await retryConnection();
+    }
+    
+    // Then retry loading models
+    await loadModels(false);
+  }, [loadModels, isFullyOnline, retryConnection]);
 
   // Effect to load models when search params change
   useEffect(() => {
@@ -130,55 +205,57 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
     setFilters(newFilters);
   }, []);
 
-  // Render loading skeleton
+  // Enhanced render functions
   const renderLoadingSkeleton = () => (
-    <div className="model-grid">
-      {Array.from({ length: DEFAULT_PAGE_SIZE }, (_, index) => (
-        <div key={index} className="model-card-skeleton">
-          <div className="skeleton-thumbnail" />
-          <div className="skeleton-content">
-            <div className="skeleton-title" />
-            <div className="skeleton-author" />
-            <div className="skeleton-description" />
-            <div className="skeleton-stats" />
-          </div>
-        </div>
-      ))}
-    </div>
+    <ModelGridSkeleton 
+      count={DEFAULT_PAGE_SIZE} 
+      platform="huggingface"
+      className="huggingface-loading-skeleton"
+    />
   );
 
-  // Render error state
-  const renderError = () => (
-    <div className="error-state">
-      <div className="error-icon">
-        <i className="pi pi-exclamation-triangle" />
-      </div>
-      <h3>{t('errors.loadFailed')}</h3>
-      <p>{loading.error}</p>
-      <button 
-        className="p-button p-button-primary"
-        onClick={retryLoad}
-      >
-        <i className="pi pi-refresh" />
-        {t('actions.retry')}
-      </button>
-    </div>
-  );
+  const renderError = () => {
+    // Check if it's an offline error
+    if (!isFullyOnline) {
+      return (
+        <OfflineEmptyState
+          platform="huggingface"
+          onRetry={retryLoad}
+          className="huggingface-offline-state"
+        />
+      );
+    }
 
-  // Render empty state
+    return (
+      <ErrorEmptyState
+        platform="huggingface"
+        description={loading.error || undefined}
+        onRetry={canRetry ? retryLoad : undefined}
+        className="huggingface-error-state"
+        suggestions={[
+          'Check your internet connection',
+          'HuggingFace might be experiencing issues',
+          'Try refreshing the page',
+          hasConnectivityIssues ? 'Connection quality is poor' : '',
+        ].filter(Boolean)}
+      />
+    );
+  };
+
   const renderEmptyState = () => (
-    <div className="empty-state">
-      <div className="empty-icon">
-        <i className="pi pi-search" />
-      </div>
-      <h3>{t('modelBrowser.huggingface.noResults')}</h3>
-      <p>{t('modelBrowser.huggingface.noResultsDescription')}</p>
-      {searchQuery && (
-        <p className="search-query">
-          {t('modelBrowser.searchQuery')}: "{searchQuery}"
-        </p>
-      )}
-    </div>
+    <NoResultsEmptyState
+      platform="huggingface"
+      searchQuery={searchQuery}
+      onClearSearch={searchQuery ? () => setSearchQuery('') : undefined}
+      onRefresh={retryLoad}
+      className="huggingface-empty-state"
+      suggestions={[
+        'Try different search terms',
+        'Remove some filters',
+        'Search for "stable-diffusion" or "text-to-image"',
+        'Look for models with "diffusers" library',
+      ]}
+    />
   );
 
   // Main render
@@ -189,82 +266,105 @@ const HuggingFaceBrowser: React.FC<HuggingFaceBrowserProps> = ({
   ].filter(Boolean).join(' ');
 
   return (
-    <div className={containerClasses}>
-      {/* Header */}
-      <div className="browser-header">
-        <div className="platform-info">
-          <i className="pi pi-github" />
-          <h3>{t('modelBrowser.huggingface.title')}</h3>
-          <span className="platform-description">
-            {t('modelBrowser.huggingface.description')}
-          </span>
+    <ModelBrowserErrorBoundary
+      platform="huggingface"
+      onRetry={retryLoad}
+      className="huggingface-error-boundary"
+    >
+      <div className={containerClasses}>
+        {/* Header */}
+        <div className="browser-header">
+          <div className="platform-info">
+            <i className="pi pi-github" />
+            <h3>{t('modelBrowser.huggingface.title')}</h3>
+            <span className="platform-description">
+              {t('modelBrowser.huggingface.description')}
+            </span>
+            
+            {/* Connection status indicator */}
+            {hasConnectivityIssues && (
+              <div className="connection-warning">
+                <i className="pi pi-exclamation-triangle" />
+                <span>Connection issues detected</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Search and Filter Bar */}
+        <HuggingFaceSearchFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          resultsCount={models.length}
+          isLoading={loading.initial || loading.loadMore || isRetrying}
+        />
+
+        {/* Retry status message */}
+        {isRetrying && (
+          <div className="retry-status">
+            <i className="pi pi-spin pi-spinner" />
+            <span>{statusMessage}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="browser-content" onScroll={handleScroll}>
+          {loading.initial && renderLoadingSkeleton()}
+          
+          {loading.error && renderError()}
+          
+          {!loading.initial && !loading.error && models.length === 0 && renderEmptyState()}
+          
+          {!loading.initial && !loading.error && models.length > 0 && (
+            <>
+              <div className="model-grid">
+                {models.map((model) => (
+                  <ModelCard
+                    key={model.id}
+                    model={model}
+                    onClick={onModelClick}
+                    onDragStart={onModelDragStart}
+                    draggable={true}
+                    className="huggingface-model-card"
+                  />
+                ))}
+              </div>
+
+              {/* Load More Button/Indicator */}
+              {hasMore && (
+                <div className="load-more-section">
+                  {loading.loadMore ? (
+                    <div className="loading-more">
+                      <i className="pi pi-spin pi-spinner" />
+                      <span>{t('modelBrowser.loadingMore')}</span>
+                    </div>
+                  ) : (
+                    <button
+                      className="p-button p-button-outlined load-more-button"
+                      onClick={loadMoreModels}
+                      disabled={!isFullyOnline}
+                    >
+                      <i className="pi pi-plus" />
+                      {t('modelBrowser.loadMore')}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* End of Results */}
+              {!hasMore && models.length > 0 && (
+                <div className="end-of-results">
+                  <i className="pi pi-check-circle" />
+                  <span>{t('modelBrowser.endOfResults')}</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
-
-      {/* Search and Filter Bar */}
-      <HuggingFaceSearchFilterBar
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        resultsCount={models.length}
-        isLoading={loading.initial || loading.loadMore}
-      />
-
-      {/* Content */}
-      <div className="browser-content" onScroll={handleScroll}>
-        {loading.initial && renderLoadingSkeleton()}
-        
-        {loading.error && renderError()}
-        
-        {!loading.initial && !loading.error && models.length === 0 && renderEmptyState()}
-        
-        {!loading.initial && !loading.error && models.length > 0 && (
-          <>
-            <div className="model-grid">
-              {models.map((model) => (
-                <ModelCard
-                  key={model.id}
-                  model={model}
-                  onClick={onModelClick}
-                  onDragStart={onModelDragStart}
-                  draggable={true}
-                  className="huggingface-model-card"
-                />
-              ))}
-            </div>
-
-            {/* Load More Button/Indicator */}
-            {hasMore && (
-              <div className="load-more-section">
-                {loading.loadMore ? (
-                  <div className="loading-more">
-                    <i className="pi pi-spin pi-spinner" />
-                    <span>{t('modelBrowser.loadingMore')}</span>
-                  </div>
-                ) : (
-                  <button
-                    className="p-button p-button-outlined load-more-button"
-                    onClick={loadMoreModels}
-                  >
-                    <i className="pi pi-plus" />
-                    {t('modelBrowser.loadMore')}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* End of Results */}
-            {!hasMore && models.length > 0 && (
-              <div className="end-of-results">
-                <i className="pi pi-check-circle" />
-                <span>{t('modelBrowser.endOfResults')}</span>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+    </ModelBrowserErrorBoundary>
   );
 };
 
