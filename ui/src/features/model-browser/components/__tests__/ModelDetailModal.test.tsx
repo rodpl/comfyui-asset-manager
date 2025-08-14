@@ -139,7 +139,9 @@ describe('ModelDetailModal', () => {
     expect(
       screen.getByText('civitai', { selector: '.external-platform-badge' })
     ).toBeInTheDocument();
-    expect(screen.getByText('CHECKPOINT')).toBeInTheDocument();
+    expect(
+      screen.getByText(/checkpoint/i, { selector: '.external-model-type-badge' })
+    ).toBeInTheDocument();
   });
 
   it('renders modal when open with HuggingFace model', () => {
