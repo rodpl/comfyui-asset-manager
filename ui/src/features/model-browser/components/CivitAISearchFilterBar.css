@@ -1,0 +1,552 @@
+/* CivitAI Search Filter Bar Component Styles */
+
+.civitai-search-filter-bar {
+  background-color: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
+  transition: all 0.2s ease;
+}
+
+.civitai-search-filter-bar.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Main Search and Filter Row */
+.search-filter-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+/* Search Input */
+.search-input-container {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--text-color-secondary);
+}
+
+.clear-search-button {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.clear-search-button:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-color);
+}
+
+/* Quick Filters */
+.quick-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.filter-select {
+  min-width: 120px;
+  padding: 6px 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: 4px;
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.filter-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* NSFW Filter */
+.nsfw-filter {
+  padding: 8px 12px;
+  background-color: var(--surface-100);
+  border-radius: 6px;
+  border: 1px solid var(--surface-border);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Filter Actions */
+.filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.advanced-filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--surface-100);
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.advanced-filters-toggle:hover {
+  background-color: var(--surface-200);
+  border-color: var(--primary-color);
+}
+
+.advanced-filters-toggle.active {
+  background-color: var(--primary-100);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.advanced-filters-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.filter-count {
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.clear-filters-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: var(--red-100);
+  border: 1px solid var(--red-200);
+  border-radius: 6px;
+  color: var(--red-600);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-filters-button:hover {
+  background-color: var(--red-200);
+  border-color: var(--red-300);
+}
+
+.clear-filters-button:focus {
+  outline: 2px solid var(--red-500);
+  outline-offset: 2px;
+}
+
+/* Results Info */
+.results-info {
+  margin-left: auto;
+}
+
+.results-count {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+/* Advanced Filters Panel */
+.advanced-filters-panel {
+  border-top: 1px solid var(--surface-border);
+  background-color: var(--surface-50);
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+.advanced-filters-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Filter Sections */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-section h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--surface-border);
+  padding-bottom: 8px;
+}
+
+/* Checkbox Grid */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.checkbox-grid .checkbox-label {
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-grid .checkbox-label:hover {
+  background-color: var(--surface-100);
+}
+
+/* Additional Filters */
+.additional-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.filter-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-input-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: 4px;
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.filter-input::placeholder {
+  color: var(--text-color-secondary);
+}
+
+.filter-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .search-filter-main {
+    gap: 12px;
+  }
+  
+  .quick-filters {
+    gap: 12px;
+  }
+  
+  .filter-group {
+    gap: 6px;
+  }
+  
+  .filter-select {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-filter-main {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .search-input-container {
+    min-width: unset;
+  }
+  
+  .quick-filters {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .filter-actions {
+    justify-content: center;
+  }
+  
+  .results-info {
+    margin-left: 0;
+    text-align: center;
+  }
+  
+  .advanced-filters-content {
+    padding: 12px;
+    gap: 16px;
+  }
+  
+  .checkbox-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 6px;
+  }
+  
+  .additional-filters {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-filter-main {
+    padding: 10px 12px;
+  }
+  
+  .search-input {
+    padding: 8px 10px 8px 32px;
+    font-size: 0.85rem;
+  }
+  
+  .search-icon {
+    left: 10px;
+    font-size: 0.8rem;
+  }
+  
+  .quick-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .filter-group {
+    justify-content: space-between;
+  }
+  
+  .filter-select {
+    min-width: 80px;
+    flex: 1;
+    max-width: 120px;
+  }
+  
+  .nsfw-filter {
+    padding: 6px 10px;
+  }
+  
+  .advanced-filters-toggle,
+  .clear-filters-button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .filter-count {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+    min-width: 16px;
+  }
+  
+  .checkbox-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .checkbox-label {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+  }
+  
+  .filter-input-group label {
+    font-size: 0.8rem;
+  }
+  
+  .filter-input,
+  .filter-select {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .advanced-filters-panel {
+    animation: none;
+  }
+  
+  .search-input,
+  .filter-select,
+  .filter-input,
+  .advanced-filters-toggle,
+  .clear-filters-button,
+  .clear-search-button {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .search-input,
+  .filter-select,
+  .filter-input {
+    border-width: 2px;
+  }
+  
+  .search-input:focus,
+  .filter-select:focus,
+  .filter-input:focus {
+    border-width: 3px;
+  }
+  
+  .advanced-filters-toggle,
+  .clear-filters-button,
+  .nsfw-filter {
+    border-width: 2px;
+  }
+  
+  .advanced-filters-toggle:hover,
+  .clear-filters-button:hover {
+    border-width: 3px;
+  }
+  
+  .filter-count {
+    border: 2px solid white;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.search-input:focus-visible,
+.filter-select:focus-visible,
+.filter-input:focus-visible,
+.advanced-filters-toggle:focus-visible,
+.clear-filters-button:focus-visible,
+.clear-search-button:focus-visible,
+.checkbox-label:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .nsfw-filter {
+    background-color: var(--surface-200);
+  }
+  
+  .advanced-filters-toggle {
+    background-color: var(--surface-200);
+  }
+  
+  .advanced-filters-toggle.active {
+    background-color: rgba(var(--primary-color-rgb), 0.2);
+  }
+  
+  .advanced-filters-panel {
+    background-color: var(--surface-100);
+  }
+  
+  .checkbox-grid .checkbox-label:hover {
+    background-color: var(--surface-200);
+  }
+}

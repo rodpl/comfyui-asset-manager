@@ -35,6 +35,59 @@
       "placeholder": "Output management functionality will be implemented here. View and organize your generated images."
     }
   },
+  "modelBrowser": {
+    "civitai": {
+      "title": "CivitAI",
+      "description": "Browse and discover AI models from CivitAI",
+      "noResults": "No models found",
+      "noResultsDescription": "Try adjusting your search terms or filters to find more models."
+    },
+    "huggingface": {
+      "title": "HuggingFace",
+      "description": "Browse and discover AI models from HuggingFace",
+      "noResults": "No models found",
+      "noResultsDescription": "Try adjusting your search terms or filters to find more models."
+    },
+    "searchQuery": "Search query",
+    "resultsCount": "{{count}} result",
+    "resultsCount_plural": "{{count}} results",
+    "loadingMore": "Loading more models...",
+    "loadMore": "Load More",
+    "endOfResults": "End of results",
+    "filters": {
+      "sort": "Sort by",
+      "period": "Time period",
+      "includeNsfw": "Include NSFW content",
+      "direction": "Sort direction",
+      "author": "Author",
+      "authorPlaceholder": "Filter by author...",
+      "libraries": "Libraries",
+      "tasks": "Tasks",
+      "languages": "Languages",
+      "licenses": "Licenses"
+    },
+    "sort": {
+      "mostdownloaded": "Most Downloaded",
+      "highestrated": "Highest Rated", 
+      "newest": "Newest",
+      "mostliked": "Most Liked",
+      "downloads": "Most Downloaded",
+      "likes": "Most Liked",
+      "updated": "Recently Updated",
+      "created": "Recently Created"
+    },
+    "direction": {
+      "desc": "Descending",
+      "asc": "Ascending"
+    },
+    "period": {
+      "allTime": "All Time",
+      "year": "This Year",
+      "month": "This Month",
+      "week": "This Week",
+      "day": "Today"
+    }
+  },
   "modelGrid": {
     "modified": "Modified",
     "ariaLabel": "Model grid",
@@ -146,5 +199,11 @@
     "selectedModelsTitle": "Selected Models",
     "moreModels": "and {{count}} more...",
     "metadataToApply": "Metadata to Apply"
+  },
+  "errors": {
+    "loadFailed": "Failed to load models"
+  },
+  "actions": {
+    "retry": "Retry"
   }
 }
