@@ -5,6 +5,153 @@
   height: 100%;
 }
 
+/* Sub-tab Navigation Styles */
+.model-browser-sub-tabs {
+  border-bottom: 1px solid var(--cam-border-color);
+  margin-bottom: 0;
+}
+
+.sub-tab-nav {
+  display: flex;
+  gap: 0;
+  background-color: var(--cam-bg-color);
+}
+
+.sub-tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  background-color: transparent;
+  color: var(--cam-muted-text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  position: relative;
+}
+
+.sub-tab-button:hover {
+  background-color: var(--cam-secondary-color);
+  color: var(--cam-text-color);
+}
+
+.sub-tab-button.active {
+  color: var(--cam-primary-color);
+  border-bottom-color: var(--cam-primary-color);
+  background-color: var(--cam-secondary-color);
+}
+
+.sub-tab-button i {
+  font-size: 1rem;
+}
+
+.sub-tab-button span {
+  white-space: nowrap;
+}
+
+/* Sub-tab Content */
+.sub-tab-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-tab-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.civitai-panel {
+  /* CivitAI-specific panel styles if needed */
+}
+
+.huggingface-panel {
+  /* HuggingFace-specific panel styles if needed */
+}
+
+/* Error Boundary Styles */
+.sub-tab-error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-icon {
+  font-size: 3rem;
+  color: var(--cam-error-color, #e74c3c);
+  margin-bottom: 16px;
+}
+
+.error-content h3 {
+  color: var(--cam-text-color);
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.error-message {
+  color: var(--cam-muted-text-color);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Integrated Browser Styles */
+.civitai-browser-integrated,
+.huggingface-browser-integrated {
+  height: 100%;
+  border: none;
+  background: transparent;
+}
+
+.civitai-browser-integrated .browser-header,
+.huggingface-browser-integrated .browser-header {
+  display: none; /* Hide duplicate headers since we have sub-tab navigation */
+}
+
+/* Responsive adjustments for sub-tabs */
+@media (max-width: 768px) {
+  .sub-tab-nav {
+    flex-direction: column;
+  }
+  
+  .sub-tab-button {
+    justify-content: center;
+    padding: 16px 20px;
+  }
+  
+  .sub-tab-button span {
+    margin-left: 8px;
+  }
+}
+
 .model-browser-toolbar {
   display: flex;
   flex-direction: column;
