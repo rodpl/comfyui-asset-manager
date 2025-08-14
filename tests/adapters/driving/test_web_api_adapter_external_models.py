@@ -107,7 +107,9 @@ class TestWebAPIAdapterExternalModels(AioHTTPTestCase):
         
         app = web.Application()
         adapter.register_routes(app)
-        client = await self.get_client(app)
+        server = await self.get_server(app)
+        client = await self.get_client(server)
+        await client.start_server()
         
         # Act
         resp = await client.request("GET", "/asset_manager/external/models")

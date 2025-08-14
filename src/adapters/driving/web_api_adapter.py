@@ -1,6 +1,7 @@
 """Web API adapter for handling HTTP requests (driving adapter)."""
 
 import json
+import inspect
 import os
 import mimetypes
 from typing import Dict, Any, Optional
@@ -1131,6 +1132,9 @@ class WebAPIAdapter:
         
         try:
             platforms = self._external_model_management.get_supported_platforms()
+            # Support AsyncMock or async implementations by awaiting if needed
+            if inspect.isawaitable(platforms):
+                platforms = await platforms
             
             return web.json_response({
                 "success": True,
@@ -1175,6 +1179,9 @@ class WebAPIAdapter:
             
             # Get platform info
             info = self._external_model_management.get_platform_info(platform)
+            # Support AsyncMock or async implementations by awaiting if needed
+            if inspect.isawaitable(info):
+                info = await info
             
             return web.json_response({
                 "success": True,
