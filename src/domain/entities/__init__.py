@@ -20,14 +20,9 @@ from .external_metadata import (
 )
 from .external_model import (
     ExternalModel,
+    ExternalPlatform,
     ComfyUIModelType,
-    ComfyUICompatibility,
-    ModelTypeMapping,
-    CivitAIFile,
-    CivitAIVersion,
-    CivitAIMetadata as ExternalCivitAIMetadata,
-    HuggingFaceSibling,
-    HuggingFaceMetadata as ExternalHuggingFaceMetadata
+    ComfyUICompatibility
 )
 from .output import Output, ImageDimensions, FileInfo
 
@@ -51,14 +46,9 @@ __all__ = [
     "MetadataSource",
     # External model entities
     "ExternalModel",
+    "ExternalPlatform",
     "ComfyUIModelType",
     "ComfyUICompatibility",
-    "ModelTypeMapping",
-    "CivitAIFile",
-    "CivitAIVersion",
-    "ExternalCivitAIMetadata",
-    "HuggingFaceSibling",
-    "ExternalHuggingFaceMetadata",
     # Output entities
     "Output",
     "ImageDimensions",
