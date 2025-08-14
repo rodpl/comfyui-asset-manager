@@ -5,6 +5,8 @@
 export { default as ModelCard } from './ModelCard';
 export type { ModelCardProps } from './ModelCard';
 export { default as ModelCardDemo } from './ModelCardDemo';
+export { default as ModelDetailModal } from './ModelDetailModal';
+export type { ModelDetailModalProps } from './ModelDetailModal';
 export { default as CivitAIBrowser } from './CivitAIBrowser';
 export type { CivitAIBrowserProps } from './CivitAIBrowser';
 export { default as CivitAISearchFilterBar } from './CivitAISearchFilterBar';
