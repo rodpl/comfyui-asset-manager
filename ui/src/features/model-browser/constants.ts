@@ -97,6 +97,9 @@ export const MAX_PAGE_SIZE = 100;
 // Image placeholder for failed loads
 export const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik04NyA3NEg2M0M2MS44OTU0IDc0IDYxIDc0Ljg5NTQgNjEgNzZWMTI0QzYxIDEyNS4xMDUgNjEuODk1NCAxMjYgNjMgMTI2SDg3Qzg4LjEwNDYgMTI2IDg5IDEyNS4xMDUgODkgMTI0Vjc2Qzg5IDc0Ljg5NTQgODguMTA0NiA3NCA4NyA3NFoiIGZpbGw9IiNEMUQ1REIiLz4KPHBhdGggZD0iTTEzNyA3NEgxMTNDMTExLjg5NSA3NCAxMTEgNzQuODk1NCAxMTEgNzZWMTI0QzExMSAxMjUuMTA1IDExMS44OTUgMTI2IDExMyAxMjZIMTM3QzEzOC4xMDUgMTI2IDEzOSAxMjUuMTA1IDEzOSAxMjRWNzZDMTM5IDc0Ljg5NTQgMTM4LjEwNSA3NCAxMzcgNzRaIiBmaWxsPSIjRDFENURCIi8+Cjwvc3ZnPgo=';
 
+// HuggingFace logo (served via backend proxy to avoid CORS)
+export const HUGGINGFACE_LOGO_URL = '/asset_manager/proxy/huggingface/file?url=https%3A%2F%2Fhuggingface.co%2Ffront%2Fassets%2Fhuggingface_logo.svg';
+
 // Error messages
 export const ERROR_MESSAGES = {
   NETWORK_ERROR: 'Network error occurred. Please check your connection.',

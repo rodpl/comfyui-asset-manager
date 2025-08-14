@@ -13,8 +13,8 @@ import {
   ExternalModelError
 } from '../types';
 
-// CivitAI API configuration
-const CIVITAI_BASE_URL = 'https://civitai.com/api/v1';
+// CivitAI API configuration (proxied via backend to avoid CORS)
+const CIVITAI_BASE_URL = '/asset_manager/proxy/civitai';
 const DEFAULT_LIMIT = 20;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second

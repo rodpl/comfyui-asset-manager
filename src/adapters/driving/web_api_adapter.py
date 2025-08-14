@@ -6,6 +6,7 @@ import os
 import mimetypes
 from typing import Dict, Any, Optional
 from aiohttp import web, hdrs
+import aiohttp
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response
 
@@ -85,6 +86,13 @@ class WebAPIAdapter:
         app.router.add_get('/asset_manager/external/recent', self.get_recent_external_models)
         app.router.add_get('/asset_manager/external/platforms', self.get_supported_platforms)
         app.router.add_get('/asset_manager/external/platforms/{platform}/info', self.get_platform_info)
+
+        # Proxy endpoints to avoid CORS for external APIs
+        app.router.add_get('/asset_manager/proxy/civitai/models', self.proxy_civitai_models)
+        app.router.add_get('/asset_manager/proxy/civitai/models/{model_id}', self.proxy_civitai_model_details)
+        app.router.add_get('/asset_manager/proxy/huggingface/models', self.proxy_huggingface_models)
+        app.router.add_get('/asset_manager/proxy/huggingface/models/{model_id}', self.proxy_huggingface_model_details)
+        app.router.add_get('/asset_manager/proxy/huggingface/file', self.proxy_huggingface_file)
     
     async def get_folders(self, request: Request) -> Response:
         """Handle GET /asset_manager/folders endpoint.
@@ -109,6 +117,182 @@ class WebAPIAdapter:
             
         except DomainError as e:
             return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    # Proxy handlers
+    async def proxy_civitai_models(self, request: Request) -> Response:
+        """Proxy GET /models to CivitAI API to bypass browser CORS.
+
+        Forwards query parameters transparently and returns the JSON response body.
+        """
+        base_url = 'https://civitai.com/api/v1/models'
+        query_string = request.query_string
+        url = f"{base_url}{'?' + query_string if query_string else ''}"
+
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    # Try to return JSON as-is; fall back to text
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'CivitAI proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_civitai_model_details(self, request: Request) -> Response:
+        """Proxy GET /models/{model_id} to CivitAI API to bypass browser CORS."""
+        model_id = request.match_info.get('model_id')
+        if not model_id:
+            return web.json_response({
+                'success': False,
+                'error': "Missing 'model_id'",
+                'error_type': 'validation_error'
+            }, status=400)
+
+        url = f'https://civitai.com/api/v1/models/{model_id}'
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'CivitAI proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_huggingface_models(self, request: Request) -> Response:
+        """Proxy GET /models to HuggingFace API to bypass browser CORS."""
+        base_url = 'https://huggingface.co/api/models'
+        query_string = request.query_string
+        url = f"{base_url}{'?' + query_string if query_string else ''}"
+
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'HuggingFace proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_huggingface_model_details(self, request: Request) -> Response:
+        """Proxy GET /models/{model_id} to HuggingFace API to bypass browser CORS."""
+        model_id = request.match_info.get('model_id')
+        if not model_id:
+            return web.json_response({
+                'success': False,
+                'error': "Missing 'model_id'",
+                'error_type': 'validation_error'
+            }, status=400)
+
+        url = f'https://huggingface.co/api/models/{model_id}'
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'Accept': 'application/json',
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url, headers=headers) as resp:
+                    status = resp.status
+                    content_type = resp.headers.get('Content-Type', '')
+                    if 'application/json' in content_type:
+                        data = await resp.json()
+                        return web.json_response(data, status=status)
+                    text = await resp.text()
+                    return web.Response(text=text, status=status, content_type=content_type or 'application/json')
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'HuggingFace proxy request failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+
+    async def proxy_huggingface_file(self, request: Request) -> Response:
+        """Proxy arbitrary HuggingFace file URLs (e.g., thumbnails) to avoid CORS and hotlinking issues.
+
+        Query param: url (required) - absolute HuggingFace URL
+        """
+        target_url = request.query.get('url')
+        if not target_url or not target_url.startswith('https://huggingface.co/'):
+            return web.json_response({
+                'success': False,
+                'error': "Missing or invalid 'url'",
+                'error_type': 'validation_error'
+            }, status=400)
+
+        timeout = aiohttp.ClientTimeout(total=30)
+        headers = {
+            'User-Agent': 'ComfyUI-Asset-Manager/1.0',
+            'Accept': '*/*'
+        }
+
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(target_url, headers=headers) as resp:
+                    status = resp.status
+                    content = await resp.read()
+                    content_type = resp.headers.get('Content-Type', 'application/octet-stream')
+                    return web.Response(body=content, status=status, content_type=content_type, headers={
+                        'Cache-Control': 'public, max-age=3600'
+                    })
+        except aiohttp.ClientError as e:
+            return web.json_response({
+                'success': False,
+                'error': f'HuggingFace proxy file failed: {str(e)}',
+                'error_type': 'proxy_error'
+            }, status=502)
         except Exception as e:
             return self._handle_unexpected_error(e)
     
