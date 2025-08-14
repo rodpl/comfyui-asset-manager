@@ -57,13 +57,28 @@
     "filters": {
       "sort": "Sort by",
       "period": "Time period",
-      "includeNsfw": "Include NSFW content"
+      "includeNsfw": "Include NSFW content",
+      "direction": "Sort direction",
+      "author": "Author",
+      "authorPlaceholder": "Filter by author...",
+      "libraries": "Libraries",
+      "tasks": "Tasks",
+      "languages": "Languages",
+      "licenses": "Licenses"
     },
     "sort": {
       "mostdownloaded": "Most Downloaded",
       "highestrated": "Highest Rated", 
       "newest": "Newest",
-      "mostliked": "Most Liked"
+      "mostliked": "Most Liked",
+      "downloads": "Most Downloaded",
+      "likes": "Most Liked",
+      "updated": "Recently Updated",
+      "created": "Recently Created"
+    },
+    "direction": {
+      "desc": "Descending",
+      "asc": "Ascending"
     },
     "period": {
       "allTime": "All Time",
