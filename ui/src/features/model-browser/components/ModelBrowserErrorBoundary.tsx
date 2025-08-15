@@ -4,7 +4,6 @@
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { ExternalModelError } from '../types';
 import './ModelBrowserErrorBoundary.css';
 
 interface Props {

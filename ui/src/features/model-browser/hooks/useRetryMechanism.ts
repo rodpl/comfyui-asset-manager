@@ -55,10 +55,7 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
   onCircuitClose: () => {},
 };
 
-export const useRetryMechanism = <T>(
-  operation: () => Promise<T>,
-  options: RetryOptions = {}
-) => {
+export const useRetryMechanism = <T>(operation: () => Promise<T>, options: RetryOptions = {}) => {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
   const [state, setState] = useState<RetryState>({
@@ -71,80 +68,54 @@ export const useRetryMechanism = <T>(
   });
 
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownIntervalRef = useRef<NodeJS.Interval | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const circuitBreakerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const failureCountRef = useRef(0);
   const lastFailureTimeRef = useRef<Date | null>(null);
 
   // Calculate delay with exponential backoff and jitter
-  const calculateDelay = useCallback((attempt: number): number => {
-    let delay = opts.initialDelay * Math.pow(opts.backoffFactor, attempt - 1);
-    delay = Math.min(delay, opts.maxDelay);
+  const calculateDelay = useCallback(
+    (attempt: number): number => {
+      let delay = opts.initialDelay * Math.pow(opts.backoffFactor, attempt - 1);
+      delay = Math.min(delay, opts.maxDelay);
 
-    if (opts.jitter) {
-      // Add ±25% jitter
-      const jitterRange = delay * 0.25;
-      delay += (Math.random() - 0.5) * 2 * jitterRange;
-    }
+      if (opts.jitter) {
+        // Add ±25% jitter
+        const jitterRange = delay * 0.25;
+        delay += (Math.random() - 0.5) * 2 * jitterRange;
+      }
 
-    return Math.max(delay, opts.initialDelay);
-  }, [opts.initialDelay, opts.backoffFactor, opts.maxDelay, opts.jitter]);
+      return Math.max(delay, opts.initialDelay);
+    },
+    [opts.initialDelay, opts.backoffFactor, opts.maxDelay, opts.jitter]
+  );
 
   // Check if error is retryable
-  const isRetryableError = useCallback((error: Error): boolean => {
-    return opts.retryableErrors.some(retryableError =>
-      error.message.includes(retryableError) || error.name.includes(retryableError)
-    );
-  }, [opts.retryableErrors]);
-
-  // Open circuit breaker
-  const openCircuit = useCallback(() => {
-    setState(prev => ({ ...prev, isCircuitOpen: true, canRetry: false }));
-    opts.onCircuitOpen();
-
-    // Close circuit after timeout
-    circuitBreakerTimeoutRef.current = setTimeout(() => {
-      setState(prev => ({ ...prev, isCircuitOpen: false, canRetry: true }));
-      failureCountRef.current = 0;
-      opts.onCircuitClose();
-    }, opts.circuitBreakerTimeout);
-  }, [opts.onCircuitOpen, opts.onCircuitClose, opts.circuitBreakerTimeout]);
-
-  // Start countdown timer
-  const startCountdown = useCallback((delay: number) => {
-    setState(prev => ({ ...prev, nextRetryIn: delay }));
-
-    countdownIntervalRef.current = setInterval(() => {
-      setState(prev => {
-        const newTime = prev.nextRetryIn - 100;
-        if (newTime <= 0) {
-          if (countdownIntervalRef.current) {
-            clearInterval(countdownIntervalRef.current);
-            countdownIntervalRef.current = null;
-          }
-          return { ...prev, nextRetryIn: 0 };
-        }
-        return { ...prev, nextRetryIn: newTime };
-      });
-    }, 100);
-  }, []);
+  const isRetryableError = useCallback(
+    (error: Error): boolean => {
+      return opts.retryableErrors.some(
+        (retryableError) =>
+          error.message.includes(retryableError) || error.name.includes(retryableError)
+      );
+    },
+    [opts.retryableErrors]
+  );
 
   // Execute operation with retry logic
   const execute = useCallback(async (): Promise<T> => {
-    // Check circuit breaker
     if (state.isCircuitOpen) {
       throw new Error('Circuit breaker is open. Service temporarily unavailable.');
     }
 
     try {
-      setState(prev => ({ ...prev, isRetrying: true, lastError: null }));
-      
+      setState((prev) => ({ ...prev, isRetrying: true, lastError: null }));
+
       const result = await operation();
-      
-      // Success - reset failure count and state
+
+      // Success - reset state
       failureCountRef.current = 0;
       lastFailureTimeRef.current = null;
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isRetrying: false,
         retryCount: 0,
@@ -154,34 +125,41 @@ export const useRetryMechanism = <T>(
       }));
 
       return result;
-
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      
-      setState(prev => ({ ...prev, lastError: err }));
-      
+
+      setState((prev) => ({ ...prev, lastError: err, isRetrying: false }));
+
       // Increment failure count
       failureCountRef.current++;
       lastFailureTimeRef.current = new Date();
 
       // Check if we should open circuit breaker
       if (failureCountRef.current >= opts.circuitBreakerThreshold) {
-        openCircuit();
+        setState((prev) => ({ ...prev, isCircuitOpen: true, canRetry: false }));
+        opts.onCircuitOpen();
+
+        // Close circuit after timeout
+        circuitBreakerTimeoutRef.current = setTimeout(() => {
+          setState((prev) => ({ ...prev, isCircuitOpen: false, canRetry: true }));
+          failureCountRef.current = 0;
+          opts.onCircuitClose();
+        }, opts.circuitBreakerTimeout);
+
         throw err;
       }
 
       // Check if error is retryable and we haven't exceeded max retries
       if (!isRetryableError(err) || state.retryCount >= opts.maxRetries) {
-        setState(prev => ({ 
-          ...prev, 
-          isRetrying: false, 
-          canRetry: false 
+        setState((prev) => ({
+          ...prev,
+          canRetry: false,
         }));
-        
+
         if (state.retryCount >= opts.maxRetries) {
           opts.onMaxRetriesReached(err);
         }
-        
+
         throw err;
       }
 
@@ -189,14 +167,30 @@ export const useRetryMechanism = <T>(
       const nextAttempt = state.retryCount + 1;
       const delay = calculateDelay(nextAttempt);
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         retryCount: nextAttempt,
         canRetry: nextAttempt < opts.maxRetries,
+        isRetrying: true,
+        nextRetryIn: delay,
       }));
 
       opts.onRetry(nextAttempt, err);
-      startCountdown(delay);
+
+      // Start countdown
+      countdownIntervalRef.current = setInterval(() => {
+        setState((prev) => {
+          const newTime = prev.nextRetryIn - 100;
+          if (newTime <= 0) {
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current);
+              countdownIntervalRef.current = null;
+            }
+            return { ...prev, nextRetryIn: 0 };
+          }
+          return { ...prev, nextRetryIn: newTime };
+        });
+      }, 100);
 
       return new Promise<T>((resolve, reject) => {
         retryTimeoutRef.current = setTimeout(async () => {
@@ -209,18 +203,7 @@ export const useRetryMechanism = <T>(
         }, delay);
       });
     }
-  }, [
-    state.isCircuitOpen,
-    state.retryCount,
-    operation,
-    opts.maxRetries,
-    opts.onRetry,
-    opts.onMaxRetriesReached,
-    isRetryableError,
-    calculateDelay,
-    openCircuit,
-    startCountdown,
-  ]);
+  }, [operation, state.isCircuitOpen, state.retryCount, opts, isRetryableError, calculateDelay]);
 
   // Manual retry function
   const retry = useCallback(async (): Promise<T> => {
@@ -235,7 +218,7 @@ export const useRetryMechanism = <T>(
     }
 
     // Reset state for manual retry
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       retryCount: 0,
       lastError: null,
@@ -287,7 +270,7 @@ export const useRetryMechanism = <T>(
       countdownIntervalRef.current = null;
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       isRetrying: false,
       nextRetryIn: 0,
@@ -343,13 +326,13 @@ export const useRetryMechanism = <T>(
     hasReachedMaxRetries,
     failureRate,
     statusMessage: getStatusMessage(),
-    
+
     // Actions
     execute,
     retry,
     reset,
     cancel,
-    
+
     // Metadata
     totalFailures: failureCountRef.current,
     lastFailureTime: lastFailureTimeRef.current,
