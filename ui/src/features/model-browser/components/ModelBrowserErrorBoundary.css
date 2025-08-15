@@ -1,0 +1,265 @@
+/**
+ * Model Browser Error Boundary Styles
+ */
+
+.model-browser-error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 2rem;
+  background-color: var(--comfy-input-bg, #f8f9fa);
+  border: 1px solid var(--comfy-input-border, #e9ecef);
+  border-radius: var(--comfy-border-radius, 8px);
+  margin: 1rem 0;
+}
+
+.error-boundary-content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.error-icon {
+  margin-bottom: 1rem;
+}
+
+.error-icon i {
+  font-size: 3rem;
+  color: var(--comfy-error-color, #dc3545);
+  opacity: 0.8;
+}
+
+.error-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--comfy-input-text, #212529);
+}
+
+.error-message {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--comfy-input-text, #6c757d);
+}
+
+.retry-info {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: var(--comfy-input-text, #6c757d);
+  font-style: italic;
+}
+
+.auto-retry-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: var(--comfy-menu-bg, #fff);
+  border: 1px solid var(--comfy-input-border, #e9ecef);
+  border-radius: var(--comfy-border-radius, 4px);
+  font-size: 0.875rem;
+  color: var(--comfy-input-text, #6c757d);
+}
+
+.auto-retry-indicator i {
+  color: var(--comfy-primary-color, #007bff);
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.retry-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.help-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--comfy-input-text, #6c757d);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.help-button:hover {
+  color: var(--comfy-primary-color, #007bff);
+  text-decoration: none;
+}
+
+.error-details {
+  margin-top: 2rem;
+  text-align: left;
+  background-color: var(--comfy-menu-bg, #f8f9fa);
+  border: 1px solid var(--comfy-input-border, #e9ecef);
+  border-radius: var(--comfy-border-radius, 4px);
+  padding: 1rem;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--comfy-input-text, #495057);
+  margin-bottom: 0.5rem;
+}
+
+.error-details summary:hover {
+  color: var(--comfy-primary-color, #007bff);
+}
+
+.error-stack {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--comfy-input-text, #495057);
+  background-color: var(--comfy-input-bg, #fff);
+  padding: 0.75rem;
+  border-radius: var(--comfy-border-radius, 4px);
+  border: 1px solid var(--comfy-input-border, #e9ecef);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-stack pre {
+  margin: 0.5rem 0 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .model-browser-error-boundary {
+    padding: 1rem;
+    min-height: 250px;
+  }
+
+  .error-boundary-content {
+    max-width: 100%;
+  }
+
+  .error-icon i {
+    font-size: 2.5rem;
+  }
+
+  .error-title {
+    font-size: 1.25rem;
+  }
+
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .retry-button,
+  .help-button {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .model-browser-error-boundary {
+    background-color: var(--comfy-input-bg, #2d3748);
+    border-color: var(--comfy-input-border, #4a5568);
+  }
+
+  .error-title {
+    color: var(--comfy-input-text, #f7fafc);
+  }
+
+  .error-message,
+  .retry-info {
+    color: var(--comfy-input-text, #cbd5e0);
+  }
+
+  .auto-retry-indicator {
+    background-color: var(--comfy-menu-bg, #1a202c);
+    border-color: var(--comfy-input-border, #4a5568);
+    color: var(--comfy-input-text, #cbd5e0);
+  }
+
+  .help-button {
+    color: var(--comfy-input-text, #cbd5e0);
+  }
+
+  .help-button:hover {
+    color: var(--comfy-primary-color, #63b3ed);
+  }
+
+  .error-details {
+    background-color: var(--comfy-menu-bg, #1a202c);
+    border-color: var(--comfy-input-border, #4a5568);
+  }
+
+  .error-details summary {
+    color: var(--comfy-input-text, #e2e8f0);
+  }
+
+  .error-details summary:hover {
+    color: var(--comfy-primary-color, #63b3ed);
+  }
+
+  .error-stack {
+    background-color: var(--comfy-input-bg, #2d3748);
+    border-color: var(--comfy-input-border, #4a5568);
+    color: var(--comfy-input-text, #e2e8f0);
+  }
+}
+
+/* Animation for retry button */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.retry-button:active {
+  animation: pulse 0.2s ease-in-out;
+}
+
+/* Loading state for auto-retry */
+.auto-retry-indicator i.pi-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

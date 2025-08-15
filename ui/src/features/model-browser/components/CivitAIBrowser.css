@@ -433,4 +433,158 @@
       transparent
     );
   }
+}/* E
+nhanced error handling and loading states */
+
+.connection-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--comfy-warning-bg, #fff3cd);
+  border: 1px solid var(--comfy-warning-border, #ffeaa7);
+  border-radius: var(--comfy-border-radius, 4px);
+  color: var(--comfy-warning-text, #856404);
+  font-size: 0.875rem;
+}
+
+.connection-warning i {
+  color: var(--comfy-warning-color, #ffc107);
+}
+
+.retry-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: var(--comfy-info-bg, #d1ecf1);
+  border: 1px solid var(--comfy-info-border, #bee5eb);
+  border-radius: var(--comfy-border-radius, 6px);
+  color: var(--comfy-info-text, #0c5460);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.retry-status i {
+  color: var(--comfy-info-color, #17a2b8);
+  font-size: 1rem;
+}
+
+.civitai-loading-skeleton {
+  margin: 1rem 0;
+}
+
+.civitai-offline-state,
+.civitai-error-state,
+.civitai-empty-state {
+  margin: 2rem 0;
+}
+
+.civitai-error-boundary {
+  width: 100%;
+}
+
+/* Load more button disabled state */
+.load-more-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--comfy-input-bg, #f8f9fa);
+  border-color: var(--comfy-input-border, #e9ecef);
+  color: var(--comfy-input-text, #6c757d);
+}
+
+.load-more-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Enhanced loading states */
+.civitai-browser.loading {
+  position: relative;
+}
+
+.civitai-browser.loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: loading-sweep 2s infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes loading-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .connection-warning {
+    background-color: var(--comfy-warning-bg, #664d03);
+    border-color: var(--comfy-warning-border, #997404);
+    color: var(--comfy-warning-text, #ffecb5);
+  }
+
+  .retry-status {
+    background-color: var(--comfy-info-bg, #055160);
+    border-color: var(--comfy-info-border, #0c5460);
+    color: var(--comfy-info-text, #b8daff);
+  }
+
+  .load-more-button:disabled {
+    background-color: var(--comfy-input-bg, #2d3748);
+    border-color: var(--comfy-input-border, #4a5568);
+    color: var(--comfy-input-text, #a0aec0);
+  }
+
+  .civitai-browser.loading::before {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .connection-warning {
+    border-width: 2px;
+  }
+
+  .retry-status {
+    border-width: 2px;
+  }
+
+  .load-more-button:disabled {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .civitai-browser.loading::before {
+    animation: none;
+  }
+
+  .retry-status i.pi-spin {
+    animation: none;
+  }
 }
