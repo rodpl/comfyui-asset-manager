@@ -1,8 +1,8 @@
 /**
- * Theme Testing Utilities
+ * Enhanced Theme Testing Utilities
  *
- * Utilities for testing CSS variable inheritance, fallback behavior,
- * and theme switching functionality in the ComfyUI Asset Manager.
+ * Comprehensive utilities for testing CSS variable inheritance, fallback behavior,
+ * theme switching functionality, and visual regression testing in the ComfyUI Asset Manager.
  */
 
 export interface ThemeTestResult {
@@ -19,6 +19,30 @@ export interface ThemeTestSuite {
   transitionTests: boolean;
 }
 
+export interface ComponentStyleSnapshot {
+  selector: string;
+  computedStyles: Record<string, string>;
+  theme: 'light' | 'dark';
+  timestamp: number;
+}
+
+export interface ThemeTransitionTest {
+  element: HTMLElement;
+  property: string;
+  startValue: string;
+  endValue: string;
+  duration: number;
+  completed: boolean;
+}
+
+export interface VisualRegressionResult {
+  component: string;
+  theme: 'light' | 'dark';
+  snapshots: ComponentStyleSnapshot[];
+  differences: string[];
+  passed: boolean;
+}
+
 /**
  * Get the computed value of a CSS variable from the extension root element
  */
@@ -32,7 +56,7 @@ export function getCSSVariableValue(variableName: string, element?: HTMLElement)
  * Test if a CSS variable has a valid value (not empty or 'initial')
  */
 export function isValidCSSVariableValue(value: string): boolean {
-  return value !== '' && value !== 'initial' && value !== 'inherit' && value !== 'unset';
+  return value !== '' && value !== 'initial' && value !== 'inherit' && value !== 'unset' && value !== 'revert';
 }
 
 /**
@@ -298,4 +322,421 @@ export function testComfyUIVariableMapping(): Record<
   });
 
   return results;
+}
+
+/**
+ * Enhanced theme switching test utilities for comprehensive testing
+ */
+
+/**
+ * Create a test environment with proper DOM structure
+ */
+export function createThemeTestEnvironment(): {
+  rootElement: HTMLElement;
+  cleanup: () => void;
+} {
+  // Create extension root element
+  const rootElement = document.createElement('div');
+  rootElement.id = 'comfyui-asset-manager-root';
+  document.body.appendChild(rootElement);
+
+  // Add basic CSS variables for testing
+  const style = document.createElement('style');
+  style.textContent = `
+    :root {
+      --asset-manager-bg-primary: var(--comfy-menu-bg, #2a2a2a);
+      --asset-manager-text-primary: var(--input-text, #ffffff);
+      --asset-manager-border-primary: var(--border-color, #555555);
+      --asset-manager-transition-normal: 0.2s ease;
+    }
+    
+    :root.comfy-theme-light #comfyui-asset-manager-root {
+      --asset-manager-bg-primary: var(--comfy-menu-bg, #f0f0f0);
+      --asset-manager-text-primary: var(--input-text, #000000);
+      --asset-manager-border-primary: var(--border-color, #cccccc);
+    }
+    
+    .asset-manager-component {
+      background-color: var(--asset-manager-bg-primary);
+      color: var(--asset-manager-text-primary);
+      border: 1px solid var(--asset-manager-border-primary);
+      transition: var(--asset-manager-transition-normal);
+    }
+  `;
+  document.head.appendChild(style);
+
+  const cleanup = () => {
+    if (rootElement.parentNode) {
+      rootElement.parentNode.removeChild(rootElement);
+    }
+    if (style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+    document.documentElement.className = '';
+  };
+
+  return { rootElement, cleanup };
+}
+
+/**
+ * Test theme switching with transition monitoring
+ */
+export function testThemeTransition(
+  element: HTMLElement,
+  property: string = 'background-color'
+): Promise<ThemeTransitionTest> {
+  return new Promise((resolve) => {
+    const startValue = getComputedStyle(element).getPropertyValue(property);
+    const startTime = performance.now();
+    
+    // Switch theme
+    const currentTheme = getCurrentTheme();
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setComfyUITheme(newTheme);
+    
+    // Monitor for transition completion
+    const checkTransition = () => {
+      const currentValue = getComputedStyle(element).getPropertyValue(property);
+      const duration = performance.now() - startTime;
+      
+      if (currentValue !== startValue || duration > 1000) {
+        resolve({
+          element,
+          property,
+          startValue,
+          endValue: currentValue,
+          duration,
+          completed: currentValue !== startValue
+        });
+      } else {
+        requestAnimationFrame(checkTransition);
+      }
+    };
+    
+    requestAnimationFrame(checkTransition);
+  });
+}
+
+/**
+ * Capture component style snapshot for visual regression testing
+ */
+export function captureComponentSnapshot(
+  selector: string,
+  properties: string[] = [
+    'background-color',
+    'color',
+    'border-color',
+    'font-size',
+    'padding',
+    'margin'
+  ]
+): ComponentStyleSnapshot {
+  const element = document.querySelector(selector) as HTMLElement;
+  if (!element) {
+    throw new Error(`Element not found: ${selector}`);
+  }
+  
+  const computedStyles = getComputedStyle(element);
+  const styles: Record<string, string> = {};
+  
+  properties.forEach(property => {
+    styles[property] = computedStyles.getPropertyValue(property);
+  });
+  
+  return {
+    selector,
+    computedStyles: styles,
+    theme: getCurrentTheme(),
+    timestamp: Date.now()
+  };
+}
+
+/**
+ * Compare component snapshots for visual regression testing
+ */
+export function compareComponentSnapshots(
+  snapshot1: ComponentStyleSnapshot,
+  snapshot2: ComponentStyleSnapshot,
+  toleranceProperties: string[] = []
+): VisualRegressionResult {
+  const differences: string[] = [];
+  
+  // Compare all properties
+  const allProperties = new Set([
+    ...Object.keys(snapshot1.computedStyles),
+    ...Object.keys(snapshot2.computedStyles)
+  ]);
+  
+  allProperties.forEach(property => {
+    const value1 = snapshot1.computedStyles[property] || '';
+    const value2 = snapshot2.computedStyles[property] || '';
+    
+    if (value1 !== value2 && !toleranceProperties.includes(property)) {
+      differences.push(
+        `${property}: "${value1}" (${snapshot1.theme}) vs "${value2}" (${snapshot2.theme})`
+      );
+    }
+  });
+  
+  return {
+    component: snapshot1.selector,
+    theme: snapshot2.theme,
+    snapshots: [snapshot1, snapshot2],
+    differences,
+    passed: differences.length === 0
+  };
+}
+
+/**
+ * Test all theme components for visual consistency
+ */
+export function testAllComponentsVisualConsistency(
+  componentSelectors: string[] = [
+    '.asset-manager-button',
+    '.asset-manager-card',
+    '.asset-manager-input',
+    '.asset-manager-modal',
+    '.asset-manager-loading',
+    '.asset-manager-error-message',
+    '.asset-manager-empty-state'
+  ]
+): Promise<VisualRegressionResult[]> {
+  return new Promise((resolve) => {
+    const results: VisualRegressionResult[] = [];
+    
+    // Test each component in both themes
+    componentSelectors.forEach(selector => {
+      const element = document.querySelector(selector);
+      if (!element) return;
+      
+      // Capture dark theme snapshot
+      setComfyUITheme('dark');
+      const darkSnapshot = captureComponentSnapshot(selector);
+      
+      // Capture light theme snapshot
+      setComfyUITheme('light');
+      const lightSnapshot = captureComponentSnapshot(selector);
+      
+      // Compare snapshots
+      const comparison = compareComponentSnapshots(darkSnapshot, lightSnapshot);
+      results.push(comparison);
+    });
+    
+    resolve(results);
+  });
+}
+
+/**
+ * Mock ComfyUI variables for testing
+ */
+export function mockComfyUIVariables(variables: Record<string, string>): () => void {
+  const originalValues: Record<string, string> = {};
+  
+  Object.entries(variables).forEach(([variable, value]) => {
+    originalValues[variable] = document.documentElement.style.getPropertyValue(variable);
+    document.documentElement.style.setProperty(variable, value);
+  });
+  
+  return () => {
+    Object.entries(originalValues).forEach(([variable, value]) => {
+      if (value) {
+        document.documentElement.style.setProperty(variable, value);
+      } else {
+        document.documentElement.style.removeProperty(variable);
+      }
+    });
+  };
+}
+
+/**
+ * Test CSS variable fallback chain
+ */
+export function testVariableFallbackChain(
+  assetManagerVar: string,
+  comfyUIVar: string,
+  fallbackValue: string
+): {
+  withComfyUI: string;
+  withoutComfyUI: string;
+  fallbackWorks: boolean;
+} {
+  const testElement = document.createElement('div');
+  testElement.style.setProperty('--test-var', `var(${assetManagerVar})`);
+  testElement.style.backgroundColor = 'var(--test-var)';
+  document.body.appendChild(testElement);
+  
+  // Test with ComfyUI variable
+  document.documentElement.style.setProperty(comfyUIVar, '#ff0000');
+  const withComfyUI = getComputedStyle(testElement).backgroundColor;
+  
+  // Test without ComfyUI variable
+  document.documentElement.style.removeProperty(comfyUIVar);
+  const withoutComfyUI = getComputedStyle(testElement).backgroundColor;
+  
+  document.body.removeChild(testElement);
+  
+  return {
+    withComfyUI,
+    withoutComfyUI,
+    fallbackWorks: withoutComfyUI !== '' && withoutComfyUI !== 'rgba(0, 0, 0, 0)'
+  };
+}
+
+/**
+ * Performance test for theme switching
+ */
+export function performanceTestThemeSwitching(iterations: number = 100): {
+  averageTime: number;
+  minTime: number;
+  maxTime: number;
+  totalTime: number;
+} {
+  const times: number[] = [];
+  
+  for (let i = 0; i < iterations; i++) {
+    const startTime = performance.now();
+    
+    // Switch theme
+    const currentTheme = getCurrentTheme();
+    setComfyUITheme(currentTheme === 'light' ? 'dark' : 'light');
+    
+    const endTime = performance.now();
+    times.push(endTime - startTime);
+  }
+  
+  return {
+    averageTime: times.reduce((sum, time) => sum + time, 0) / times.length,
+    minTime: Math.min(...times),
+    maxTime: Math.max(...times),
+    totalTime: times.reduce((sum, time) => sum + time, 0)
+  };
+}
+
+/**
+ * Test theme switching with large component trees
+ */
+export function testThemeSwitchingPerformance(componentCount: number = 100): Promise<{
+  switchTime: number;
+  renderTime: number;
+  totalTime: number;
+}> {
+  return new Promise((resolve) => {
+    const container = document.createElement('div');
+    container.id = 'performance-test-container';
+    document.body.appendChild(container);
+    
+    // Create many components
+    const startCreateTime = performance.now();
+    for (let i = 0; i < componentCount; i++) {
+      const component = document.createElement('div');
+      component.className = 'asset-manager-component';
+      component.textContent = `Component ${i}`;
+      container.appendChild(component);
+    }
+    const createTime = performance.now() - startCreateTime;
+    
+    // Test theme switching
+    const startSwitchTime = performance.now();
+    setComfyUITheme('light');
+    
+    requestAnimationFrame(() => {
+      const switchTime = performance.now() - startSwitchTime;
+      
+      // Clean up
+      document.body.removeChild(container);
+      
+      resolve({
+        switchTime,
+        renderTime: createTime,
+        totalTime: switchTime + createTime
+      });
+    });
+  });
+}
+
+/**
+ * Validate CSS class naming conventions
+ */
+export function validateCSSClassNaming(element: HTMLElement): {
+  valid: boolean;
+  violations: string[];
+} {
+  const violations: string[] = [];
+  const classes = element.className.split(' ');
+  
+  classes.forEach(className => {
+    if (className.startsWith('asset-manager-')) {
+      // Check kebab-case pattern
+      if (!/^asset-manager-[a-z-]+$/.test(className)) {
+        violations.push(`Invalid class name pattern: ${className}`);
+      }
+      
+      // Check modifier pattern
+      if (className.includes('--')) {
+        if (!/^asset-manager-[a-z-]+--[a-z-]+$/.test(className)) {
+          violations.push(`Invalid modifier pattern: ${className}`);
+        }
+      }
+    }
+  });
+  
+  return {
+    valid: violations.length === 0,
+    violations
+  };
+}
+
+/**
+ * Test CSS variable inheritance chain
+ */
+export function testCSSVariableInheritance(): {
+  rootVariables: string[];
+  inheritedVariables: string[];
+  brokenInheritance: string[];
+} {
+  const rootElement = document.getElementById('comfyui-asset-manager-root');
+  if (!rootElement) {
+    throw new Error('Extension root element not found');
+  }
+  
+  const testChild = document.createElement('div');
+  testChild.className = 'asset-manager-component';
+  rootElement.appendChild(testChild);
+  
+  const rootStyles = getComputedStyle(rootElement);
+  const childStyles = getComputedStyle(testChild);
+  
+  const testVariables = [
+    '--asset-manager-bg-primary',
+    '--asset-manager-text-primary',
+    '--asset-manager-border-primary',
+    '--asset-manager-interactive-primary'
+  ];
+  
+  const rootVariables: string[] = [];
+  const inheritedVariables: string[] = [];
+  const brokenInheritance: string[] = [];
+  
+  testVariables.forEach(variable => {
+    const rootValue = rootStyles.getPropertyValue(variable);
+    const childValue = childStyles.getPropertyValue(variable);
+    
+    if (rootValue) {
+      rootVariables.push(variable);
+      
+      if (childValue === rootValue) {
+        inheritedVariables.push(variable);
+      } else {
+        brokenInheritance.push(variable);
+      }
+    }
+  });
+  
+  rootElement.removeChild(testChild);
+  
+  return {
+    rootVariables,
+    inheritedVariables,
+    brokenInheritance
+  };
 }
