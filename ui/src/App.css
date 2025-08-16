@@ -4,8 +4,8 @@
   max-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--cam-bg-color);
-  color: var(--cam-text-color);
+  background-color: var(--asset-manager-bg-primary);
+  color: var(--asset-manager-text-primary);
   overflow: hidden;
 }
 
@@ -14,15 +14,12 @@
         align-items: center;
         justify-content: space-between;
         flex-wrap: wrap;
-        padding: var(--p-toolbar-padding);
-        background: var(--p-toolbar-background);
-        border-left: 1px solid var(--p-toolbar-border-color);
-        border-right: 1px solid var(--p-toolbar-border-color);
-        border-bottom: 1px solid var(--p-toolbar-border-color);
-        border-top: 1px solid var(--p-toolbar-border-color);
-        color: var(--p-toolbar-color);
-        border-radius: var(--p-toolbar-border-radius);
-        gap: var(--p-toolbar-gap);
+        padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-md);
+        background: var(--asset-manager-bg-secondary);
+        border: 1px solid var(--asset-manager-border-primary);
+        color: var(--asset-manager-text-primary);
+        border-radius: var(--asset-manager-border-radius-md);
+        gap: var(--asset-manager-spacing-sm);
     }
     
     /* Allow Tailwind border utilities to override */
@@ -43,35 +40,35 @@
 /* Tab Navigation */
 .asset-manager-container .tab-navigation {
   display: flex;
-  border-bottom: 2px solid var(--cam-border-color);
-  margin-bottom: 16px;
+  border-bottom: 2px solid var(--asset-manager-border-primary);
+  margin-bottom: var(--asset-manager-spacing-md);
   flex-shrink: 0;
 }
 
 .asset-manager-container .tab-button {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: var(--asset-manager-spacing-sm);
+  padding: var(--asset-manager-spacing-md) var(--asset-manager-spacing-lg);
   border: none;
   background: transparent;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-muted);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition: all var(--asset-manager-transition-normal);
   font-size: 0.9rem;
   white-space: nowrap;
 }
 
 .asset-manager-container .tab-button:hover {
-  background-color: var(--cam-border-color);
-  color: var(--cam-text-color);
+  background-color: var(--asset-manager-interactive-hover);
+  color: var(--asset-manager-text-primary);
 }
 
 .asset-manager-container .tab-button.active {
-  color: var(--cam-primary-color);
-  border-bottom-color: var(--cam-primary-color);
-  background-color: rgba(52, 152, 219, 0.1);
+  color: var(--asset-manager-interactive-primary);
+  border-bottom-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-bg-tertiary);
 }
 
 .asset-manager-container .tab-button i {
@@ -99,14 +96,14 @@
 
 .asset-manager-container .tab-panel-header h3 {
   margin-top: 0;
-  margin-bottom: 12px;
-  color: var(--cam-text-color);
+  margin-bottom: var(--asset-manager-spacing-md);
+  color: var(--asset-manager-text-primary);
   font-size: 1.2rem;
 }
 
 .asset-manager-container .tab-panel-header p {
   margin: 0;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-secondary);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -126,13 +123,13 @@
   justify-content: center;
   height: 100%;
   text-align: center;
-  color: var(--cam-muted-text-color);
-  padding: 48px 24px;
+  color: var(--asset-manager-text-muted);
+  padding: calc(var(--asset-manager-spacing-xl) * 1.5) var(--asset-manager-spacing-xl);
 }
 
 .asset-manager-container .placeholder-content i {
-  margin-bottom: 16px;
-  color: var(--cam-muted-text-color);
+  margin-bottom: var(--asset-manager-spacing-md);
+  color: var(--asset-manager-text-muted);
 }
 
 .asset-manager-container .placeholder-content p {
@@ -149,17 +146,17 @@
 
 .asset-manager-container .tab-content::-webkit-scrollbar-track,
 .asset-manager-container .tab-panel-content::-webkit-scrollbar-track {
-  background: var(--cam-secondary-color);
+  background: var(--asset-manager-bg-secondary);
 }
 
 .asset-manager-container .tab-content::-webkit-scrollbar-thumb,
 .asset-manager-container .tab-panel-content::-webkit-scrollbar-thumb {
-  background: var(--cam-border-color);
-  border-radius: 4px;
+  background: var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-sm);
 }
 
 .asset-manager-container .tab-content::-webkit-scrollbar-thumb:hover,
 .asset-manager-container .tab-panel-content::-webkit-scrollbar-thumb:hover {
-  background: var(--cam-muted-text-color);
+  background: var(--asset-manager-text-muted);
 }
 

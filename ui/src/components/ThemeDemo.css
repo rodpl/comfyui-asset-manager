@@ -1,0 +1,55 @@
+/* Theme Demo Component Styles */
+
+.theme-demo {
+  padding: var(--asset-manager-spacing-lg);
+  background-color: var(--asset-manager-bg-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
+  border: 1px solid var(--asset-manager-border-primary);
+}
+
+.demo-section {
+  margin-bottom: var(--asset-manager-spacing-lg);
+}
+
+.demo-section h4 {
+  margin-bottom: var(--asset-manager-spacing-md);
+  font-size: 1.1rem;
+}
+
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--asset-manager-spacing-sm);
+}
+
+.demo-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--asset-manager-spacing-sm);
+  max-width: 300px;
+}
+
+.demo-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--asset-manager-spacing-md);
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--asset-manager-spacing-sm);
+  margin-top: var(--asset-manager-spacing-md);
+}
+
+.demo-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--asset-manager-spacing-sm);
+  max-width: 300px;
+}
+
+.demo-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--asset-manager-spacing-md);
+}

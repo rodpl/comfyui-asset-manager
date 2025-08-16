@@ -6,3 +6,4 @@ export {
   ModelGridSkeleton,
   FolderNavigationSkeleton,
 } from './LoadingSpinner';
+export { default as ThemeDemo } from './ThemeDemo';

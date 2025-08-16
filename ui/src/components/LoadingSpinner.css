@@ -1,4 +1,4 @@
-/* Loading Spinner Component Styles */
+/* Loading Spinner Component Styles - Using Asset Manager Theme System */
 
 .loading-container {
   display: flex;
@@ -13,16 +13,17 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background-color: var(--asset-manager-modal-backdrop, rgba(0, 0, 0, 0.5));
   backdrop-filter: blur(2px);
   z-index: 100;
+  transition: background-color var(--asset-manager-transition-normal, 0.2s ease);
 }
 
 .loading-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: var(--asset-manager-spacing-md, 12px);
 }
 
 /* Spinner sizes */
@@ -52,31 +53,32 @@
   animation: spin 1s linear infinite;
 }
 
-/* Spinner colors */
+/* Spinner colors using theme variables */
 .loading-spinner.primary .spinner-circle {
-  border-color: #3b82f6;
+  border-color: var(--asset-manager-interactive-primary, #007acc);
   border-top-color: transparent;
 }
 
 .loading-spinner.secondary .spinner-circle {
-  border-color: #6b7280;
+  border-color: var(--asset-manager-interactive-secondary, #6c757d);
   border-top-color: transparent;
 }
 
 .loading-spinner.white .spinner-circle {
-  border-color: #ffffff;
+  border-color: var(--asset-manager-text-primary, #ffffff);
   border-top-color: transparent;
 }
 
-/* Spinner text */
+/* Spinner text using theme variables */
 .spinner-text {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--asset-manager-text-secondary, #cccccc);
   text-align: center;
+  transition: color var(--asset-manager-transition-normal, 0.2s ease);
 }
 
 .loading-spinner.white .spinner-text {
-  color: #ffffff;
+  color: var(--asset-manager-text-primary, #ffffff);
 }
 
 /* Spin animation */
@@ -86,11 +88,15 @@
   }
 }
 
-/* Skeleton loader */
+/* Skeleton loader using theme variables */
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, 
+    var(--asset-manager-bg-secondary, #3a3a3a) 25%, 
+    var(--asset-manager-bg-tertiary, #4a4a4a) 50%, 
+    var(--asset-manager-bg-secondary, #3a3a3a) 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
+  border-radius: var(--asset-manager-border-radius-sm, 0.25rem);
 }
 
 @keyframes loading {
@@ -102,79 +108,60 @@
   }
 }
 
-/* Model grid skeleton */
+/* Model grid skeleton using theme variables */
 .model-grid-skeleton {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  padding: 16px;
+  gap: var(--asset-manager-spacing-md, 16px);
+  padding: var(--asset-manager-spacing-md, 16px);
 }
 
 .model-card-skeleton {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--asset-manager-border-primary, #555555);
+  border-radius: var(--asset-manager-border-radius-lg, 0.5rem);
   overflow: hidden;
-  background: #ffffff;
+  background-color: var(--asset-manager-bg-secondary, #3a3a3a);
+  transition: 
+    background-color var(--asset-manager-transition-normal, 0.2s ease),
+    border-color var(--asset-manager-transition-normal, 0.2s ease);
 }
 
 .model-card-skeleton-content {
-  padding: 12px;
+  padding: var(--asset-manager-spacing-md, 12px);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--asset-manager-spacing-sm, 8px);
 }
 
-/* Folder navigation skeleton */
+/* Folder navigation skeleton using theme variables */
 .folder-navigation-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
+  gap: var(--asset-manager-spacing-sm, 8px);
+  padding: var(--asset-manager-spacing-md, 16px);
 }
 
 .folder-item-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  border-radius: 4px;
-  background: #f9fafb;
+  gap: var(--asset-manager-spacing-xs, 4px);
+  padding: var(--asset-manager-spacing-sm, 8px);
+  border-radius: var(--asset-manager-border-radius-sm, 0.25rem);
+  background-color: var(--asset-manager-bg-tertiary, #4a4a4a);
+  transition: background-color var(--asset-manager-transition-normal, 0.2s ease);
 }
 
-/* Dark theme */
-@media (prefers-color-scheme: dark) {
-  .loading-container.overlay {
-    background: rgba(0, 0, 0, 0.8);
-  }
-  
-  .skeleton {
-    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-    background-size: 200% 100%;
-  }
-  
-  .model-card-skeleton {
-    border-color: #374151;
-    background: #1f2937;
-  }
-  
-  .folder-item-skeleton {
-    background: #374151;
-  }
-  
-  .spinner-text {
-    color: #d1d5db;
-  }
-}
+/* Dark/light theme handled automatically by CSS variables */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .model-grid-skeleton {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
-    padding: 12px;
+    gap: var(--asset-manager-spacing-md, 12px);
+    padding: var(--asset-manager-spacing-md, 12px);
   }
   
   .model-card-skeleton-content {
-    padding: 8px;
+    padding: var(--asset-manager-spacing-sm, 8px);
   }
 }

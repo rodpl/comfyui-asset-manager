@@ -1,0 +1,303 @@
+/* ComfyUI Asset Manager Theme System */
+
+/* 
+ * CSS-based theme system that automatically adapts to ComfyUI's light/dark theme
+ * Uses ComfyUI's CSS custom properties with fallback values
+ * Implements smooth transitions for theme switching
+ */
+
+/* Default (dark) theme variables - references ComfyUI's CSS custom properties */
+:root {
+  /* Primary background colors */
+  --asset-manager-bg-primary: var(--comfy-menu-bg, #2a2a2a);
+  --asset-manager-bg-secondary: var(--comfy-input-bg, #3a3a3a);
+  --asset-manager-bg-tertiary: var(--comfy-input-bg-hover, #4a4a4a);
+  
+  /* Text colors */
+  --asset-manager-text-primary: var(--input-text, #ffffff);
+  --asset-manager-text-secondary: var(--descrip-text, #cccccc);
+  --asset-manager-text-muted: var(--descrip-text, #999999);
+  
+  /* Border colors */
+  --asset-manager-border-primary: var(--border-color, #555555);
+  --asset-manager-border-secondary: var(--comfy-input-border, #666666);
+  --asset-manager-border-hover: var(--comfy-input-border-hover, #777777);
+  
+  /* Interactive colors */
+  --asset-manager-interactive-primary: var(--p-button-text-primary-color, #007acc);
+  --asset-manager-interactive-secondary: var(--p-button-text-secondary-color, #6c757d);
+  --asset-manager-interactive-hover: var(--comfy-input-bg-hover, #4a4a4a);
+  
+  /* Status colors */
+  --asset-manager-success: var(--p-button-success-background, #28a745);
+  --asset-manager-warning: var(--p-button-warning-background, #ffc107);
+  --asset-manager-error: var(--p-button-danger-background, #dc3545);
+  --asset-manager-info: var(--p-button-info-background, #17a2b8);
+  
+  /* Shadow and elevation */
+  --asset-manager-shadow-light: rgba(0, 0, 0, 0.1);
+  --asset-manager-shadow-medium: rgba(0, 0, 0, 0.2);
+  --asset-manager-shadow-heavy: rgba(0, 0, 0, 0.3);
+  
+  /* Spacing and layout */
+  --asset-manager-spacing-xs: 0.25rem;
+  --asset-manager-spacing-sm: 0.5rem;
+  --asset-manager-spacing-md: 1rem;
+  --asset-manager-spacing-lg: 1.5rem;
+  --asset-manager-spacing-xl: 2rem;
+  
+  /* Border radius */
+  --asset-manager-border-radius-sm: 0.25rem;
+  --asset-manager-border-radius-md: 0.375rem;
+  --asset-manager-border-radius-lg: 0.5rem;
+  
+  /* Transition properties for smooth theme switching */
+  --asset-manager-transition-fast: 0.15s ease;
+  --asset-manager-transition-normal: 0.2s ease;
+  --asset-manager-transition-slow: 0.3s ease;
+}
+
+/* Light theme overrides using ComfyUI's theme class selector */
+:root.comfy-theme-light #comfyui-asset-manager-root {
+  /* Primary background colors - light theme */
+  --asset-manager-bg-primary: var(--comfy-menu-bg, #f0f0f0);
+  --asset-manager-bg-secondary: var(--comfy-input-bg, #ffffff);
+  --asset-manager-bg-tertiary: var(--comfy-input-bg-hover, #f8f9fa);
+  
+  /* Text colors - light theme */
+  --asset-manager-text-primary: var(--input-text, #000000);
+  --asset-manager-text-secondary: var(--descrip-text, #666666);
+  --asset-manager-text-muted: var(--descrip-text, #999999);
+  
+  /* Border colors - light theme */
+  --asset-manager-border-primary: var(--border-color, #cccccc);
+  --asset-manager-border-secondary: var(--comfy-input-border, #dddddd);
+  --asset-manager-border-hover: var(--comfy-input-border-hover, #aaaaaa);
+  
+  /* Interactive colors - light theme */
+  --asset-manager-interactive-primary: var(--p-button-text-primary-color, #0066cc);
+  --asset-manager-interactive-secondary: var(--p-button-text-secondary-color, #6c757d);
+  --asset-manager-interactive-hover: var(--comfy-input-bg-hover, #f8f9fa);
+  
+  /* Shadow adjustments for light theme */
+  --asset-manager-shadow-light: rgba(0, 0, 0, 0.05);
+  --asset-manager-shadow-medium: rgba(0, 0, 0, 0.1);
+  --asset-manager-shadow-heavy: rgba(0, 0, 0, 0.15);
+}
+
+/* Theme-aware component base classes - scoped to extension root */
+
+/* Base component styling */
+#comfyui-asset-manager-root .asset-manager-component {
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-component:hover {
+  background-color: var(--asset-manager-bg-tertiary);
+  border-color: var(--asset-manager-border-hover);
+}
+
+/* Button styling */
+#comfyui-asset-manager-root .asset-manager-button {
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-md);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    opacity var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-button:hover {
+  background-color: var(--asset-manager-interactive-hover);
+  border-color: var(--asset-manager-border-hover);
+}
+
+#comfyui-asset-manager-root .asset-manager-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--asset-manager-interactive-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-button--primary {
+  background-color: var(--asset-manager-interactive-primary);
+  color: white;
+  border-color: var(--asset-manager-interactive-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-button--primary:hover {
+  opacity: 0.9;
+}
+
+#comfyui-asset-manager-root .asset-manager-button--secondary {
+  background-color: var(--asset-manager-interactive-secondary);
+  color: white;
+  border-color: var(--asset-manager-interactive-secondary);
+}
+
+#comfyui-asset-manager-root .asset-manager-button--success {
+  background-color: var(--asset-manager-success);
+  color: white;
+  border-color: var(--asset-manager-success);
+}
+
+#comfyui-asset-manager-root .asset-manager-button--warning {
+  background-color: var(--asset-manager-warning);
+  color: white;
+  border-color: var(--asset-manager-warning);
+}
+
+#comfyui-asset-manager-root .asset-manager-button--error {
+  background-color: var(--asset-manager-error);
+  color: white;
+  border-color: var(--asset-manager-error);
+}
+
+/* Input styling */
+#comfyui-asset-manager-root .asset-manager-input {
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-md);
+  font-family: inherit;
+  font-size: inherit;
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    box-shadow var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-input:focus {
+  outline: none;
+  border-color: var(--asset-manager-interactive-primary);
+  box-shadow: 0 0 0 2px var(--asset-manager-shadow-light);
+}
+
+#comfyui-asset-manager-root .asset-manager-input::placeholder {
+  color: var(--asset-manager-text-muted);
+}
+
+/* Card styling */
+#comfyui-asset-manager-root .asset-manager-card {
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
+  padding: var(--asset-manager-spacing-md);
+  box-shadow: 0 2px 4px var(--asset-manager-shadow-light);
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    box-shadow var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-card:hover {
+  box-shadow: 0 4px 8px var(--asset-manager-shadow-medium);
+  border-color: var(--asset-manager-border-hover);
+}
+
+/* Modal and dialog styling */
+#comfyui-asset-manager-root .asset-manager-modal {
+  background-color: var(--asset-manager-bg-primary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
+  box-shadow: 0 8px 32px var(--asset-manager-shadow-heavy);
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: background-color var(--asset-manager-transition-normal);
+}
+
+/* Loading states */
+#comfyui-asset-manager-root .asset-manager-loading {
+  color: var(--asset-manager-text-secondary);
+}
+
+#comfyui-asset-manager-root .asset-manager-spinner {
+  border: 2px solid var(--asset-manager-border-primary);
+  border-top: 2px solid var(--asset-manager-interactive-primary);
+  border-radius: 50%;
+  animation: asset-manager-spin 1s linear infinite;
+}
+
+@keyframes asset-manager-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Status and feedback styling */
+#comfyui-asset-manager-root .asset-manager-success {
+  color: var(--asset-manager-success);
+}
+
+#comfyui-asset-manager-root .asset-manager-success.asset-manager-component {
+  border-color: var(--asset-manager-success);
+}
+
+#comfyui-asset-manager-root .asset-manager-warning {
+  color: var(--asset-manager-warning);
+}
+
+#comfyui-asset-manager-root .asset-manager-warning.asset-manager-component {
+  border-color: var(--asset-manager-warning);
+}
+
+#comfyui-asset-manager-root .asset-manager-error {
+  color: var(--asset-manager-error);
+}
+
+#comfyui-asset-manager-root .asset-manager-error.asset-manager-component {
+  border-color: var(--asset-manager-error);
+}
+
+#comfyui-asset-manager-root .asset-manager-info {
+  color: var(--asset-manager-info);
+}
+
+#comfyui-asset-manager-root .asset-manager-info.asset-manager-component {
+  border-color: var(--asset-manager-info);
+}
+
+/* Utility classes for spacing */
+#comfyui-asset-manager-root .asset-manager-spacing-xs { margin: var(--asset-manager-spacing-xs); }
+#comfyui-asset-manager-root .asset-manager-spacing-sm { margin: var(--asset-manager-spacing-sm); }
+#comfyui-asset-manager-root .asset-manager-spacing-md { margin: var(--asset-manager-spacing-md); }
+#comfyui-asset-manager-root .asset-manager-spacing-lg { margin: var(--asset-manager-spacing-lg); }
+#comfyui-asset-manager-root .asset-manager-spacing-xl { margin: var(--asset-manager-spacing-xl); }
+
+#comfyui-asset-manager-root .asset-manager-padding-xs { padding: var(--asset-manager-spacing-xs); }
+#comfyui-asset-manager-root .asset-manager-padding-sm { padding: var(--asset-manager-spacing-sm); }
+#comfyui-asset-manager-root .asset-manager-padding-md { padding: var(--asset-manager-spacing-md); }
+#comfyui-asset-manager-root .asset-manager-padding-lg { padding: var(--asset-manager-spacing-lg); }
+#comfyui-asset-manager-root .asset-manager-padding-xl { padding: var(--asset-manager-spacing-xl); }
+
+/* Utility classes for text colors */
+#comfyui-asset-manager-root .asset-manager-text-primary { color: var(--asset-manager-text-primary); }
+#comfyui-asset-manager-root .asset-manager-text-secondary { color: var(--asset-manager-text-secondary); }
+#comfyui-asset-manager-root .asset-manager-text-muted { color: var(--asset-manager-text-muted); }
+
+/* Utility classes for background colors */
+#comfyui-asset-manager-root .asset-manager-bg-primary { background-color: var(--asset-manager-bg-primary); }
+#comfyui-asset-manager-root .asset-manager-bg-secondary { background-color: var(--asset-manager-bg-secondary); }
+#comfyui-asset-manager-root .asset-manager-bg-tertiary { background-color: var(--asset-manager-bg-tertiary); }
