@@ -1,4 +1,3 @@
-import { ComfyApp } from '@comfyorg/comfyui-frontend-types';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { useTranslation } from 'react-i18next';
@@ -6,10 +5,43 @@ import { useTranslation } from 'react-i18next';
 import './index.css';
 import './utils/i18n';
 
+// ComfyUI App interface for extension registration
+interface ComfyUIExtensionApp {
+  toast?: (
+    message: string,
+    options?: {
+      type?: string;
+      title?: string;
+      timeout?: number;
+    }
+  ) => void;
+  extensionManager?: {
+    registerSidebarTab?: (config: unknown) => void;
+    toast?: (
+      message: string,
+      options?: {
+        type?: 'info' | 'success' | 'error' | 'warning';
+        timeout?: number;
+      }
+    ) => void;
+  };
+  registerExtension?: (config: unknown) => void;
+  ui?: {
+    dialog?: {
+      show: (options: {
+        type?: 'info' | 'success' | 'error' | 'warning';
+        content: string;
+        title?: string;
+      }) => void;
+    };
+  };
+  version?: string;
+}
+
 // Declare global ComfyUI objects
 declare global {
   interface Window {
-    app?: ComfyApp;
+    app?: ComfyUIExtensionApp;
   }
 }
 
@@ -112,10 +144,10 @@ async function initializeExtension(): Promise<void> {
       },
     };
 
-    window.app.extensionManager.registerSidebarTab(sidebarTab);
+    window.app.extensionManager?.registerSidebarTab?.(sidebarTab);
 
     // Register extension with about page badges
-    window.app.registerExtension({
+    window.app.registerExtension?.({
       name: 'rodpl.AssetManager',
       // About Panel Badges API - Adds custom badges to the ComfyUI about page
       aboutPageBadges: [

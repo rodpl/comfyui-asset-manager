@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LocalAssetsTab, ModelBrowserTab, OutputsTab } from './features';
 import './App.css';
-import { ThemeDemo } from './components';
+import { ThemeDemo, ToastContainer } from './components';
 
 // Define tab types for better type safety
 type TabId = 'local' | 'browse' | 'outputs' | 'theme';
@@ -92,6 +92,9 @@ const App = () => {
       >
         {renderTabContent()}
       </main>
+
+      {/* Toast Container for fallback notifications */}
+      <ToastContainer position="top-right" maxToasts={5} />
     </div>
   );
 };

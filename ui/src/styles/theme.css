@@ -1499,3 +1499,120 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Toast Container Styles */
+#comfyui-asset-manager-root .asset-manager-toast-container {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--asset-manager-spacing-sm);
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Toast container positioning */
+#comfyui-asset-manager-root .asset-manager-toast-container--top-right {
+  top: var(--asset-manager-spacing-lg);
+  right: var(--asset-manager-spacing-lg);
+}
+
+#comfyui-asset-manager-root .asset-manager-toast-container--top-left {
+  top: var(--asset-manager-spacing-lg);
+  left: var(--asset-manager-spacing-lg);
+}
+
+#comfyui-asset-manager-root .asset-manager-toast-container--bottom-right {
+  bottom: var(--asset-manager-spacing-lg);
+  right: var(--asset-manager-spacing-lg);
+  flex-direction: column-reverse;
+}
+
+#comfyui-asset-manager-root .asset-manager-toast-container--bottom-left {
+  bottom: var(--asset-manager-spacing-lg);
+  left: var(--asset-manager-spacing-lg);
+  flex-direction: column-reverse;
+}
+
+#comfyui-asset-manager-root .asset-manager-toast-container--top-center {
+  top: var(--asset-manager-spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#comfyui-asset-manager-root .asset-manager-toast-container--bottom-center {
+  bottom: var(--asset-manager-spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column-reverse;
+}
+
+/* Individual toast items in container */
+#comfyui-asset-manager-root .asset-manager-toast-container-item {
+  pointer-events: auto;
+  animation: asset-manager-toast-slide-in 0.3s ease-out;
+}
+
+/* Toast slide-in animation */
+@keyframes asset-manager-toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Toast slide-in animation for left-positioned containers */
+#comfyui-asset-manager-root .asset-manager-toast-container--top-left .asset-manager-toast-container-item,
+#comfyui-asset-manager-root .asset-manager-toast-container--bottom-left .asset-manager-toast-container-item {
+  animation: asset-manager-toast-slide-in-left 0.3s ease-out;
+}
+
+@keyframes asset-manager-toast-slide-in-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Toast slide-in animation for center-positioned containers */
+#comfyui-asset-manager-root .asset-manager-toast-container--top-center .asset-manager-toast-container-item,
+#comfyui-asset-manager-root .asset-manager-toast-container--bottom-center .asset-manager-toast-container-item {
+  animation: asset-manager-toast-slide-in-center 0.3s ease-out;
+}
+
+@keyframes asset-manager-toast-slide-in-center {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive toast container */
+@media (max-width: 768px) {
+  #comfyui-asset-manager-root .asset-manager-toast-container {
+    max-width: calc(100vw - 2 * var(--asset-manager-spacing-lg));
+    left: var(--asset-manager-spacing-lg) !important;
+    right: var(--asset-manager-spacing-lg) !important;
+    transform: none !important;
+  }
+  
+  #comfyui-asset-manager-root .asset-manager-toast-container--top-center,
+  #comfyui-asset-manager-root .asset-manager-toast-container--bottom-center {
+    left: var(--asset-manager-spacing-lg);
+    right: var(--asset-manager-spacing-lg);
+    transform: none;
+  }
+}

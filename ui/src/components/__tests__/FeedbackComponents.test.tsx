@@ -2,26 +2,15 @@
  * Tests for feedback components with theme support
  */
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import {
-  ErrorMessage,
-  SuccessMessage,
-  EmptyState,
-  Toast,
-  ProgressIndicator,
-} from '../index';
+import { ErrorMessage, SuccessMessage, EmptyState, Toast, ProgressIndicator } from '../index';
 
 describe('Feedback Components', () => {
   describe('ErrorMessage', () => {
     it('renders error message with title and description', () => {
       render(
-        <ErrorMessage
-          title="Test Error"
-          message="This is a test error message"
-          variant="error"
-        />
+        <ErrorMessage title="Test Error" message="This is a test error message" variant="error" />
       );
 
       expect(screen.getByText('Test Error')).toBeInTheDocument();
@@ -29,24 +18,14 @@ describe('Feedback Components', () => {
     });
 
     it('renders inline error message', () => {
-      render(
-        <ErrorMessage
-          message="Inline error"
-          inline
-        />
-      );
+      render(<ErrorMessage message="Inline error" inline />);
 
       expect(screen.getByText('Inline error')).toBeInTheDocument();
     });
 
     it('calls onDismiss when dismiss button is clicked', () => {
       const onDismiss = vi.fn();
-      render(
-        <ErrorMessage
-          message="Test message"
-          onDismiss={onDismiss}
-        />
-      );
+      render(<ErrorMessage message="Test message" onDismiss={onDismiss} />);
 
       const dismissButton = screen.getByLabelText('Dismiss error');
       fireEvent.click(dismissButton);
@@ -57,12 +36,7 @@ describe('Feedback Components', () => {
 
   describe('SuccessMessage', () => {
     it('renders success message with title and description', () => {
-      render(
-        <SuccessMessage
-          title="Success!"
-          message="Operation completed successfully"
-        />
-      );
+      render(<SuccessMessage title="Success!" message="Operation completed successfully" />);
 
       expect(screen.getByText('Success!')).toBeInTheDocument();
       expect(screen.getByText('Operation completed successfully')).toBeInTheDocument();
@@ -70,12 +44,7 @@ describe('Feedback Components', () => {
 
     it('calls onDismiss when dismiss button is clicked', () => {
       const onDismiss = vi.fn();
-      render(
-        <SuccessMessage
-          message="Test message"
-          onDismiss={onDismiss}
-        />
-      );
+      render(<SuccessMessage message="Test message" onDismiss={onDismiss} />);
 
       const dismissButton = screen.getByLabelText('Dismiss success message');
       fireEvent.click(dismissButton);
@@ -99,14 +68,7 @@ describe('Feedback Components', () => {
     });
 
     it('renders actions when provided', () => {
-      render(
-        <EmptyState
-          title="No Items"
-          actions={
-            <button>Add Item</button>
-          }
-        />
-      );
+      render(<EmptyState title="No Items" actions={<button>Add Item</button>} />);
 
       expect(screen.getByText('Add Item')).toBeInTheDocument();
     });
@@ -129,13 +91,7 @@ describe('Feedback Components', () => {
 
     it('calls onClose when close button is clicked', () => {
       const onClose = vi.fn();
-      render(
-        <Toast
-          message="Test message"
-          visible={true}
-          onClose={onClose}
-        />
-      );
+      render(<Toast message="Test message" visible={true} onClose={onClose} />);
 
       const closeButton = screen.getByLabelText('Close notification');
       fireEvent.click(closeButton);
@@ -144,12 +100,7 @@ describe('Feedback Components', () => {
     });
 
     it('does not render when visible is false', () => {
-      render(
-        <Toast
-          message="Test message"
-          visible={false}
-        />
-      );
+      render(<Toast message="Test message" visible={false} />);
 
       expect(screen.queryByText('Test message')).not.toBeInTheDocument();
     });
@@ -157,12 +108,7 @@ describe('Feedback Components', () => {
 
   describe('ProgressIndicator', () => {
     it('renders determinate progress', () => {
-      render(
-        <ProgressIndicator
-          progress={50}
-          showPercentage={true}
-        />
-      );
+      render(<ProgressIndicator progress={50} showPercentage={true} />);
 
       const progressBar = screen.getByRole('progressbar');
       expect(progressBar).toHaveAttribute('aria-valuenow', '50');
@@ -170,9 +116,7 @@ describe('Feedback Components', () => {
     });
 
     it('renders indeterminate progress', () => {
-      render(
-        <ProgressIndicator />
-      );
+      render(<ProgressIndicator />);
 
       const progressBar = screen.getByRole('progressbar');
       expect(progressBar).toHaveAttribute('aria-label', 'Loading...');
@@ -180,12 +124,7 @@ describe('Feedback Components', () => {
     });
 
     it('clamps progress values to 0-100 range', () => {
-      render(
-        <ProgressIndicator
-          progress={150}
-          showPercentage={true}
-        />
-      );
+      render(<ProgressIndicator progress={150} showPercentage={true} />);
 
       const progressBar = screen.getByRole('progressbar');
       expect(progressBar).toHaveAttribute('aria-valuenow', '100');

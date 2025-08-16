@@ -14,5 +14,6 @@ export { default as ErrorMessage } from './ErrorMessage';
 export { default as SuccessMessage } from './SuccessMessage';
 export { default as EmptyState } from './EmptyState';
 export { default as Toast } from './Toast';
+export { default as ToastContainer } from './ToastContainer';
 export { default as ProgressIndicator } from './ProgressIndicator';
 export { default as FeedbackDemo } from './FeedbackDemo';

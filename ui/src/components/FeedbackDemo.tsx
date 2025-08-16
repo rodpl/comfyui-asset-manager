@@ -12,15 +12,66 @@ import {
   Toast,
   ProgressIndicator,
 } from './index';
+import { useNotifications } from '../hooks/useNotifications';
 
 const FeedbackDemo: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
-  const [toastVariant, setToastVariant] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+  const [toastVariant, setToastVariant] = useState<'success' | 'error' | 'warning' | 'info'>(
+    'success'
+  );
   const [progress, setProgress] = useState(45);
+  const [testResult, setTestResult] = useState<string>('');
+
+  // Use notification service
+  const {
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo,
+    isComfyUIAvailable,
+    capabilities,
+    comfyUIVersion,
+    testIntegration,
+  } = useNotifications();
 
   const handleShowToast = (variant: 'success' | 'error' | 'warning' | 'info') => {
     setToastVariant(variant);
     setShowToast(true);
+  };
+
+  const handleNotificationTest = async (type: 'success' | 'error' | 'warning' | 'info') => {
+    const messages = {
+      success: 'ComfyUI integration test successful!',
+      error: 'This is a test error notification',
+      warning: 'This is a test warning notification',
+      info: 'This is a test info notification',
+    };
+
+    switch (type) {
+      case 'success':
+        showSuccess(messages.success, { title: 'Success Test' });
+        break;
+      case 'error':
+        showError(messages.error, { title: 'Error Test' });
+        break;
+      case 'warning':
+        showWarning(messages.warning, { title: 'Warning Test' });
+        break;
+      case 'info':
+        showInfo(messages.info, { title: 'Info Test' });
+        break;
+    }
+  };
+
+  const handleIntegrationTest = async () => {
+    try {
+      const result = await testIntegration();
+      setTestResult(JSON.stringify(result, null, 2));
+      showSuccess('Integration test completed!', { title: 'Test Complete' });
+    } catch (error) {
+      setTestResult(`Error: ${error}`);
+      showError('Integration test failed', { title: 'Test Failed' });
+    }
   };
 
   return (
@@ -37,25 +88,49 @@ const FeedbackDemo: React.FC = () => {
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ textAlign: 'center' }}>
             <LoadingSpinner size="small" color="primary" />
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '12px', marginTop: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '12px',
+                marginTop: '8px',
+              }}
+            >
               Small Primary
             </p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <LoadingSpinner size="medium" color="success" />
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '12px', marginTop: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '12px',
+                marginTop: '8px',
+              }}
+            >
               Medium Success
             </p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <LoadingSpinner size="large" color="warning" />
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '12px', marginTop: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '12px',
+                marginTop: '8px',
+              }}
+            >
               Large Warning
             </p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <LoadingSpinner size="medium" color="error" text="Loading..." />
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '12px', marginTop: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '12px',
+                marginTop: '8px',
+              }}
+            >
               With Text
             </p>
           </div>
@@ -69,7 +144,13 @@ const FeedbackDemo: React.FC = () => {
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <div>
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '14px', marginBottom: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '14px',
+                marginBottom: '8px',
+              }}
+            >
               Determinate Progress ({progress}%)
             </p>
             <ProgressIndicator progress={progress} showPercentage />
@@ -90,13 +171,25 @@ const FeedbackDemo: React.FC = () => {
             </div>
           </div>
           <div>
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '14px', marginBottom: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '14px',
+                marginBottom: '8px',
+              }}
+            >
               Indeterminate Progress
             </p>
             <ProgressIndicator />
           </div>
           <div>
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '14px', marginBottom: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '14px',
+                marginBottom: '8px',
+              }}
+            >
               Success Progress
             </p>
             <ProgressIndicator progress={100} variant="success" />
@@ -126,13 +219,16 @@ const FeedbackDemo: React.FC = () => {
             variant="info"
           />
           <div>
-            <p style={{ color: 'var(--asset-manager-text-secondary)', fontSize: '14px', marginBottom: '8px' }}>
+            <p
+              style={{
+                color: 'var(--asset-manager-text-secondary)',
+                fontSize: '14px',
+                marginBottom: '8px',
+              }}
+            >
               Inline Error:
             </p>
-            <ErrorMessage
-              message="This field is required"
-              inline
-            />
+            <ErrorMessage message="This field is required" inline />
           </div>
         </div>
       </section>
@@ -153,8 +249,20 @@ const FeedbackDemo: React.FC = () => {
         <h3 style={{ color: 'var(--asset-manager-text-primary)', marginBottom: '20px' }}>
           Empty States
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-          <div style={{ border: '1px solid var(--asset-manager-border-primary)', borderRadius: '8px', minHeight: '200px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '20px',
+          }}
+        >
+          <div
+            style={{
+              border: '1px solid var(--asset-manager-border-primary)',
+              borderRadius: '8px',
+              minHeight: '200px',
+            }}
+          >
             <EmptyState
               icon="pi pi-folder-open"
               title="No Models Found"
@@ -167,7 +275,13 @@ const FeedbackDemo: React.FC = () => {
               variant="compact"
             />
           </div>
-          <div style={{ border: '1px solid var(--asset-manager-border-primary)', borderRadius: '8px', minHeight: '200px' }}>
+          <div
+            style={{
+              border: '1px solid var(--asset-manager-border-primary)',
+              borderRadius: '8px',
+              minHeight: '200px',
+            }}
+          >
             <EmptyState
               icon="pi pi-search"
               title="No Search Results"
@@ -188,10 +302,104 @@ const FeedbackDemo: React.FC = () => {
         </div>
       </section>
 
-      {/* Toast Notifications */}
+      {/* ComfyUI Notification Integration */}
       <section style={{ marginBottom: '40px' }}>
         <h3 style={{ color: 'var(--asset-manager-text-primary)', marginBottom: '20px' }}>
-          Toast Notifications
+          ComfyUI Notification Integration
+        </h3>
+
+        {/* Integration Status */}
+        <div
+          style={{
+            padding: '15px',
+            backgroundColor: 'var(--asset-manager-bg-secondary)',
+            border: '1px solid var(--asset-manager-border-primary)',
+            borderRadius: '4px',
+            marginBottom: '20px',
+          }}
+        >
+          <h4 style={{ color: 'var(--asset-manager-text-primary)', marginBottom: '10px' }}>
+            Integration Status
+          </h4>
+          <p style={{ color: 'var(--asset-manager-text-secondary)', marginBottom: '5px' }}>
+            ComfyUI Available:{' '}
+            <strong
+              style={{
+                color: isComfyUIAvailable
+                  ? 'var(--asset-manager-success)'
+                  : 'var(--asset-manager-error)',
+              }}
+            >
+              {isComfyUIAvailable ? 'Yes' : 'No (Using Fallback)'}
+            </strong>
+          </p>
+          <p style={{ color: 'var(--asset-manager-text-secondary)', marginBottom: '5px' }}>
+            Version: <strong>{comfyUIVersion || 'Unknown'}</strong>
+          </p>
+          <p style={{ color: 'var(--asset-manager-text-secondary)', marginBottom: '10px' }}>
+            Capabilities: Extension Toast: {capabilities.hasExtensionToast ? '✓' : '✗'}, UI Dialog:{' '}
+            {capabilities.hasUIDialog ? '✓' : '✗'}, Native Toast:{' '}
+            {capabilities.hasNativeToast ? '✓' : '✗'}
+          </p>
+          <button
+            className="asset-manager-button asset-manager-button--primary"
+            onClick={handleIntegrationTest}
+            style={{ marginRight: '10px' }}
+          >
+            Test Integration
+          </button>
+          {testResult && (
+            <pre
+              style={{
+                marginTop: '10px',
+                padding: '10px',
+                backgroundColor: 'var(--asset-manager-bg-tertiary)',
+                border: '1px solid var(--asset-manager-border-primary)',
+                borderRadius: '4px',
+                fontSize: '12px',
+                color: 'var(--asset-manager-text-secondary)',
+                overflow: 'auto',
+                maxHeight: '200px',
+              }}
+            >
+              {testResult}
+            </pre>
+          )}
+        </div>
+
+        {/* Notification Test Buttons */}
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          <button
+            className="asset-manager-button asset-manager-button--success"
+            onClick={() => handleNotificationTest('success')}
+          >
+            Test Success Notification
+          </button>
+          <button
+            className="asset-manager-button asset-manager-button--error"
+            onClick={() => handleNotificationTest('error')}
+          >
+            Test Error Notification
+          </button>
+          <button
+            className="asset-manager-button asset-manager-button--warning"
+            onClick={() => handleNotificationTest('warning')}
+          >
+            Test Warning Notification
+          </button>
+          <button
+            className="asset-manager-button asset-manager-button--secondary"
+            onClick={() => handleNotificationTest('info')}
+          >
+            Test Info Notification
+          </button>
+        </div>
+      </section>
+
+      {/* Toast Notifications (Legacy) */}
+      <section style={{ marginBottom: '40px' }}>
+        <h3 style={{ color: 'var(--asset-manager-text-primary)', marginBottom: '20px' }}>
+          Legacy Toast Component
         </h3>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
