@@ -5,6 +5,7 @@
 
 import './ThemeDemo.css';
 import { InteractiveElementsDemo } from './InteractiveElementsDemo';
+import TransitionTestComponent from './TransitionTestComponent';
 
 interface ThemeDemoProps {
   className?: string;
@@ -21,6 +22,11 @@ export const ThemeDemo = ({ className = '' }: ThemeDemoProps) => {
 
       {/* Comprehensive Interactive Elements Demo */}
       <InteractiveElementsDemo />
+
+      {/* Theme Transition Performance Test */}
+      <div className="demo-section">
+        <TransitionTestComponent elementCount={50} showMetrics={true} />
+      </div>
 
       {/* Original Simple Examples for Quick Reference */}
       <div className="demo-section">

@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LocalAssetsTab, ModelBrowserTab, OutputsTab } from './features';
 import './App.css';
 import { ThemeDemo, ToastContainer } from './components';
+import { preventInitialTransitionFlash } from './hooks/useComfyUITheme';
 
 // Define tab types for better type safety
 type TabId = 'local' | 'browse' | 'outputs' | 'theme';
@@ -25,6 +26,11 @@ const TABS: Tab[] = [
 const App = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('local');
+
+  // Prevent transition flash during initial load
+  useEffect(() => {
+    preventInitialTransitionFlash();
+  }, []);
 
   // Memoized tab change handler
   const handleTabChange = useCallback((tabId: TabId) => {

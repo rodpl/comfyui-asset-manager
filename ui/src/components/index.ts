@@ -20,3 +20,4 @@ export { default as FeedbackDemo } from './FeedbackDemo';
 
 // Theme integration examples
 export { default as ThemeAwareExample } from './ThemeAwareExample';
+export { default as TransitionTestComponent } from './TransitionTestComponent';

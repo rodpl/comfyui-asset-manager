@@ -186,7 +186,7 @@ describe('useThemeValue', () => {
 describe('useThemeConditional', () => {
   beforeEach(() => {
     document.documentElement.className = '';
-    global.MutationObserver = vi.fn(() => new MockMutationObserver(() => {})) as unknown;
+    global.MutationObserver = vi.fn(() => new MockMutationObserver(() => {})) as any;
   });
 
   afterEach(() => {
