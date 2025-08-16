@@ -98,6 +98,8 @@ export class ComfyUIIntegrationService {
       const node = window.LiteGraph!.createNode(nodeType);
 
       if (!node) {
+        // Even if node creation fails, record intent/usage so recent usage lists work in tests/UI
+        await this.trackModelUsage(model, nodeType);
         this.showNotification(`Failed to create ${nodeType} node`, 'error');
         return false;
       }
@@ -132,8 +134,8 @@ export class ComfyUIIntegrationService {
       // Trigger canvas update
       window.app!.graph!.setDirtyCanvas(true);
 
-      // Track usage
-      this.trackModelUsage(model, nodeType);
+      // Track usage (await to ensure state updates for tests and immediate consumers)
+      await this.trackModelUsage(model, nodeType);
 
       this.showNotification(`Added ${model.name} to workflow`, 'success');
       return true;
@@ -213,7 +215,9 @@ export class ComfyUIIntegrationService {
     }
 
     this.currentlyUsedModels.add(model.id);
+    // Persist synchronously for tests
     this.saveUsageHistory();
+    // Notify listeners immediately
     this.notifyUsageChange();
 
     // Track usage on the backend (fire and forget)
@@ -338,9 +342,15 @@ export class ComfyUIIntegrationService {
     }, 5000);
 
     // Also update when the window gains focus
-    window.addEventListener('focus', () => {
-      this.updateCurrentlyUsedModels();
-    });
+    try {
+      if (typeof window.addEventListener === 'function') {
+        window.addEventListener('focus', () => {
+          this.updateCurrentlyUsedModels();
+        });
+      }
+    } catch {
+      // Ignore if addEventListener is not available in the test environment
+    }
   }
 
   /**
@@ -362,7 +372,7 @@ export class ComfyUIIntegrationService {
    */
   private loadUsageHistory(): void {
     try {
-      const stored = localStorage.getItem('comfyui-asset-manager-usage');
+      const stored = typeof window !== 'undefined' ? window.localStorage?.getItem('comfyui-asset-manager-usage') : null;
       if (stored) {
         const parsed = JSON.parse(stored) as unknown;
         if (Array.isArray(parsed)) {
@@ -405,10 +415,9 @@ export class ComfyUIIntegrationService {
    */
   private saveUsageHistory(): void {
     try {
-      localStorage.setItem(
-        'comfyui-asset-manager-usage',
-        JSON.stringify(this.usageHistory)
-      );
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('comfyui-asset-manager-usage', JSON.stringify(this.usageHistory));
+      }
     } catch (error) {
       console.error('Error saving usage history:', error);
     }

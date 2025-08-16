@@ -172,6 +172,8 @@ export class ComfyUINotificationService {
    * Show notification using best available method
    */
   public show(message: string, options: NotificationOptions = {}): string {
+    // Ensure we have up-to-date capabilities (tests mutate window.app at runtime)
+    this.detectComfyUICapabilities();
     const type = options.type || 'info';
     const title = options.title;
     const duration = options.duration || 5000;

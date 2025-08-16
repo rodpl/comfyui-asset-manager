@@ -8,7 +8,7 @@ interface ModelGridProps {
   models: ModelInfo[];
   loading: boolean;
   onModelSelect: (model: ModelInfo) => void;
-  onModelDrag?: (model: ModelInfo, event: DragEvent) => void;
+  onModelDrag?: (model: ModelInfo) => void;
   searchQuery?: string;
   currentlyUsedModels?: string[];
 }
@@ -16,7 +16,7 @@ interface ModelGridProps {
 interface ModelCardProps {
   model: ModelInfo;
   onSelect: (model: ModelInfo) => void;
-  onDragStart?: (model: ModelInfo, event: DragEvent) => void;
+  onDragStart?: (model: ModelInfo) => void;
   searchQuery?: string;
   isCurrentlyUsed?: boolean;
 }
@@ -54,7 +54,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
 
   const handleDragStart = useCallback(
     (e: React.DragEvent) => {
-      // Set basic drag data
+      // Set comprehensive drag data for compatibility with ComfyUI and generic handlers
       e.dataTransfer.setData(
         'application/json',
         JSON.stringify({
@@ -62,10 +62,19 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
           model: model,
         })
       );
+      e.dataTransfer.setData('text/plain', model.filePath);
+      e.dataTransfer.setData(
+        'comfyui/model',
+        JSON.stringify({
+          type: model.modelType,
+          path: model.filePath,
+          name: model.name,
+        })
+      );
       e.dataTransfer.effectAllowed = 'copy';
-      
-      // Call the drag handler with the native event
-      onDragStart?.(model, e.nativeEvent as DragEvent);
+
+      // Notify consumer without leaking native event per test expectations
+      onDragStart?.(model);
     },
     [model, onDragStart]
   );
