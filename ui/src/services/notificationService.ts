@@ -121,10 +121,10 @@ export class ComfyUINotificationService {
         this.capabilities.hasUIDialog = !!window.app.ui?.dialog?.show;
 
         // Check for native toast system (future ComfyUI versions)
-        this.capabilities.hasNativeToast = !!window.app.toast;
+        this.capabilities.hasNativeToast = !!(window.app as any).toast;
 
         // Try to detect ComfyUI version if available
-        this.comfyUIVersion = window.app.version || null;
+        this.comfyUIVersion = (window.app as any).version || null;
 
         console.log('[NotificationService] ComfyUI capabilities detected:', {
           version: this.comfyUIVersion,
@@ -187,8 +187,8 @@ export class ComfyUINotificationService {
       }
 
       // Try native ComfyUI toast (future versions)
-      if (this.capabilities.hasNativeToast && window.app?.toast) {
-        window.app.toast(message, {
+      if (this.capabilities.hasNativeToast && (window.app as any)?.toast) {
+        (window.app as any).toast(message, {
           type,
           title,
           timeout: duration,

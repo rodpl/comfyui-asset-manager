@@ -398,6 +398,22 @@ export class ApiClient {
   }
 
   /**
+   * Track model usage in workflow
+   */
+  async trackModelUsage(
+    modelId: string,
+    nodeType: string,
+    workflowId?: string,
+    options?: RequestOptions
+  ): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(
+      `/models/${encodeURIComponent(modelId)}/track-usage`,
+      { node_type: nodeType, workflow_id: workflowId },
+      options
+    );
+  }
+
+  /**
    * Get all outputs with optional filtering
    */
   async getOutputs(

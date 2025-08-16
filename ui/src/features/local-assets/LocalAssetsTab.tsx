@@ -5,6 +5,7 @@ import { ModelGrid, SearchFilterBar, SearchEmptyState, ModelDetailModal } from '
 import { ModelFolder, ModelInfo, FilterOptions, EnrichedModelInfo } from './types';
 import { filterModels } from './utils/searchUtils';
 import { apiClient } from '../../services/api';
+import { useComfyUIIntegration } from '../../hooks/useComfyUIIntegration';
 import './LocalAssetsTab.css';
 
 const LocalAssetsTab: React.FC = () => {
@@ -25,6 +26,15 @@ const LocalAssetsTab: React.FC = () => {
     hasMetadata: undefined,
     hasThumbnail: undefined,
   });
+
+  // ComfyUI integration
+  const {
+    isComfyUIAvailable,
+    currentlyUsedModels,
+    addModelToWorkflow,
+    setupModelDrag,
+    updateCurrentlyUsedModels
+  } = useComfyUIIntegration();
 
   // Load folders on component mount
   useEffect(() => {
@@ -97,24 +107,33 @@ const LocalAssetsTab: React.FC = () => {
   }, []);
 
   const handleAddToWorkflow = useCallback(
-    (model: EnrichedModelInfo) => {
+    async (model: EnrichedModelInfo) => {
       try {
         console.log('Adding model to workflow:', model);
-        // TODO: Implement ComfyUI workflow integration
-        // This would typically involve communicating with ComfyUI's API
-        // to add the model to the current workflow
+        
+        if (!isComfyUIAvailable) {
+          // Fallback: copy file path to clipboard
+          if (navigator.clipboard) {
+            await navigator.clipboard.writeText(model.filePath);
+            setError(t('localAssets.info.pathCopied'));
+          } else {
+            setError(t('localAssets.errors.comfyuiNotAvailable'));
+          }
+          return;
+        }
 
-        // For now, copy the file path to clipboard as a fallback
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(model.filePath);
-          // In a real implementation, you'd show a success toast here
+        // Add model to ComfyUI workflow
+        const success = await addModelToWorkflow(model);
+        if (success) {
+          // Update currently used models after successful addition
+          setTimeout(() => updateCurrentlyUsedModels(), 1000);
         }
       } catch (err) {
         console.error('Error adding model to workflow:', err);
         setError(t('localAssets.errors.workflowAddFailed'));
       }
     },
-    [t]
+    [t, isComfyUIAvailable, addModelToWorkflow, updateCurrentlyUsedModels]
   );
 
   const handleUpdateMetadata = useCallback(
@@ -144,11 +163,21 @@ const LocalAssetsTab: React.FC = () => {
     [selectedModel, t]
   );
 
-  const handleModelDrag = useCallback((model: ModelInfo) => {
+  const handleModelDrag = useCallback((model: ModelInfo, event: DragEvent) => {
     console.log('Dragging model:', model);
-    // TODO: Handle drag to ComfyUI workflow
-    // This would set up the drag data for ComfyUI to consume
-  }, []);
+    
+    if (isComfyUIAvailable) {
+      // Setup ComfyUI-specific drag data
+      setupModelDrag(model, event);
+    } else {
+      // Fallback: set basic drag data
+      event.dataTransfer?.setData('text/plain', model.filePath);
+      event.dataTransfer?.setData('application/json', JSON.stringify({
+        type: 'model',
+        model: model
+      }));
+    }
+  }, [isComfyUIAvailable, setupModelDrag]);
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
@@ -280,6 +309,7 @@ const LocalAssetsTab: React.FC = () => {
                   onModelSelect={handleModelSelect}
                   onModelDrag={handleModelDrag}
                   searchQuery={searchQuery}
+                  currentlyUsedModels={currentlyUsedModels}
                 />
               )}
             </main>

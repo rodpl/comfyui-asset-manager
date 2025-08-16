@@ -4,46 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import './index.css';
 import './utils/i18n';
+import './types/comfyui';
 
-// ComfyUI App interface for extension registration
-interface ComfyUIExtensionApp {
-  toast?: (
-    message: string,
-    options?: {
-      type?: string;
-      title?: string;
-      timeout?: number;
-    }
-  ) => void;
-  extensionManager?: {
-    registerSidebarTab?: (config: unknown) => void;
-    toast?: (
-      message: string,
-      options?: {
-        type?: 'info' | 'success' | 'error' | 'warning';
-        timeout?: number;
-      }
-    ) => void;
-  };
-  registerExtension?: (config: unknown) => void;
-  ui?: {
-    dialog?: {
-      show: (options: {
-        type?: 'info' | 'success' | 'error' | 'warning';
-        content: string;
-        title?: string;
-      }) => void;
-    };
-  };
-  version?: string;
-}
-
-// Declare global ComfyUI objects
-declare global {
-  interface Window {
-    app?: ComfyUIExtensionApp;
-  }
-}
+// ComfyUI types are now imported from types/comfyui.ts
 
 // Lazy load the App component for better performance
 const App = React.lazy(() => import('./App'));

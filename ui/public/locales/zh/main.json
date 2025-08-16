@@ -38,6 +38,7 @@
   "modelGrid": {
     "modified": "修改时间",
     "ariaLabel": "模型网格",
+    "currentlyInUse": "当前使用中",
     "empty": {
       "title": "未找到模型",
       "description": "在所选文件夹中未找到模型。请尝试选择其他文件夹或检查您的 ComfyUI 模型目录。"
@@ -106,12 +107,24 @@
     "quickActions": "快速操作",
     "addToWorkflow": "添加到工作流",
     "copyForWorkflow": "复制路径",
+    "comfyuiNotAvailable": "ComfyUI 集成不可用",
+    "comfyuiNotAvailableMessage": "ComfyUI 集成不可用。"添加到工作流"按钮将复制文件路径。",
+    "usageStatus": "使用状态",
+    "currentlyInUse": "当前使用中",
+    "totalUsage": "总使用次数",
+    "lastUsed": "最后使用",
+    "usedInNodes": "使用的节点",
+    "times": "次",
+    "yes": "是",
+    "no": "否",
     "usageInstructions": "使用说明",
     "dragAndDrop": "拖放",
     "dragAndDropDescription": "将此模型从网格直接拖放到工作流中的兼容 ComfyUI 节点上。",
+    "dragAndDropDescriptionFallback": "从网格拖放此模型。ComfyUI 集成不可用，将提供基本拖放数据。",
     "manualLoad": "手动加载",
     "manualLoadDescription": "使用下面的文件路径在 ComfyUI 节点中手动加载此模型：",
-    "compatibleNodes": "兼容节点"
+    "compatibleNodes": "兼容节点",
+    "noCompatibleNodes": "未找到此模型类型的兼容节点"
   },
   "localAssets": {
     "navigation": {
@@ -123,7 +136,11 @@
       "modelSelectFailed": "选择模型失败。请重试。",
       "workflowAddFailed": "添加模型到工作流失败。请重试。",
       "metadataUpdateFailed": "更新模型元数据失败。请重试。",
+      "comfyuiNotAvailable": "ComfyUI 不可用。文件路径已复制到剪贴板。",
       "dismiss": "关闭错误"
+    },
+    "info": {
+      "pathCopied": "文件路径已复制到剪贴板"
     }
   },
   "metadataEditor": {
