@@ -8,7 +8,7 @@ import './LoadingSpinner.css';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'medium' | 'large';
-  color?: 'primary' | 'secondary' | 'white';
+  color?: 'primary' | 'secondary' | 'white' | 'success' | 'warning' | 'error';
   text?: string;
   overlay?: boolean;
   className?: string;

@@ -1,116 +1,127 @@
-/* Search Empty State Styles */
-.search-empty-state {
+/* Search Empty State Styles - Updated for ComfyUI Theme Integration */
+#comfyui-asset-manager-root .search-empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 400px;
-  padding: 40px 20px;
+  padding: var(--asset-manager-spacing-xl) var(--asset-manager-spacing-lg);
 }
 
-.search-empty-content {
+#comfyui-asset-manager-root .search-empty-content {
   text-align: center;
   max-width: 400px;
 }
 
-.search-empty-icon {
+#comfyui-asset-manager-root .search-empty-icon {
   width: 80px;
   height: 80px;
-  margin: 0 auto 24px;
-  color: var(--cam-muted-text-color);
+  margin: 0 auto var(--asset-manager-spacing-lg);
+  color: var(--asset-manager-text-muted);
   opacity: 0.6;
+  transition: color var(--asset-manager-transition-normal);
 }
 
-.search-empty-icon svg {
+#comfyui-asset-manager-root .search-empty-icon svg {
   width: 100%;
   height: 100%;
 }
 
-.search-empty-title {
-  font-size: 24px;
+#comfyui-asset-manager-root .search-empty-title {
+  font-size: 1.5rem;
   font-weight: 600;
-  color: var(--cam-text-color);
-  margin: 0 0 12px;
+  color: var(--asset-manager-text-primary);
+  margin: 0 0 var(--asset-manager-spacing-sm);
+  transition: color var(--asset-manager-transition-normal);
 }
 
-.search-empty-description {
-  font-size: 16px;
-  color: var(--cam-muted-text-color);
+#comfyui-asset-manager-root .search-empty-description {
+  font-size: 1rem;
+  color: var(--asset-manager-text-secondary);
   line-height: 1.5;
-  margin: 0 0 24px;
+  margin: 0 0 var(--asset-manager-spacing-lg);
+  transition: color var(--asset-manager-transition-normal);
 }
 
-.search-empty-suggestions {
+#comfyui-asset-manager-root .search-empty-suggestions {
   text-align: left;
-  margin-bottom: 32px;
+  margin-bottom: var(--asset-manager-spacing-xl);
 }
 
-.search-empty-suggestions h4 {
-  font-size: 14px;
+#comfyui-asset-manager-root .search-empty-suggestions h4 {
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--cam-text-color);
-  margin: 0 0 12px;
+  color: var(--asset-manager-text-primary);
+  margin: 0 0 var(--asset-manager-spacing-sm);
+  transition: color var(--asset-manager-transition-normal);
 }
 
-.search-empty-suggestions ul {
+#comfyui-asset-manager-root .search-empty-suggestions ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.search-empty-suggestions li {
-  font-size: 14px;
-  color: var(--cam-muted-text-color);
-  padding: 4px 0;
+#comfyui-asset-manager-root .search-empty-suggestions li {
+  font-size: 0.875rem;
+  color: var(--asset-manager-text-secondary);
+  padding: var(--asset-manager-spacing-xs) 0;
   position: relative;
-  padding-left: 20px;
+  padding-left: var(--asset-manager-spacing-lg);
+  transition: color var(--asset-manager-transition-normal);
 }
 
-.search-empty-suggestions li::before {
+#comfyui-asset-manager-root .search-empty-suggestions li::before {
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--cam-primary-color);
+  color: var(--asset-manager-interactive-primary);
   font-weight: bold;
 }
 
-.search-empty-actions {
+#comfyui-asset-manager-root .search-empty-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--asset-manager-spacing-sm);
   justify-content: center;
   flex-wrap: wrap;
 }
 
-.search-empty-button {
-  padding: 10px 20px;
-  border: 1px solid var(--cam-border-color);
-  border-radius: 6px;
-  font-size: 14px;
+#comfyui-asset-manager-root .search-empty-button {
+  padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-lg);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal),
+    transform var(--asset-manager-transition-fast);
   min-width: 120px;
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
 }
 
-.search-empty-button.primary {
-  background-color: var(--cam-primary-color);
+#comfyui-asset-manager-root .search-empty-button.primary {
+  background-color: var(--asset-manager-interactive-primary);
   color: white;
-  border-color: var(--cam-primary-color);
+  border-color: var(--asset-manager-interactive-primary);
 }
 
-.search-empty-button.primary:hover {
-  background-color: var(--cam-primary-color-dark, var(--cam-primary-color));
+#comfyui-asset-manager-root .search-empty-button.primary:hover {
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 
-.search-empty-button.secondary {
-  background-color: var(--cam-secondary-color);
-  color: var(--cam-text-color);
-  border-color: var(--cam-border-color);
+#comfyui-asset-manager-root .search-empty-button.secondary {
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
+  border-color: var(--asset-manager-border-primary);
 }
 
-.search-empty-button.secondary:hover {
-  background-color: var(--cam-background-color);
-  border-color: var(--cam-primary-color);
+#comfyui-asset-manager-root .search-empty-button.secondary:hover {
+  background-color: var(--asset-manager-bg-tertiary);
+  border-color: var(--asset-manager-interactive-primary);
 }
 
 /* Responsive Design */

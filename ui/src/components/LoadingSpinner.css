@@ -1,91 +1,108 @@
-/* Loading Spinner Component Styles - Using Asset Manager Theme System */
+/* Loading Spinner Component Styles - Enhanced Theme Integration */
 
-.loading-container {
+/* Loading container using new theme system */
+#comfyui-asset-manager-root .loading-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100px;
 }
 
-.loading-container.overlay {
+#comfyui-asset-manager-root .loading-container.overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--asset-manager-modal-backdrop, rgba(0, 0, 0, 0.5));
-  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
   z-index: 100;
-  transition: background-color var(--asset-manager-transition-normal, 0.2s ease);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    backdrop-filter var(--asset-manager-transition-normal);
 }
 
-.loading-spinner {
+/* Light theme overlay adjustment */
+:root.comfy-theme-light #comfyui-asset-manager-root .loading-container.overlay {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+#comfyui-asset-manager-root .loading-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--asset-manager-spacing-md, 12px);
+  gap: var(--asset-manager-spacing-sm);
 }
 
-/* Spinner sizes */
-.loading-spinner.small .spinner-circle {
-  width: 20px;
-  height: 20px;
+/* Enhanced spinner using theme system classes */
+#comfyui-asset-manager-root .spinner-circle {
+  border-radius: 50%;
+  border-style: solid;
+  border-top-color: transparent;
+  animation: asset-manager-spin 1s linear infinite;
+  transition: border-color var(--asset-manager-transition-normal);
+}
+
+/* Spinner sizes using theme system */
+#comfyui-asset-manager-root .loading-spinner.small .spinner-circle {
+  width: 16px;
+  height: 16px;
   border-width: 2px;
 }
 
-.loading-spinner.medium .spinner-circle {
+#comfyui-asset-manager-root .loading-spinner.medium .spinner-circle {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+#comfyui-asset-manager-root .loading-spinner.large .spinner-circle {
   width: 32px;
   height: 32px;
   border-width: 3px;
 }
 
-.loading-spinner.large .spinner-circle {
-  width: 48px;
-  height: 48px;
-  border-width: 4px;
+/* Spinner colors using enhanced theme variables */
+#comfyui-asset-manager-root .loading-spinner.primary .spinner-circle {
+  border-color: var(--asset-manager-border-primary);
+  border-top-color: var(--asset-manager-interactive-primary);
 }
 
-/* Spinner circle */
-.spinner-circle {
-  border-radius: 50%;
-  border-style: solid;
-  border-top-color: transparent;
-  animation: spin 1s linear infinite;
+#comfyui-asset-manager-root .loading-spinner.secondary .spinner-circle {
+  border-color: var(--asset-manager-border-primary);
+  border-top-color: var(--asset-manager-interactive-secondary);
 }
 
-/* Spinner colors using theme variables */
-.loading-spinner.primary .spinner-circle {
-  border-color: var(--asset-manager-interactive-primary, #007acc);
-  border-top-color: transparent;
+#comfyui-asset-manager-root .loading-spinner.white .spinner-circle {
+  border-color: var(--asset-manager-border-secondary);
+  border-top-color: var(--asset-manager-text-primary);
 }
 
-.loading-spinner.secondary .spinner-circle {
-  border-color: var(--asset-manager-interactive-secondary, #6c757d);
-  border-top-color: transparent;
+#comfyui-asset-manager-root .loading-spinner.success .spinner-circle {
+  border-color: var(--asset-manager-border-primary);
+  border-top-color: var(--asset-manager-success);
 }
 
-.loading-spinner.white .spinner-circle {
-  border-color: var(--asset-manager-text-primary, #ffffff);
-  border-top-color: transparent;
+#comfyui-asset-manager-root .loading-spinner.warning .spinner-circle {
+  border-color: var(--asset-manager-border-primary);
+  border-top-color: var(--asset-manager-warning);
 }
 
-/* Spinner text using theme variables */
-.spinner-text {
-  font-size: 14px;
-  color: var(--asset-manager-text-secondary, #cccccc);
+#comfyui-asset-manager-root .loading-spinner.error .spinner-circle {
+  border-color: var(--asset-manager-border-primary);
+  border-top-color: var(--asset-manager-error);
+}
+
+/* Spinner text using enhanced theme variables */
+#comfyui-asset-manager-root .spinner-text {
+  font-size: 0.875rem;
+  color: var(--asset-manager-text-secondary);
   text-align: center;
-  transition: color var(--asset-manager-transition-normal, 0.2s ease);
+  transition: color var(--asset-manager-transition-normal);
 }
 
-.loading-spinner.white .spinner-text {
-  color: var(--asset-manager-text-primary, #ffffff);
-}
-
-/* Spin animation */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+#comfyui-asset-manager-root .loading-spinner.white .spinner-text {
+  color: var(--asset-manager-text-primary);
 }
 
 /* Skeleton loader using theme variables */
