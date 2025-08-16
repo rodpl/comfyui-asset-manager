@@ -1,263 +1,114 @@
-# ComfyUI Asset Manager Theme System
+# Theme Integration System
 
-This directory contains the comprehensive theme system for the ComfyUI Asset Manager extension. The theme system automatically adapts to ComfyUI's light and dark themes using CSS variables and provides a consistent visual experience.
+## Overview
 
-## Files
+The ComfyUI Asset Manager uses a CSS-based theme integration system that automatically adapts to ComfyUI's light and dark themes. This system provides seamless visual integration without requiring complex JavaScript theme management.
 
-- `theme.css` - Complete theme system with CSS variables, component styles, and theme switching
-- `README.md` - This documentation file
+## How It Works
 
-## Architecture
+### 1. Automatic Theme Detection
 
-The theme system uses a CSS-first approach that automatically adapts to ComfyUI's theme changes without requiring JavaScript theme management.
+The system detects ComfyUI's theme through CSS class observation:
 
-### Key Features
+- **Dark Theme (Default)**: No special class required
+- **Light Theme**: ComfyUI adds `.comfy-theme-light` class to `:root`
 
-1. **Automatic Theme Detection**: Uses ComfyUI's `.comfy-theme-light` class to detect theme changes
-2. **CSS Variable System**: Semantic variables that map to ComfyUI's CSS custom properties
-3. **Fallback Values**: All variables include fallback values for when ComfyUI variables are unavailable
-4. **Smooth Transitions**: Configurable transition properties for theme switching
-5. **Component Classes**: Pre-styled component classes for consistent theming
-6. **Utility Classes**: Helper classes for spacing, colors, and common styling needs
+### 2. CSS Variable System
 
-## CSS Variable Structure
-
-### Semantic Categories
-
-#### Background Colors
-- `--asset-manager-bg-primary` - Main background color
-- `--asset-manager-bg-secondary` - Secondary background (cards, inputs)
-- `--asset-manager-bg-tertiary` - Tertiary background (hover states)
-
-#### Text Colors
-- `--asset-manager-text-primary` - Primary text color
-- `--asset-manager-text-secondary` - Secondary text color
-- `--asset-manager-text-muted` - Muted text color
-
-#### Border Colors
-- `--asset-manager-border-primary` - Primary border color
-- `--asset-manager-border-secondary` - Secondary border color
-- `--asset-manager-border-hover` - Hover state border color
-
-#### Interactive Colors
-- `--asset-manager-interactive-primary` - Primary interactive color (buttons, links)
-- `--asset-manager-interactive-secondary` - Secondary interactive color
-- `--asset-manager-interactive-hover` - Hover state color
-
-#### Status Colors
-- `--asset-manager-success` - Success state color
-- `--asset-manager-warning` - Warning state color
-- `--asset-manager-error` - Error state color
-- `--asset-manager-info` - Info state color
-
-#### Spacing
-- `--asset-manager-spacing-xs` - Extra small spacing (0.25rem)
-- `--asset-manager-spacing-sm` - Small spacing (0.5rem)
-- `--asset-manager-spacing-md` - Medium spacing (1rem)
-- `--asset-manager-spacing-lg` - Large spacing (1.5rem)
-- `--asset-manager-spacing-xl` - Extra large spacing (2rem)
-
-#### Border Radius
-- `--asset-manager-border-radius-sm` - Small border radius (0.25rem)
-- `--asset-manager-border-radius-md` - Medium border radius (0.375rem)
-- `--asset-manager-border-radius-lg` - Large border radius (0.5rem)
-
-#### Transitions
-- `--asset-manager-transition-fast` - Fast transition (0.15s ease)
-- `--asset-manager-transition-normal` - Normal transition (0.2s ease)
-- `--asset-manager-transition-slow` - Slow transition (0.3s ease)
-
-## Component Classes
-
-### Base Components
-- `.asset-manager-component` - Base component styling
-- `.asset-manager-button` - Button styling
-- `.asset-manager-input` - Input field styling
-- `.asset-manager-card` - Card/panel styling
-- `.asset-manager-modal` - Modal dialog styling
-
-### Button Variants
-- `.asset-manager-button--primary` - Primary button
-- `.asset-manager-button--secondary` - Secondary button
-- `.asset-manager-button--success` - Success button
-- `.asset-manager-button--warning` - Warning button
-- `.asset-manager-button--error` - Error button
-
-### Status Components
-- `.asset-manager-success` - Success styling
-- `.asset-manager-warning` - Warning styling
-- `.asset-manager-error` - Error styling
-- `.asset-manager-info` - Info styling
-
-### Loading States
-- `.asset-manager-loading` - Loading text styling
-- `.asset-manager-spinner` - Loading spinner animation
-
-### Utility Classes
-- `.asset-manager-spacing-*` - Margin utilities
-- `.asset-manager-padding-*` - Padding utilities
-- `.asset-manager-text-*` - Text color utilities
-- `.asset-manager-bg-*` - Background color utilities
-
-## Usage
-
-### In React Components
-
-```tsx
-// Use component classes
-<button className="asset-manager-button asset-manager-button--primary">
-  Primary Button
-</button>
-
-<div className="asset-manager-card">
-  <h3>Card Title</h3>
-  <p className="asset-manager-text-secondary">Card content</p>
-</div>
-
-// Use utility classes
-<div className="asset-manager-padding-md asset-manager-bg-secondary">
-  Content with padding and background
-</div>
-```
-
-### In CSS
-
-```css
-/* Use CSS variables directly */
-.custom-component {
-  background-color: var(--asset-manager-bg-secondary);
-  color: var(--asset-manager-text-primary);
-  border: 1px solid var(--asset-manager-border-primary);
-  border-radius: var(--asset-manager-border-radius-md);
-  padding: var(--asset-manager-spacing-md);
-  transition: 
-    color var(--asset-manager-transition-normal),
-    background-color var(--asset-manager-transition-normal);
-}
-
-.custom-component:hover {
-  background-color: var(--asset-manager-bg-tertiary);
-  border-color: var(--asset-manager-border-hover);
-}
-```
-
-## Theme Switching
-
-The theme system automatically responds to ComfyUI's theme changes. When ComfyUI adds the `.comfy-theme-light` class to the document root, all Asset Manager components automatically switch to light theme styling.
-
-### Manual Theme Testing
-
-For development and testing, you can manually toggle themes:
-
-```javascript
-// Switch to light theme
-document.documentElement.classList.add('comfy-theme-light');
-
-// Switch to dark theme
-document.documentElement.classList.remove('comfy-theme-light');
-```
-
-## Testing
-
-### Automated Tests
-
-Run the theme system tests:
-
-```bash
-npm test -- --run src/utils/__tests__/themeSystem.test.ts
-```
-
-### Browser Validation
-
-Open the validation page in a browser:
-
-```bash
-# Serve the UI directory and open validate-theme-system.html
-# This provides interactive testing of all theme features
-```
-
-### Validation Features
-
-The validation page tests:
-- CSS variable inheritance and fallback behavior
-- Theme switching functionality
-- Component styling consistency
-- Status and feedback components
-- Loading states and animations
-
-## Integration with ComfyUI
-
-### CSS Variable Mapping
-
-Asset Manager variables map to ComfyUI variables with fallbacks:
+Theme-aware CSS variables automatically reference ComfyUI's design tokens:
 
 ```css
 :root {
+  /* Default (dark) theme */
   --asset-manager-bg-primary: var(--comfy-menu-bg, #2a2a2a);
   --asset-manager-text-primary: var(--input-text, #ffffff);
-  --asset-manager-interactive-primary: var(--p-button-text-primary-color, #007acc);
 }
-```
 
-### Theme Class Detection
-
-Light theme overrides are scoped to the extension root:
-
-```css
-:root.comfy-theme-light #comfyui-asset-manager-root {
+/* Light theme overrides */
+:root.comfy-theme-light #asset-manager-root {
   --asset-manager-bg-primary: var(--comfy-menu-bg, #f0f0f0);
   --asset-manager-text-primary: var(--input-text, #000000);
 }
 ```
 
-### Extension Root Scoping
+### 3. Component Integration
 
-All styles are scoped to `#comfyui-asset-manager-root` to prevent style leakage:
+Components use CSS variables for automatic theme adaptation:
 
 ```css
-#comfyui-asset-manager-root .asset-manager-component {
-  /* Scoped styles here */
+.my-component {
+  background-color: var(--asset-manager-bg-primary);
+  color: var(--asset-manager-text-primary);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 ```
 
-## Best Practices
+## File Structure
 
-### For Developers
+```
+ui/src/styles/
+├── README.md           # This file - system overview
+├── theme.css          # Main theme variable definitions
+└── components/        # Component-specific theme styles
+```
 
-1. **Use Semantic Variables**: Always use semantic variables instead of hardcoded colors
-2. **Follow Naming Conventions**: Use `asset-manager-` prefix for all custom variables and classes
-3. **Include Transitions**: Add transition properties for smooth theme switching
-4. **Test Both Themes**: Always test components in both light and dark themes
-5. **Use Utility Classes**: Leverage utility classes for consistent spacing and colors
+## Key Files
 
-### For Components
+### `theme.css`
 
-1. **Scope Styles**: Always scope styles to the extension root element
-2. **Use Component Classes**: Prefer component classes over inline styles
-3. **Handle Hover States**: Include hover and focus states for interactive elements
-4. **Support Status States**: Use status classes for success, warning, error states
-5. **Include Loading States**: Provide loading and empty state styling
+Contains all CSS variable definitions and light theme overrides. This is the core of the theme system.
 
-## Troubleshooting
+### Component CSS Files
 
-### Common Issues
+Individual component CSS files use the theme variables defined in `theme.css`.
 
-1. **Variables Not Working**: Ensure styles are scoped to `#comfyui-asset-manager-root`
-2. **Theme Not Switching**: Check that ComfyUI's theme class is being applied
-3. **Fallbacks Not Working**: Verify fallback values are valid CSS values
-4. **Transitions Not Smooth**: Check transition properties are applied to changing elements
+## Usage Guidelines
 
-### Debugging
+### For New Components
 
-1. **Use Browser DevTools**: Inspect computed styles to see actual variable values
-2. **Check Console**: Look for CSS parsing errors
-3. **Test Isolation**: Test components in isolation to identify issues
-4. **Validate HTML**: Use the validation page to test all theme features
+1. **Use CSS Variables**: Always use theme variables instead of hardcoded colors
+2. **Add Transitions**: Include smooth transitions for theme switching
+3. **Test Both Themes**: Verify components work in light and dark themes
 
-## Future Enhancements
+### CSS Variable Reference
 
-- Support for custom ComfyUI themes
-- Additional component variants
-- Animation and motion utilities
-- Accessibility improvements
-- Performance optimizations
+See the [Theme Integration Quick Reference](../../../docs/development/theme-integration-quick-reference.md) for a complete list of available CSS variables.
+
+## Testing
+
+Theme integration includes comprehensive testing:
+
+- **CSS Variable Fallbacks**: Ensure variables work without ComfyUI
+- **Theme Switching**: Test automatic theme transitions
+- **Visual Regression**: Compare component appearance across themes
+
+Test utilities are available in `ui/src/utils/themeTestUtils.ts`.
+
+## Documentation
+
+- **Complete Guide**: [Theme Integration Guide](../../../docs/development/theme-integration-guide.md)
+- **Quick Reference**: [Theme Integration Quick Reference](../../../docs/development/theme-integration-quick-reference.md)
+- **Test Utils**: `ui/src/utils/themeTestUtils.ts`
+- **Theme Hook**: `ui/src/hooks/useComfyUITheme.ts` (optional)
+
+## Benefits
+
+- **Automatic Integration**: No manual theme management required
+- **Performance**: CSS-based switching with no JavaScript overhead
+- **Maintainability**: Centralized theme variable system
+- **Future-Proof**: Automatically inherits ComfyUI theme updates
+- **Accessibility**: Respects user theme preferences
+
+## Architecture
+
+The theme system follows a CSS-first approach:
+
+1. **CSS Variables**: Define semantic color variables
+2. **ComfyUI Integration**: Reference ComfyUI's CSS custom properties
+3. **Fallback Values**: Provide defaults for graceful degradation
+4. **Automatic Switching**: Use CSS selectors for theme transitions
+5. **Optional JavaScript**: Minimal JS for components that need theme awareness
+
+This approach ensures the theme system is performant, maintainable, and automatically compatible with ComfyUI's theme evolution.

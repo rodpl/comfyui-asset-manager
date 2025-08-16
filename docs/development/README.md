@@ -46,6 +46,31 @@ This directory contains comprehensive documentation for developers working on th
   - Testing patterns and common development tasks
   - Troubleshooting and best practices
 
+### 🎨 Theme Integration Documentation
+
+#### [Theme Integration Guide](./theme-integration-guide.md)
+**Comprehensive guide for implementing ComfyUI theme integration**
+
+- **What it covers**: Complete CSS-based theme system implementation
+- **Who should read it**: Frontend developers and anyone working with UI components
+- **Key sections**:
+  - CSS variable system and naming conventions
+  - Theme detection and switching mechanisms
+  - Component theming guidelines and patterns
+  - Testing approaches for theme functionality
+  - Troubleshooting guide and best practices
+
+#### [Theme Integration Quick Reference](./theme-integration-quick-reference.md)
+**Quick reference for common theme integration patterns**
+
+- **What it covers**: Essential patterns, variables, and troubleshooting steps
+- **Who should read it**: Developers who need quick access to theme integration patterns
+- **Key sections**:
+  - CSS variable reference and usage patterns
+  - Common component theming patterns
+  - Testing commands and debugging tools
+  - Troubleshooting checklist
+
 ## Quick Navigation
 
 ### 🚀 Getting Started
@@ -66,6 +91,10 @@ This directory contains comprehensive documentation for developers working on th
 | **How to Add Features** | [Developer Guide](./developer-guide.md) | Common Development Tasks |
 | **Testing Patterns** | [Developer Guide](./developer-guide.md) | Testing Patterns |
 | **Troubleshooting** | [Developer Guide](./developer-guide.md) | Troubleshooting |
+| **Theme Integration** | [Theme Integration Guide](./theme-integration-guide.md) | Complete Guide |
+| **Theme Quick Reference** | [Theme Integration Quick Reference](./theme-integration-quick-reference.md) | Quick Patterns |
+| **CSS Variables** | [Theme Integration Guide](./theme-integration-guide.md) | CSS Variable System |
+| **Theme Testing** | [Theme Integration Guide](./theme-integration-guide.md) | Testing Theme Integration |
 
 ### 🎯 By Role
 
@@ -88,6 +117,12 @@ This directory contains comprehensive documentation for developers working on th
 1. Understand [Hexagonal Architecture Implementation](./hexagonal-architecture.md) - Implementation Flow
 2. Review [Current Implementation Status](./current-implementation-status.md) - Test Coverage Summary
 3. Use [Developer Guide](./developer-guide.md) - Testing Patterns
+4. Reference [Theme Integration Guide](./theme-integration-guide.md) - Testing Theme Integration
+
+#### **Frontend/UI Developers**
+1. Read [Theme Integration Guide](./theme-integration-guide.md) - Complete guide
+2. Use [Theme Integration Quick Reference](./theme-integration-quick-reference.md) - Daily reference
+3. Follow [Developer Guide](./developer-guide.md) - General development patterns
 
 ## Key Concepts Summary
 
