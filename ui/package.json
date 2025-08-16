@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
     "lint": "eslint . --ext ts,tsx,js,jsx --report-unused-disable-directives --max-warnings 0",

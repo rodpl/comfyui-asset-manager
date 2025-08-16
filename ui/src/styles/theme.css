@@ -301,3 +301,649 @@
 #comfyui-asset-manager-root .asset-manager-bg-primary { background-color: var(--asset-manager-bg-primary); }
 #comfyui-asset-manager-root .asset-manager-bg-secondary { background-color: var(--asset-manager-bg-secondary); }
 #comfyui-asset-manager-root .asset-manager-bg-tertiary { background-color: var(--asset-manager-bg-tertiary); }
+
+/* ===== ENHANCED INTERACTIVE ELEMENT CLASSES ===== */
+
+/* Button size variants */
+#comfyui-asset-manager-root .asset-manager-button--small {
+  padding: var(--asset-manager-spacing-xs) var(--asset-manager-spacing-sm);
+  font-size: 0.875rem;
+}
+
+#comfyui-asset-manager-root .asset-manager-button--large {
+  padding: var(--asset-manager-spacing-md) var(--asset-manager-spacing-lg);
+  font-size: 1.125rem;
+}
+
+/* Button states */
+#comfyui-asset-manager-root .asset-manager-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+#comfyui-asset-manager-root .asset-manager-button:active {
+  transform: translateY(1px);
+}
+
+#comfyui-asset-manager-root .asset-manager-button--loading {
+  position: relative;
+  color: transparent;
+}
+
+#comfyui-asset-manager-root .asset-manager-button--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: asset-manager-spin 1s linear infinite;
+}
+
+/* Icon buttons */
+#comfyui-asset-manager-root .asset-manager-button--icon {
+  padding: var(--asset-manager-spacing-sm);
+  min-width: auto;
+  aspect-ratio: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#comfyui-asset-manager-root .asset-manager-button--icon-small {
+  padding: var(--asset-manager-spacing-xs);
+  font-size: 0.875rem;
+}
+
+/* Button groups */
+#comfyui-asset-manager-root .asset-manager-button-group {
+  display: inline-flex;
+  border-radius: var(--asset-manager-border-radius-md);
+  overflow: hidden;
+}
+
+#comfyui-asset-manager-root .asset-manager-button-group .asset-manager-button {
+  border-radius: 0;
+  border-right-width: 0;
+}
+
+#comfyui-asset-manager-root .asset-manager-button-group .asset-manager-button:first-child {
+  border-top-left-radius: var(--asset-manager-border-radius-md);
+  border-bottom-left-radius: var(--asset-manager-border-radius-md);
+}
+
+#comfyui-asset-manager-root .asset-manager-button-group .asset-manager-button:last-child {
+  border-top-right-radius: var(--asset-manager-border-radius-md);
+  border-bottom-right-radius: var(--asset-manager-border-radius-md);
+  border-right-width: 1px;
+}
+
+/* Enhanced input field styling */
+#comfyui-asset-manager-root .asset-manager-input--small {
+  padding: var(--asset-manager-spacing-xs) var(--asset-manager-spacing-sm);
+  font-size: 0.875rem;
+}
+
+#comfyui-asset-manager-root .asset-manager-input--large {
+  padding: var(--asset-manager-spacing-md) var(--asset-manager-spacing-lg);
+  font-size: 1.125rem;
+}
+
+#comfyui-asset-manager-root .asset-manager-input:hover {
+  border-color: var(--asset-manager-border-hover);
+}
+
+#comfyui-asset-manager-root .asset-manager-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--asset-manager-bg-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-input--error {
+  border-color: var(--asset-manager-error);
+}
+
+#comfyui-asset-manager-root .asset-manager-input--error:focus {
+  border-color: var(--asset-manager-error);
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+#comfyui-asset-manager-root .asset-manager-input--success {
+  border-color: var(--asset-manager-success);
+}
+
+#comfyui-asset-manager-root .asset-manager-input--success:focus {
+  border-color: var(--asset-manager-success);
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+}
+
+/* Input groups */
+#comfyui-asset-manager-root .asset-manager-input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+#comfyui-asset-manager-root .asset-manager-input-group .asset-manager-input {
+  border-radius: 0;
+  border-right-width: 0;
+}
+
+#comfyui-asset-manager-root .asset-manager-input-group .asset-manager-input:first-child {
+  border-top-left-radius: var(--asset-manager-border-radius-md);
+  border-bottom-left-radius: var(--asset-manager-border-radius-md);
+}
+
+#comfyui-asset-manager-root .asset-manager-input-group .asset-manager-input:last-child {
+  border-top-right-radius: var(--asset-manager-border-radius-md);
+  border-bottom-right-radius: var(--asset-manager-border-radius-md);
+  border-right-width: 1px;
+}
+
+#comfyui-asset-manager-root .asset-manager-input-group .asset-manager-button {
+  border-radius: 0;
+  border-left-width: 0;
+}
+
+#comfyui-asset-manager-root .asset-manager-input-group .asset-manager-button:last-child {
+  border-top-right-radius: var(--asset-manager-border-radius-md);
+  border-bottom-right-radius: var(--asset-manager-border-radius-md);
+}
+
+/* Select styling */
+#comfyui-asset-manager-root .asset-manager-select {
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-md);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    box-shadow var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-select:hover {
+  border-color: var(--asset-manager-border-hover);
+}
+
+#comfyui-asset-manager-root .asset-manager-select:focus {
+  outline: none;
+  border-color: var(--asset-manager-interactive-primary);
+  box-shadow: 0 0 0 2px var(--asset-manager-shadow-light);
+}
+
+#comfyui-asset-manager-root .asset-manager-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--asset-manager-bg-primary);
+}
+
+/* Checkbox styling */
+#comfyui-asset-manager-root .asset-manager-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox .asset-manager-checkbox-indicator {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--asset-manager-bg-secondary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-sm);
+  margin-right: var(--asset-manager-spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox:hover .asset-manager-checkbox-indicator {
+  border-color: var(--asset-manager-border-hover);
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox input[type="checkbox"]:checked + .asset-manager-checkbox-indicator {
+  background-color: var(--asset-manager-interactive-primary);
+  border-color: var(--asset-manager-interactive-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox input[type="checkbox"]:checked + .asset-manager-checkbox-indicator::after {
+  content: '✓';
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox input[type="checkbox"]:focus + .asset-manager-checkbox-indicator {
+  box-shadow: 0 0 0 2px var(--asset-manager-shadow-light);
+}
+
+#comfyui-asset-manager-root .asset-manager-checkbox input[type="checkbox"]:disabled + .asset-manager-checkbox-indicator {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Radio button styling */
+#comfyui-asset-manager-root .asset-manager-radio {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+#comfyui-asset-manager-root .asset-manager-radio input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#comfyui-asset-manager-root .asset-manager-radio .asset-manager-radio-indicator {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--asset-manager-bg-secondary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: 50%;
+  margin-right: var(--asset-manager-spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-radio:hover .asset-manager-radio-indicator {
+  border-color: var(--asset-manager-border-hover);
+}
+
+#comfyui-asset-manager-root .asset-manager-radio input[type="radio"]:checked + .asset-manager-radio-indicator {
+  border-color: var(--asset-manager-interactive-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-radio input[type="radio"]:checked + .asset-manager-radio-indicator::after {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--asset-manager-interactive-primary);
+  border-radius: 50%;
+}
+
+#comfyui-asset-manager-root .asset-manager-radio input[type="radio"]:focus + .asset-manager-radio-indicator {
+  box-shadow: 0 0 0 2px var(--asset-manager-shadow-light);
+}
+
+#comfyui-asset-manager-root .asset-manager-radio input[type="radio"]:disabled + .asset-manager-radio-indicator {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Enhanced modal and dialog styling */
+#comfyui-asset-manager-root .asset-manager-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: background-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-modal {
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+  margin: var(--asset-manager-spacing-md);
+}
+
+#comfyui-asset-manager-root .asset-manager-modal--small {
+  max-width: 400px;
+}
+
+#comfyui-asset-manager-root .asset-manager-modal--medium {
+  max-width: 600px;
+}
+
+#comfyui-asset-manager-root .asset-manager-modal--large {
+  max-width: 800px;
+}
+
+#comfyui-asset-manager-root .asset-manager-modal--fullscreen {
+  max-width: 95vw;
+  max-height: 95vh;
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-header {
+  padding: var(--asset-manager-spacing-lg);
+  border-bottom: 1px solid var(--asset-manager-border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--asset-manager-text-primary);
+  margin: 0;
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-close {
+  background: none;
+  border: none;
+  color: var(--asset-manager-text-secondary);
+  cursor: pointer;
+  padding: var(--asset-manager-spacing-xs);
+  border-radius: var(--asset-manager-border-radius-sm);
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-close:hover {
+  color: var(--asset-manager-text-primary);
+  background-color: var(--asset-manager-bg-tertiary);
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-body {
+  padding: var(--asset-manager-spacing-lg);
+}
+
+#comfyui-asset-manager-root .asset-manager-modal-footer {
+  padding: var(--asset-manager-spacing-lg);
+  border-top: 1px solid var(--asset-manager-border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--asset-manager-spacing-sm);
+}
+
+/* Dropdown menu styling */
+#comfyui-asset-manager-root .asset-manager-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  background-color: var(--asset-manager-bg-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  box-shadow: 0 4px 12px var(--asset-manager-shadow-medium);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: 
+    opacity var(--asset-manager-transition-normal),
+    visibility var(--asset-manager-transition-normal),
+    transform var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown--open .asset-manager-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-md);
+  color: var(--asset-manager-text-primary);
+  text-decoration: none;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown-item:hover {
+  background-color: var(--asset-manager-bg-tertiary);
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown-item:focus {
+  outline: none;
+  background-color: var(--asset-manager-bg-tertiary);
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown-item--active {
+  background-color: var(--asset-manager-interactive-primary);
+  color: white;
+}
+
+#comfyui-asset-manager-root .asset-manager-dropdown-divider {
+  height: 1px;
+  background-color: var(--asset-manager-border-primary);
+  margin: var(--asset-manager-spacing-xs) 0;
+}
+
+/* Tooltip styling */
+#comfyui-asset-manager-root .asset-manager-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+#comfyui-asset-manager-root .asset-manager-tooltip-content {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--asset-manager-bg-primary);
+  color: var(--asset-manager-text-primary);
+  padding: var(--asset-manager-spacing-xs) var(--asset-manager-spacing-sm);
+  border-radius: var(--asset-manager-border-radius-sm);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px var(--asset-manager-shadow-medium);
+  opacity: 0;
+  visibility: hidden;
+  transition: 
+    opacity var(--asset-manager-transition-normal),
+    visibility var(--asset-manager-transition-normal);
+  z-index: 200;
+}
+
+#comfyui-asset-manager-root .asset-manager-tooltip:hover .asset-manager-tooltip-content {
+  opacity: 1;
+  visibility: visible;
+}
+
+#comfyui-asset-manager-root .asset-manager-tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--asset-manager-bg-primary);
+}
+
+/* Tab styling */
+#comfyui-asset-manager-root .asset-manager-tabs {
+  border-bottom: 1px solid var(--asset-manager-border-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-tab-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#comfyui-asset-manager-root .asset-manager-tab {
+  padding: var(--asset-manager-spacing-sm) var(--asset-manager-spacing-md);
+  background: none;
+  border: none;
+  color: var(--asset-manager-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: 
+    color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-tab:hover {
+  color: var(--asset-manager-text-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-tab--active {
+  color: var(--asset-manager-interactive-primary);
+  border-bottom-color: var(--asset-manager-interactive-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-tab-panel {
+  padding: var(--asset-manager-spacing-md) 0;
+}
+
+/* Progress bar styling */
+#comfyui-asset-manager-root .asset-manager-progress {
+  width: 100%;
+  height: 0.5rem;
+  background-color: var(--asset-manager-bg-tertiary);
+  border-radius: var(--asset-manager-border-radius-sm);
+  overflow: hidden;
+}
+
+#comfyui-asset-manager-root .asset-manager-progress-bar {
+  height: 100%;
+  background-color: var(--asset-manager-interactive-primary);
+  transition: width var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-progress--success .asset-manager-progress-bar {
+  background-color: var(--asset-manager-success);
+}
+
+#comfyui-asset-manager-root .asset-manager-progress--warning .asset-manager-progress-bar {
+  background-color: var(--asset-manager-warning);
+}
+
+#comfyui-asset-manager-root .asset-manager-progress--error .asset-manager-progress-bar {
+  background-color: var(--asset-manager-error);
+}
+
+/* Badge styling */
+#comfyui-asset-manager-root .asset-manager-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--asset-manager-spacing-xs) var(--asset-manager-spacing-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--asset-manager-border-radius-sm);
+  background-color: var(--asset-manager-bg-tertiary);
+  color: var(--asset-manager-text-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-badge--primary {
+  background-color: var(--asset-manager-interactive-primary);
+  color: white;
+}
+
+#comfyui-asset-manager-root .asset-manager-badge--success {
+  background-color: var(--asset-manager-success);
+  color: white;
+}
+
+#comfyui-asset-manager-root .asset-manager-badge--warning {
+  background-color: var(--asset-manager-warning);
+  color: white;
+}
+
+#comfyui-asset-manager-root .asset-manager-badge--error {
+  background-color: var(--asset-manager-error);
+  color: white;
+}
+
+/* Toggle switch styling */
+#comfyui-asset-manager-root .asset-manager-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle-track {
+  width: 2.5rem;
+  height: 1.25rem;
+  background-color: var(--asset-manager-bg-tertiary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: 1rem;
+  position: relative;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle-thumb {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--asset-manager-text-primary);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 0.125rem;
+  transform: translateY(-50%);
+  transition: 
+    left var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal);
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle input[type="checkbox"]:checked + .asset-manager-toggle-track {
+  background-color: var(--asset-manager-interactive-primary);
+  border-color: var(--asset-manager-interactive-primary);
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle input[type="checkbox"]:checked + .asset-manager-toggle-track .asset-manager-toggle-thumb {
+  left: 1.375rem;
+  background-color: white;
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle input[type="checkbox"]:focus + .asset-manager-toggle-track {
+  box-shadow: 0 0 0 2px var(--asset-manager-shadow-light);
+}
+
+#comfyui-asset-manager-root .asset-manager-toggle input[type="checkbox"]:disabled + .asset-manager-toggle-track {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

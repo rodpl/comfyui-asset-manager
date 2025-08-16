@@ -4,6 +4,7 @@
  */
 
 import './ThemeDemo.css';
+import { InteractiveElementsDemo } from './InteractiveElementsDemo';
 
 interface ThemeDemoProps {
   className?: string;
@@ -15,89 +16,30 @@ export const ThemeDemo = ({ className = '' }: ThemeDemoProps) => {
       <h3 className="asset-manager-text-primary">Theme System Demo</h3>
       <p className="asset-manager-text-secondary">
         This demonstrates the CSS-based theme system that automatically adapts to ComfyUI's
-        light/dark theme.
+        light/dark theme. All interactive elements use ComfyUI's CSS custom properties with fallback values.
       </p>
 
-      {/* Button Examples */}
+      {/* Comprehensive Interactive Elements Demo */}
+      <InteractiveElementsDemo />
+
+      {/* Original Simple Examples for Quick Reference */}
       <div className="demo-section">
-        <h4 className="asset-manager-text-primary">Buttons</h4>
+        <h4 className="asset-manager-text-primary">Quick Reference</h4>
+        <p className="asset-manager-text-secondary">
+          Basic examples showing theme adaptation:
+        </p>
+        
         <div className="demo-buttons">
-          <button className="asset-manager-button">Default Button</button>
-          <button className="asset-manager-button asset-manager-button--primary">
-            Primary Button
-          </button>
-          <button className="asset-manager-button asset-manager-button--secondary">
-            Secondary Button
-          </button>
-          <button className="asset-manager-button asset-manager-button--success">
-            Success Button
-          </button>
-          <button className="asset-manager-button asset-manager-button--warning">
-            Warning Button
-          </button>
-          <button className="asset-manager-button asset-manager-button--error">Error Button</button>
+          <button className="asset-manager-button">Default</button>
+          <button className="asset-manager-button asset-manager-button--primary">Primary</button>
+          <input className="asset-manager-input" type="text" placeholder="Theme-aware input..." />
         </div>
-      </div>
-
-      {/* Input Examples */}
-      <div className="demo-section">
-        <h4 className="asset-manager-text-primary">Inputs</h4>
-        <div className="demo-inputs">
-          <input className="asset-manager-input" type="text" placeholder="Enter text here..." />
-          <input className="asset-manager-input" type="search" placeholder="Search models..." />
-        </div>
-      </div>
-
-      {/* Card Examples */}
-      <div className="demo-section">
-        <h4 className="asset-manager-text-primary">Cards</h4>
-        <div className="demo-cards">
-          <div className="asset-manager-card">
-            <h5 className="asset-manager-text-primary">Model Card</h5>
-            <p className="asset-manager-text-secondary">
-              This is a sample model card that adapts to the theme.
-            </p>
-            <div className="card-actions">
-              <button className="asset-manager-button asset-manager-button--primary">
-                Download
-              </button>
-              <button className="asset-manager-button">Details</button>
-            </div>
-          </div>
-          <div className="asset-manager-card">
-            <h5 className="asset-manager-text-primary">Another Card</h5>
-            <p className="asset-manager-text-secondary">
-              Cards automatically inherit theme colors and transitions.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Status Examples */}
-      <div className="demo-section">
-        <h4 className="asset-manager-text-primary">Status Indicators</h4>
-        <div className="demo-status">
-          <div className="asset-manager-component asset-manager-success asset-manager-padding-sm">
-            <span>✓ Success status</span>
-          </div>
-          <div className="asset-manager-component asset-manager-warning asset-manager-padding-sm">
-            <span>⚠ Warning status</span>
-          </div>
-          <div className="asset-manager-component asset-manager-error asset-manager-padding-sm">
-            <span>✗ Error status</span>
-          </div>
-          <div className="asset-manager-component asset-manager-info asset-manager-padding-sm">
-            <span>ℹ Info status</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Loading Example */}
-      <div className="demo-section">
-        <h4 className="asset-manager-text-primary">Loading States</h4>
-        <div className="demo-loading">
-          <div className="asset-manager-spinner" style={{ width: '32px', height: '32px' }}></div>
-          <span className="asset-manager-loading asset-manager-spacing-sm">Loading content...</span>
+        
+        <div className="asset-manager-card" style={{ marginTop: '1rem' }}>
+          <h5 className="asset-manager-text-primary">Theme-Aware Card</h5>
+          <p className="asset-manager-text-secondary">
+            This card automatically adapts to ComfyUI's theme changes.
+          </p>
         </div>
       </div>
     </div>

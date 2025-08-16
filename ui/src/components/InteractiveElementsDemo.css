@@ -1,0 +1,139 @@
+/* Interactive Elements Demo Styling */
+
+.interactive-elements-demo {
+  padding: var(--asset-manager-spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.demo-title {
+  color: var(--asset-manager-text-primary);
+  margin-bottom: var(--asset-manager-spacing-xl);
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.demo-section {
+  margin-bottom: var(--asset-manager-spacing-xl);
+  padding: var(--asset-manager-spacing-lg);
+  background-color: var(--asset-manager-bg-secondary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
+}
+
+.demo-section-title {
+  color: var(--asset-manager-text-primary);
+  margin-bottom: var(--asset-manager-spacing-lg);
+  font-size: 1.5rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--asset-manager-border-primary);
+  padding-bottom: var(--asset-manager-spacing-sm);
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--asset-manager-spacing-lg);
+}
+
+.demo-group {
+  padding: var(--asset-manager-spacing-md);
+  background-color: var(--asset-manager-bg-primary);
+  border: 1px solid var(--asset-manager-border-secondary);
+  border-radius: var(--asset-manager-border-radius-md);
+}
+
+.demo-group h4 {
+  color: var(--asset-manager-text-primary);
+  margin-bottom: var(--asset-manager-spacing-md);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--asset-manager-spacing-sm);
+  align-items: center;
+}
+
+.demo-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--asset-manager-spacing-sm);
+}
+
+.demo-form-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--asset-manager-spacing-md);
+}
+
+.demo-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--asset-manager-spacing-md);
+}
+
+.demo-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--asset-manager-spacing-sm);
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .demo-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .demo-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .demo-buttons .asset-manager-button {
+    width: 100%;
+  }
+  
+  .interactive-elements-demo {
+    padding: var(--asset-manager-spacing-md);
+  }
+}
+
+/* Demo-specific overrides for better visibility */
+.demo-group .asset-manager-input,
+.demo-group .asset-manager-select {
+  width: 100%;
+  max-width: 300px;
+}
+
+.demo-group .asset-manager-button-group {
+  width: fit-content;
+}
+
+.demo-group .asset-manager-progress {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Ensure dropdown is visible in demo */
+.demo-group .asset-manager-dropdown {
+  position: relative;
+  z-index: 10;
+}
+
+.demo-group .asset-manager-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 11;
+}
+
+/* Tooltip positioning for demo */
+.demo-group .asset-manager-tooltip {
+  display: inline-block;
+  margin: var(--asset-manager-spacing-lg) 0;
+}

@@ -7,3 +7,4 @@ export {
   FolderNavigationSkeleton,
 } from './LoadingSpinner';
 export { default as ThemeDemo } from './ThemeDemo';
+export { default as InteractiveElementsDemo } from './InteractiveElementsDemo';
