@@ -66,7 +66,13 @@ class FallbackToastManager {
   }
 
   public getToasts(): ToastNotification[] {
-    return Array.from(this.toasts.values()).sort((a, b) => b.timestamp - a.timestamp);
+    return Array.from(this.toasts.values()).sort((a, b) => {
+      if (b.timestamp !== a.timestamp) return b.timestamp - a.timestamp;
+      // Tie-breaker: use numeric id to ensure newest-first ordering
+      const aSeq = parseInt(a.id.split('-')[1] || '0', 10);
+      const bSeq = parseInt(b.id.split('-')[1] || '0', 10);
+      return bSeq - aSeq;
+    });
   }
 
   public subscribe(listener: (toasts: ToastNotification[]) => void): () => void {
@@ -125,6 +131,11 @@ export class ComfyUINotificationService {
           capabilities: this.capabilities,
         });
       } else {
+        // Reset capabilities and version when ComfyUI app is not available
+        this.capabilities.hasExtensionToast = false;
+        this.capabilities.hasUIDialog = false;
+        this.capabilities.hasNativeToast = false;
+        this.comfyUIVersion = null;
         console.log('[NotificationService] ComfyUI app not available, using fallback');
       }
     } catch (error) {
@@ -279,6 +290,21 @@ export class ComfyUINotificationService {
     const testMessage = 'ComfyUI Toast Integration Test';
 
     try {
+      // Prefer UI dialog explicitly for integration test when available
+      if (this.capabilities.hasUIDialog && window.app?.ui?.dialog?.show) {
+        window.app.ui.dialog.show({
+          type: 'info',
+          content: testMessage,
+          title: 'Integration Test',
+        });
+        return {
+          success: true,
+          method: 'ui-dialog',
+          capabilities: this.capabilities,
+          version: this.comfyUIVersion,
+        };
+      }
+
       const id = this.show(testMessage, {
         type: 'info',
         title: 'Integration Test',

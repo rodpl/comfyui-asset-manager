@@ -6,17 +6,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { ComfyUINotificationService } from '../notificationService';
 
 // Mock window.app
-const mockApp = {
-  extensionManager: {
-    toast: vi.fn(),
-  },
-  ui: {
-    dialog: {
-      show: vi.fn(),
-    },
-  },
-  version: '1.0.0',
-};
+let mockApp: any;
 
 describe('ComfyUINotificationService', () => {
   let service: ComfyUINotificationService;
@@ -24,6 +14,19 @@ describe('ComfyUINotificationService', () => {
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
+
+    // Fresh mock for each test to avoid cross-test mutations
+    mockApp = {
+      extensionManager: {
+        toast: vi.fn(),
+      },
+      ui: {
+        dialog: {
+          show: vi.fn(),
+        },
+      },
+      version: '1.0.0',
+    };
 
     // Mock window object
     Object.defineProperty(window, 'app', {
@@ -186,8 +189,8 @@ describe('ComfyUINotificationService', () => {
 
       const result = await service.testIntegration();
 
-      expect(result.success).toBe(true); // Should still succeed with fallback
-      expect(result.method).toBe('fallback');
+      expect(result.success).toBe(true); // Should still succeed; integration prefers UI dialog
+      expect(result.method).toBe('ui-dialog');
     });
   });
 
