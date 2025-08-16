@@ -23,6 +23,15 @@
     /* Testing */
     "types": ["vitest/globals", "@testing-library/jest-dom", "node", "@playwright/test" ]
   },
-  "include": ["src", "tests-e2e", "playwright.config.ts", "playwright.env.d.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  // Only include source files for the production typecheck/build
+  "include": ["src"],
+  "exclude": [
+    "**/__tests__/**",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "tests-e2e/**",
+    "playwright.config.ts",
+    "playwright.env.d.ts",
+    "vite.config.ts"
+  ]
 }
