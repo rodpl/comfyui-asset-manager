@@ -17,3 +17,6 @@ export { default as Toast } from './Toast';
 export { default as ToastContainer } from './ToastContainer';
 export { default as ProgressIndicator } from './ProgressIndicator';
 export { default as FeedbackDemo } from './FeedbackDemo';
+
+// Theme integration examples
+export { default as ThemeAwareExample } from './ThemeAwareExample';
