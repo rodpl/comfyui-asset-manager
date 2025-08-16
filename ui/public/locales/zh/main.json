@@ -118,6 +118,8 @@
       "folders": "模型文件夹导航"
     },
     "errors": {
+      "foldersLoadFailed": "加载文件夹失败。请检查连接并重试。",
+      "modelsLoadFailed": "加载模型失败。请检查连接并重试。",
       "modelSelectFailed": "选择模型失败。请重试。",
       "workflowAddFailed": "添加模型到工作流失败。请重试。",
       "metadataUpdateFailed": "更新模型元数据失败。请重试。",
