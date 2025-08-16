@@ -3,35 +3,46 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--cam-secondary-color);
-  border-right: 1px solid var(--cam-border-color);
+  background-color: var(--asset-manager-bg-secondary);
+  border-right: 1px solid var(--asset-manager-border-primary);
   min-width: 250px;
   max-width: 300px;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .folder-navigation-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--cam-border-color);
-  background-color: var(--cam-background-color);
+  padding: var(--asset-manager-spacing-md);
+  border-bottom: 1px solid var(--asset-manager-border-primary);
+  background-color: var(--asset-manager-bg-primary);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .folder-navigation-header h4 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--cam-text-color);
+  color: var(--asset-manager-text-primary);
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .folder-count {
   font-size: 0.75rem;
-  color: var(--cam-muted-text-color);
-  background-color: var(--cam-secondary-color);
+  color: var(--asset-manager-text-secondary);
+  background-color: var(--asset-manager-bg-secondary);
   padding: 2px 8px;
   border-radius: 12px;
-  border: 1px solid var(--cam-border-color);
+  border: 1px solid var(--asset-manager-border-primary);
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .folder-navigation-content {
@@ -49,22 +60,25 @@
 .folder-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px var(--asset-manager-spacing-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
   border-left: 3px solid transparent;
   background-color: transparent;
   position: relative;
 }
 
 .folder-item:hover {
-  background-color: var(--cam-hover-color, rgba(255, 255, 255, 0.05));
-  border-left-color: var(--cam-primary-color);
+  background-color: var(--asset-manager-interactive-hover);
+  border-left-color: var(--asset-manager-interactive-primary);
 }
 
 .folder-item.selected {
-  background-color: var(--cam-primary-color);
-  border-left-color: var(--cam-primary-color);
+  background-color: var(--asset-manager-interactive-primary);
+  border-left-color: var(--asset-manager-interactive-primary);
   color: white;
 }
 
@@ -78,7 +92,7 @@
 }
 
 .folder-item:focus {
-  outline: 2px solid var(--cam-primary-color);
+  outline: 2px solid var(--asset-manager-interactive-primary);
   outline-offset: -2px;
 }
 
@@ -89,9 +103,12 @@
   width: 32px;
   height: 32px;
   margin-right: 12px;
-  border-radius: 6px;
-  background-color: var(--cam-background-color);
-  border: 1px solid var(--cam-border-color);
+  border-radius: var(--asset-manager-border-radius-md);
+  background-color: var(--asset-manager-bg-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .folder-item.selected .folder-item-icon {
@@ -101,7 +118,8 @@
 
 .folder-item-icon i {
   font-size: 1.1rem;
-  color: var(--cam-primary-color);
+  color: var(--asset-manager-interactive-primary);
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .folder-item-content {
@@ -112,11 +130,12 @@
 .folder-item-name {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--cam-text-color);
+  color: var(--asset-manager-text-primary);
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .folder-item-details {
@@ -127,8 +146,9 @@
 
 .folder-item-count {
   font-size: 0.75rem;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-secondary);
   font-weight: 500;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .folder-item.selected .folder-item-count {
@@ -137,11 +157,12 @@
 
 .folder-item-path {
   font-size: 0.7rem;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.7;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .folder-item.selected .folder-item-path {
@@ -167,9 +188,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 32px var(--asset-manager-spacing-md);
   text-align: center;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-secondary);
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .folder-loading i,
@@ -224,14 +246,4 @@
   }
 }
 
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  .folder-item:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-  }
-  
-  .folder-item-icon {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-}
+/* Theme transitions are handled automatically by CSS variables */
