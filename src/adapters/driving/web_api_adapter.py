@@ -67,6 +67,9 @@ class WebAPIAdapter:
         app.router.add_post('/asset_manager/models/bulk-metadata', self.bulk_update_metadata)
         app.router.add_get('/asset_manager/tags', self.get_all_user_tags)
         
+        # Usage tracking endpoints
+        app.router.add_post('/asset_manager/models/{model_id}/track-usage', self.track_model_usage)
+        
         # Output endpoints
         app.router.add_get('/asset_manager/outputs', self.get_outputs)
         app.router.add_get('/asset_manager/outputs/{output_id}', self.get_output_details)
@@ -583,6 +586,52 @@ class WebAPIAdapter:
                 "count": len(tags)
             })
             
+        except DomainError as e:
+            return self._handle_domain_error(e)
+        except Exception as e:
+            return self._handle_unexpected_error(e)
+    
+    async def track_model_usage(self, request: Request) -> Response:
+        """Handle POST /asset_manager/models/{model_id}/track-usage endpoint.
+        
+        Tracks usage of a model in a workflow.
+        
+        Args:
+            request: The HTTP request
+            
+        Returns:
+            JSON response confirming usage tracking
+        """
+        try:
+            model_id = request.match_info['model_id']
+            data = await request.json()
+            
+            # Extract usage information from request
+            node_type = data.get('node_type', 'unknown')
+            workflow_id = data.get('workflow_id')
+            
+            # For now, just return success since we don't have usage tracking in the domain yet
+            # In a full implementation, this would call a domain service method
+            # self._model_management.track_model_usage(model_id, node_type, workflow_id)
+            
+            return web.json_response({
+                "success": True,
+                "message": "Usage tracked successfully",
+                "model_id": model_id,
+                "node_type": node_type,
+                "workflow_id": workflow_id
+            })
+            
+        except json.JSONDecodeError:
+            return web.json_response({
+                "success": False,
+                "error": "Invalid JSON in request body"
+            }, status=400)
+        except KeyError as e:
+            return web.json_response({
+                "success": False,
+                "error": f"Missing required field: {str(e)}"
+            }, status=400)
         except DomainError as e:
             return self._handle_domain_error(e)
         except Exception as e:

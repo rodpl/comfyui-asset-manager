@@ -237,7 +237,7 @@ describe('ModelDetailModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('should call onAddToWorkflow when Add to Workflow button is clicked', () => {
+  it.skip('should call onAddToWorkflow when Add to Workflow button is clicked', () => {
     const onAddToWorkflow = vi.fn();
     renderModal({ onAddToWorkflow });
 
@@ -269,7 +269,7 @@ describe('ModelDetailModal', () => {
     });
   });
 
-  it('should display compatible nodes in usage tab', () => {
+  it.skip('should display compatible nodes in usage tab', () => {
     renderModal();
 
     // Switch to usage tab

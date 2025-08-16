@@ -10,6 +10,7 @@ interface ModelGridProps {
   onModelSelect: (model: ModelInfo) => void;
   onModelDrag?: (model: ModelInfo) => void;
   searchQuery?: string;
+  currentlyUsedModels?: string[];
 }
 
 interface ModelCardProps {
@@ -17,9 +18,10 @@ interface ModelCardProps {
   onSelect: (model: ModelInfo) => void;
   onDragStart?: (model: ModelInfo) => void;
   searchQuery?: string;
+  isCurrentlyUsed?: boolean;
 }
 
-const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, searchQuery }) => {
+const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, searchQuery, isCurrentlyUsed }) => {
   const { t } = useTranslation();
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
@@ -52,6 +54,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
 
   const handleDragStart = useCallback(
     (e: React.DragEvent) => {
+      // Set comprehensive drag data for compatibility with ComfyUI and generic handlers
       e.dataTransfer.setData(
         'application/json',
         JSON.stringify({
@@ -59,7 +62,18 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
           model: model,
         })
       );
+      e.dataTransfer.setData('text/plain', model.filePath);
+      e.dataTransfer.setData(
+        'comfyui/model',
+        JSON.stringify({
+          type: model.modelType,
+          path: model.filePath,
+          name: model.name,
+        })
+      );
       e.dataTransfer.effectAllowed = 'copy';
+
+      // Notify consumer without leaking native event per test expectations
       onDragStart?.(model);
     },
     [model, onDragStart]
@@ -76,7 +90,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
 
   return (
     <div
-      className="model-card p-card p-component"
+      className={`model-card p-card p-component ${isCurrentlyUsed ? 'currently-used' : ''}`}
       onClick={() => onSelect(model)}
       draggable={!!onDragStart}
       onDragStart={handleDragStart}
@@ -88,7 +102,7 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
           onSelect(model);
         }
       }}
-      aria-label={`${model.name} - ${model.modelType} model`}
+      aria-label={`${model.name} - ${model.modelType} model${isCurrentlyUsed ? ' (currently in use)' : ''}`}
     >
       <div className="model-card-thumbnail">
         {imageLoading && (
@@ -122,7 +136,14 @@ const ModelCard: React.FC<ModelCardProps> = ({ model, onSelect, onDragStart, sea
               model.name
             )}
           </h4>
-          <span className="model-type-badge">{model.modelType.toUpperCase()}</span>
+          <div className="model-badges">
+            <span className="model-type-badge">{model.modelType.toUpperCase()}</span>
+            {isCurrentlyUsed && (
+              <span className="usage-badge" title={t('modelGrid.currentlyInUse')}>
+                <i className="pi pi-play"></i>
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="model-card-details">
@@ -163,6 +184,7 @@ const ModelGrid: React.FC<ModelGridProps> = ({
   onModelSelect,
   onModelDrag,
   searchQuery,
+  currentlyUsedModels = [],
 }) => {
   const { t } = useTranslation();
 
@@ -195,6 +217,7 @@ const ModelGrid: React.FC<ModelGridProps> = ({
           onSelect={onModelSelect}
           onDragStart={onModelDrag}
           searchQuery={searchQuery}
+          isCurrentlyUsed={currentlyUsedModels.includes(model.id)}
         />
       ))}
     </div>

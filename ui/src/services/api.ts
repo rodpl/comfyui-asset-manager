@@ -328,21 +328,30 @@ export class ApiClient {
    * Get all folders
    */
   async getFolders(options?: RequestOptions): Promise<ModelFolder[]> {
-    return this.get<ModelFolder[]>('/folders', options);
+    const res = await this.get<ApiResponse<ModelFolder[]>>('/folders', options);
+    return res.data;
   }
 
   /**
    * Get models in a specific folder
    */
   async getModelsInFolder(folderId: string, options?: RequestOptions): Promise<ModelInfo[]> {
-    return this.get<ModelInfo[]>(`/folders/${encodeURIComponent(folderId)}/models`, options);
+    const res = await this.get<ApiResponse<ModelInfo[]>>(
+      `/folders/${encodeURIComponent(folderId)}/models`,
+      options
+    );
+    return res.data;
   }
 
   /**
    * Get detailed information about a specific model
    */
   async getModelDetails(modelId: string, options?: RequestOptions): Promise<EnrichedModelInfo> {
-    return this.get<EnrichedModelInfo>(`/models/${encodeURIComponent(modelId)}`, options);
+    const res = await this.get<ApiResponse<EnrichedModelInfo>>(
+      `/models/${encodeURIComponent(modelId)}`,
+      options
+    );
+    return res.data;
   }
 
   /**
@@ -355,9 +364,10 @@ export class ApiClient {
   ): Promise<ModelInfo[]> {
     const params = new URLSearchParams({ q: query });
     if (folderId) {
-      params.append('folder', folderId);
+      params.append('folder_id', folderId);
     }
-    return this.get<ModelInfo[]>(`/search?${params.toString()}`, options);
+    const res = await this.get<ApiResponse<ModelInfo[]>>(`/search?${params.toString()}`, options);
+    return res.data;
   }
 
   /**
@@ -368,11 +378,12 @@ export class ApiClient {
     metadata: { tags?: string[]; description?: string; rating?: number },
     options?: RequestOptions
   ): Promise<EnrichedModelInfo> {
-    return this.put<EnrichedModelInfo>(
+    const res = await this.put<ApiResponse<EnrichedModelInfo>>(
       `/models/${encodeURIComponent(modelId)}/metadata`,
       metadata,
       options
     );
+    return res.data;
   }
 
   /**
@@ -383,18 +394,36 @@ export class ApiClient {
     metadata: { tags?: string[]; description?: string; rating?: number },
     options?: RequestOptions
   ): Promise<EnrichedModelInfo[]> {
-    return this.request<EnrichedModelInfo[]>('/models/bulk-metadata', {
+    const res = await this.request<ApiResponse<EnrichedModelInfo[]>>('/models/bulk-metadata', {
       method: 'POST',
       body: JSON.stringify({ model_ids: modelIds, metadata }),
       ...options,
     });
+    return res.data;
   }
 
   /**
    * Get all user tags for autocomplete
    */
   async getAllUserTags(options?: RequestOptions): Promise<string[]> {
-    return this.get<string[]>('/tags', options);
+    const res = await this.get<ApiResponse<string[]>>('/tags', options);
+    return res.data;
+  }
+
+  /**
+   * Track model usage in workflow
+   */
+  async trackModelUsage(
+    modelId: string,
+    nodeType: string,
+    workflowId?: string,
+    options?: RequestOptions
+  ): Promise<{ success: boolean; message: string }> {
+    return this.post<{ success: boolean; message: string }>(
+      `/models/${encodeURIComponent(modelId)}/track-usage`,
+      { node_type: nodeType, workflow_id: workflowId },
+      options
+    );
   }
 
   /**

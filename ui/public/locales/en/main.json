@@ -93,6 +93,7 @@
   "modelGrid": {
     "modified": "Modified",
     "ariaLabel": "Model grid",
+    "currentlyInUse": "Currently in use",
     "empty": {
       "title": "No Models Found",
       "description": "No models were found in the selected folder. Try selecting a different folder or check your ComfyUI model directories."
@@ -162,22 +163,40 @@
     "quickActions": "Quick Actions",
     "addToWorkflow": "Add to Workflow",
     "copyForWorkflow": "Copy Path",
+    "comfyuiNotAvailable": "ComfyUI integration not available",
+    "comfyuiNotAvailableMessage": "ComfyUI integration is not available. The 'Add to Workflow' button will copy the file path instead.",
+    "usageStatus": "Usage Status",
+    "currentlyInUse": "Currently in use",
+    "totalUsage": "Total usage",
+    "lastUsed": "Last used",
+    "usedInNodes": "Used in nodes",
+    "times": "times",
+    "yes": "Yes",
+    "no": "No",
     "usageInstructions": "Usage Instructions",
     "dragAndDrop": "Drag and Drop",
     "dragAndDropDescription": "Drag this model from the grid directly onto compatible ComfyUI nodes in your workflow.",
+    "dragAndDropDescriptionFallback": "Drag this model from the grid. ComfyUI integration is not available, so basic drag data will be provided.",
     "manualLoad": "Manual Loading",
     "manualLoadDescription": "Use the file path below to manually load this model in ComfyUI nodes:",
-    "compatibleNodes": "Compatible Nodes"
+    "compatibleNodes": "Compatible Nodes",
+    "noCompatibleNodes": "No compatible nodes found for this model type"
   },
   "localAssets": {
     "navigation": {
       "folders": "Model folders navigation"
     },
     "errors": {
+      "foldersLoadFailed": "Failed to load folders. Please check your connection and try again.",
+      "modelsLoadFailed": "Failed to load models. Please check your connection and try again.",
       "modelSelectFailed": "Failed to select model. Please try again.",
       "workflowAddFailed": "Failed to add model to workflow. Please try again.",
       "metadataUpdateFailed": "Failed to update model metadata. Please try again.",
+      "comfyuiNotAvailable": "ComfyUI is not available. File path copied to clipboard instead.",
       "dismiss": "Dismiss error"
+    },
+    "info": {
+      "pathCopied": "File path copied to clipboard"
     }
   },
   "metadataEditor": {

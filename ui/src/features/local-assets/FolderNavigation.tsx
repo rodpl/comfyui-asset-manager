@@ -90,44 +90,46 @@ const FolderNavigation: React.FC<FolderNavigationProps> = ({
         </span>
       </div>
       <div className="folder-navigation-content">
-        <div className="folder-list">
-          {folders.map((folder) => (
-            <div
-              key={folder.id}
-              className={`folder-item ${selectedFolder === folder.id ? 'selected' : ''}`}
-              onClick={() => onFolderSelect(folder.id)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onFolderSelect(folder.id);
-                }
-              }}
-              aria-label={`Select ${getModelTypeLabel(folder.modelType)} folder with ${folder.modelCount} models`}
-            >
-              <div className="folder-item-icon">
-                <i className={`pi ${getModelTypeIcon(folder.modelType)}`}></i>
-              </div>
-              <div className="folder-item-content">
-                <div className="folder-item-name">{getModelTypeLabel(folder.modelType)}</div>
-                <div className="folder-item-details">
-                  <span className="folder-item-count">
-                    {t('folders.modelCount', '{{count}} models', { count: folder.modelCount })}
-                  </span>
-                  <span className="folder-item-path" title={folder.path}>
-                    {folder.name}
-                  </span>
+        {!loading && (
+          <div className="folder-list">
+            {folders.map((folder) => (
+              <div
+                key={folder.id}
+                className={`folder-item ${selectedFolder === folder.id ? 'selected' : ''}`}
+                onClick={() => onFolderSelect(folder.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onFolderSelect(folder.id);
+                  }
+                }}
+                aria-label={`Select ${getModelTypeLabel(folder.modelType)} folder with ${folder.modelCount} models`}
+              >
+                <div className="folder-item-icon">
+                  <i className={`pi ${getModelTypeIcon(folder.modelType)}`}></i>
                 </div>
-              </div>
-              {selectedFolder === folder.id && (
-                <div className="folder-item-indicator">
-                  <i className="pi pi-chevron-right"></i>
+                <div className="folder-item-content">
+                  <div className="folder-item-name">{getModelTypeLabel(folder.modelType)}</div>
+                  <div className="folder-item-details">
+                    <span className="folder-item-count">
+                      {t('folders.modelCount', '{{count}} models', { count: folder.modelCount })}
+                    </span>
+                    <span className="folder-item-path" title={folder.path}>
+                      {folder.name}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+                {selectedFolder === folder.id && (
+                  <div className="folder-item-indicator">
+                    <i className="pi pi-chevron-right"></i>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

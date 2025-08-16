@@ -51,6 +51,16 @@
   box-shadow: 0 4px 12px var(--asset-manager-shadow-medium);
 }
 
+.model-card.currently-used {
+  border-color: var(--comfy-accent-color, #007acc);
+  box-shadow: 0 0 0 1px var(--comfy-accent-color, #007acc);
+}
+
+.model-card.currently-used:hover {
+  border-color: var(--comfy-accent-color, #007acc);
+  box-shadow: 0 0 0 2px var(--comfy-accent-color, #007acc);
+}
+
 .model-card:focus {
   outline: 2px solid var(--asset-manager-interactive-primary);
   outline-offset: 2px;
@@ -156,6 +166,13 @@
   margin-bottom: 8px;
 }
 
+.model-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
 .model-name {
   font-size: 0.9rem;
   font-weight: 600;
@@ -181,6 +198,19 @@
   white-space: nowrap;
   flex-shrink: 0;
   transition: background-color var(--asset-manager-transition-normal);
+}
+
+.usage-badge {
+  background-color: var(--comfy-accent-color, #007acc);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: var(--asset-manager-border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
 }
 
 .model-card-details {

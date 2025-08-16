@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EnrichedModelInfo, ModelType } from '../types';
 import MetadataEditor from './MetadataEditor';
+import { useComfyUIIntegration } from '../../../hooks/useComfyUIIntegration';
 import './ModelDetailModal.css';
 
 interface ModelDetailModalProps {
@@ -27,6 +28,19 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
   const [isEditingMetadata, setIsEditingMetadata] = useState(false);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [metadataLoading, setMetadataLoading] = useState(false);
+
+  // ComfyUI integration
+  const {
+    isComfyUIAvailable,
+    getCompatibleNodeTypes,
+    isModelCurrentlyUsed,
+    getModelUsageStats,
+    addModelToWorkflow
+  } = useComfyUIIntegration();
+
+  const isCurrentlyUsed = isModelCurrentlyUsed(model.id);
+  const usageStats = getModelUsageStats(model.id);
+  const compatibleNodes = getCompatibleNodeTypes(model.modelType);
 
   const formatFileSize = useCallback((bytes: number): string => {
     const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -64,9 +78,13 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
     }
   }, []);
 
-  const handleAddToWorkflow = useCallback(() => {
-    onAddToWorkflow(model);
-  }, [model, onAddToWorkflow]);
+  const handleAddToWorkflow = useCallback(async () => {
+    if (isComfyUIAvailable) {
+      await addModelToWorkflow(model);
+    } else {
+      onAddToWorkflow(model);
+    }
+  }, [model, onAddToWorkflow, isComfyUIAvailable, addModelToWorkflow]);
 
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent) => {
@@ -464,7 +482,12 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                 <div className="info-section">
                   <h3>{t('modelDetail.quickActions')}</h3>
                   <div className="action-buttons">
-                    <button className="action-button primary" onClick={handleAddToWorkflow}>
+                    <button 
+                      className={`action-button primary ${!isComfyUIAvailable ? 'disabled' : ''}`}
+                      onClick={handleAddToWorkflow}
+                      disabled={!isComfyUIAvailable}
+                      title={!isComfyUIAvailable ? t('modelDetail.comfyuiNotAvailable') : ''}
+                    >
                       <i className="pi pi-plus"></i>
                       {t('modelDetail.addToWorkflow')}
                     </button>
@@ -476,14 +499,61 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                       {t('modelDetail.copyForWorkflow')}
                     </button>
                   </div>
+                  
+                  {!isComfyUIAvailable && (
+                    <div className="warning-message">
+                      <i className="pi pi-exclamation-triangle"></i>
+                      <span>{t('modelDetail.comfyuiNotAvailableMessage')}</span>
+                    </div>
+                  )}
                 </div>
+
+                {isComfyUIAvailable && (
+                  <div className="info-section">
+                    <h3>{t('modelDetail.usageStatus')}</h3>
+                    <div className="usage-status">
+                      <div className="status-item">
+                        <label>{t('modelDetail.currentlyInUse')}:</label>
+                        <span className={`status-badge ${isCurrentlyUsed ? 'active' : 'inactive'}`}>
+                          <i className={`pi ${isCurrentlyUsed ? 'pi-play' : 'pi-stop'}`}></i>
+                          {isCurrentlyUsed ? t('modelDetail.yes') : t('modelDetail.no')}
+                        </span>
+                      </div>
+                      <div className="status-item">
+                        <label>{t('modelDetail.totalUsage')}:</label>
+                        <span>{usageStats.totalUsage} {t('modelDetail.times')}</span>
+                      </div>
+                      {usageStats.lastUsed && (
+                        <div className="status-item">
+                          <label>{t('modelDetail.lastUsed')}:</label>
+                          <span>{usageStats.lastUsed.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {usageStats.nodeTypes.length > 0 && (
+                        <div className="status-item">
+                          <label>{t('modelDetail.usedInNodes')}:</label>
+                          <div className="node-types">
+                            {usageStats.nodeTypes.map((nodeType, index) => (
+                              <span key={index} className="node-type-tag">
+                                {nodeType}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="info-section">
                   <h3>{t('modelDetail.usageInstructions')}</h3>
                   <div className="usage-instructions">
                     <div className="instruction-item">
                       <h4>{t('modelDetail.dragAndDrop')}</h4>
-                      <p>{t('modelDetail.dragAndDropDescription')}</p>
+                      <p>{isComfyUIAvailable 
+                        ? t('modelDetail.dragAndDropDescription') 
+                        : t('modelDetail.dragAndDropDescriptionFallback')
+                      }</p>
                     </div>
                     <div className="instruction-item">
                       <h4>{t('modelDetail.manualLoad')}</h4>
@@ -496,12 +566,19 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
                 <div className="info-section">
                   <h3>{t('modelDetail.compatibleNodes')}</h3>
                   <div className="compatible-nodes">
-                    {getCompatibleNodes(model.modelType).map((node, index) => (
-                      <div key={index} className="node-item">
-                        <i className="pi pi-circle"></i>
-                        <span>{node}</span>
+                    {compatibleNodes.length > 0 ? (
+                      compatibleNodes.map((node, index) => (
+                        <div key={index} className="node-item">
+                          <i className="pi pi-circle"></i>
+                          <span>{node}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-compatible-nodes">
+                        <i className="pi pi-info-circle"></i>
+                        <span>{t('modelDetail.noCompatibleNodes')}</span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>
@@ -513,24 +590,6 @@ const ModelDetailModal: React.FC<ModelDetailModalProps> = ({
   );
 };
 
-// Helper function to get compatible nodes for each model type
-const getCompatibleNodes = (modelType: ModelType): string[] => {
-  switch (modelType) {
-    case ModelType.CHECKPOINT:
-      return ['Load Checkpoint', 'CheckpointLoaderSimple', 'CheckpointLoader'];
-    case ModelType.LORA:
-      return ['Load LoRA', 'LoraLoader', 'LoraLoaderModelOnly'];
-    case ModelType.VAE:
-      return ['Load VAE', 'VAELoader', 'VAEDecode', 'VAEEncode'];
-    case ModelType.EMBEDDING:
-      return ['Load Embedding', 'CLIPTextEncode'];
-    case ModelType.CONTROLNET:
-      return ['Load ControlNet Model', 'ControlNetLoader', 'Apply ControlNet'];
-    case ModelType.UPSCALER:
-      return ['Load Upscale Model', 'UpscaleModelLoader', 'ImageUpscaleWithModel'];
-    default:
-      return [];
-  }
-};
+
 
 export default ModelDetailModal;
