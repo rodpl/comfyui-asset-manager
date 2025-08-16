@@ -1,10 +1,12 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LocalAssetsTab, ModelBrowserTab, OutputsTab } from './features';
 import './App.css';
+import { ThemeDemo, ToastContainer } from './components';
+import { preventInitialTransitionFlash } from './hooks/useComfyUITheme';
 
 // Define tab types for better type safety
-type TabId = 'local' | 'browse' | 'outputs';
+type TabId = 'local' | 'browse' | 'outputs' | 'theme';
 
 interface Tab {
   id: TabId;
@@ -17,12 +19,18 @@ const TABS: Tab[] = [
   { id: 'local', labelKey: 'tabs.localAssets', icon: 'pi pi-folder' },
   { id: 'browse', labelKey: 'tabs.modelBrowser', icon: 'pi pi-search' },
   { id: 'outputs', labelKey: 'tabs.outputs', icon: 'pi pi-images' },
+  { id: 'theme', labelKey: 'tabs.theme', icon: 'pi pi-palette' },
 ];
 
 // Main App component
-const App: React.FC = () => {
+const App = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('local');
+
+  // Prevent transition flash during initial load
+  useEffect(() => {
+    preventInitialTransitionFlash();
+  }, []);
 
   // Memoized tab change handler
   const handleTabChange = useCallback((tabId: TabId) => {
@@ -38,6 +46,8 @@ const App: React.FC = () => {
         return <ModelBrowserTab />;
       case 'outputs':
         return <OutputsTab />;
+      case 'theme':
+        return <ThemeDemo />;
       default:
         return null;
     }
@@ -88,6 +98,9 @@ const App: React.FC = () => {
       >
         {renderTabContent()}
       </main>
+
+      {/* Toast Container for fallback notifications */}
+      <ToastContainer position="top-right" maxToasts={5} />
     </div>
   );
 };

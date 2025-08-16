@@ -9,7 +9,8 @@
     "modelBrowser": "Model Browser",
     "modelBrowserDescription": "Browse and download models from CivitAI, HuggingFace, and other platforms",
     "outputs": "Outputs",
-    "outputsDescription": "View and manage your ComfyUI generated images and outputs"
+    "outputsDescription": "View and manage your ComfyUI generated images and outputs",
+    "theme": "Theme Demo"
   },
   "folders": {
     "title": "Folders",

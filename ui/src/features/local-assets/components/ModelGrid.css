@@ -28,11 +28,15 @@
 
 /* Model Card Styles */
 .model-card {
-  background-color: var(--surface-card);
-  border: 1px solid var(--surface-border);
-  border-radius: 8px;
+  background-color: var(--asset-manager-bg-secondary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal),
+    transform var(--asset-manager-transition-normal),
+    box-shadow var(--asset-manager-transition-normal);
   cursor: pointer;
   position: relative;
   display: flex;
@@ -41,13 +45,14 @@
 }
 
 .model-card:hover {
-  border-color: var(--primary-color);
+  border-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-bg-tertiary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--asset-manager-shadow-medium);
 }
 
 .model-card:focus {
-  outline: 2px solid var(--primary-color);
+  outline: 2px solid var(--asset-manager-interactive-primary);
   outline-offset: 2px;
 }
 
@@ -65,17 +70,18 @@
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background-color: var(--surface-ground);
+  background-color: var(--asset-manager-bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color var(--asset-manager-transition-normal);
 }
 
 .model-thumbnail {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--asset-manager-transition-normal);
 }
 
 .model-thumbnail.loading {
@@ -88,22 +94,25 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--surface-100) 0%, var(--surface-200) 100%);
+  background: linear-gradient(135deg, var(--asset-manager-bg-secondary) 0%, var(--asset-manager-bg-tertiary) 100%);
+  transition: background var(--asset-manager-transition-normal);
 }
 
 .model-type-icon {
   font-size: 3rem;
-  color: var(--text-color-secondary);
+  color: var(--asset-manager-text-secondary);
   opacity: 0.6;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 /* Skeleton Loading */
 .model-thumbnail-skeleton {
   width: 100%;
   height: 100%;
-  background-color: var(--surface-200);
+  background-color: var(--asset-manager-bg-tertiary);
   position: relative;
   overflow: hidden;
+  transition: background-color var(--asset-manager-transition-normal);
 }
 
 .skeleton-shimmer {
@@ -115,7 +124,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    var(--asset-manager-shadow-light),
     transparent
   );
   animation: shimmer 1.5s infinite;
@@ -150,7 +159,7 @@
 .model-name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--asset-manager-text-primary);
   margin: 0;
   line-height: 1.3;
   overflow: hidden;
@@ -159,17 +168,19 @@
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   flex: 1;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .model-type-badge {
-  background-color: var(--primary-color);
-  color: var(--primary-color-text);
+  background-color: var(--asset-manager-interactive-primary);
+  color: white;
   font-size: 0.7rem;
   font-weight: 600;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--asset-manager-border-radius-sm);
   white-space: nowrap;
   flex-shrink: 0;
+  transition: background-color var(--asset-manager-transition-normal);
 }
 
 .model-card-details {
@@ -180,14 +191,16 @@
 
 .model-file-size {
   font-size: 0.8rem;
-  color: var(--text-color-secondary);
+  color: var(--asset-manager-text-secondary);
   font-weight: 500;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .model-modified-date {
   font-size: 0.75rem;
-  color: var(--text-color-secondary);
+  color: var(--asset-manager-text-secondary);
   opacity: 0.8;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 /* Skeleton Card */
@@ -196,10 +209,11 @@
 }
 
 .skeleton-text {
-  background-color: var(--surface-200);
-  border-radius: 4px;
+  background-color: var(--asset-manager-bg-tertiary);
+  border-radius: var(--asset-manager-border-radius-sm);
   position: relative;
   overflow: hidden;
+  transition: background-color var(--asset-manager-transition-normal);
 }
 
 .skeleton-text::after {
@@ -212,7 +226,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    var(--asset-manager-shadow-light),
     transparent
   );
   animation: shimmer 1.5s infinite;
@@ -251,23 +265,26 @@
 
 .empty-icon {
   font-size: 4rem;
-  color: var(--text-color-secondary);
+  color: var(--asset-manager-text-secondary);
   opacity: 0.5;
-  margin-bottom: 16px;
+  margin-bottom: var(--asset-manager-spacing-md);
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .empty-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--asset-manager-text-primary);
   margin: 0 0 8px 0;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .empty-description {
   font-size: 0.9rem;
-  color: var(--text-color-secondary);
+  color: var(--asset-manager-text-secondary);
   line-height: 1.5;
   margin: 0;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 /* Drag and Drop States */
@@ -277,9 +294,10 @@
 }
 
 .model-grid.drag-over {
-  background-color: var(--primary-50);
-  border: 2px dashed var(--primary-color);
-  border-radius: 8px;
+  background-color: var(--asset-manager-interactive-primary);
+  opacity: 0.1;
+  border: 2px dashed var(--asset-manager-interactive-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
 }
 
 /* Accessibility improvements */
@@ -309,6 +327,6 @@
 
 /* Focus visible for keyboard navigation */
 .model-card:focus-visible {
-  outline: 2px solid var(--primary-color);
+  outline: 2px solid var(--asset-manager-interactive-primary);
   outline-offset: 2px;
 }

@@ -6,10 +6,13 @@
   justify-content: center;
   min-height: 300px;
   padding: 20px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin: 16px;
+  background: var(--asset-manager-bg-secondary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-lg);
+  margin: var(--asset-manager-spacing-md);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .error-boundary-content {
@@ -19,61 +22,75 @@
 }
 
 .error-icon {
-  color: #ef4444;
-  margin-bottom: 16px;
+  color: var(--asset-manager-error);
+  margin-bottom: var(--asset-manager-spacing-md);
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .error-boundary h2 {
-  color: #1f2937;
+  color: var(--asset-manager-text-primary);
   font-size: 24px;
   font-weight: 600;
   margin: 0 0 8px 0;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .error-boundary p {
-  color: #6b7280;
+  color: var(--asset-manager-text-secondary);
   font-size: 16px;
   line-height: 1.5;
-  margin: 0 0 16px 0;
+  margin: 0 0 var(--asset-manager-spacing-md) 0;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .retry-info {
-  color: #f59e0b;
+  color: var(--asset-manager-warning);
   font-size: 14px;
   font-weight: 500;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .error-details {
   text-align: left;
   margin: 20px 0;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #f3f4f6;
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  background: var(--asset-manager-bg-tertiary);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .error-details summary {
   padding: 12px;
   cursor: pointer;
   font-weight: 500;
-  color: #374151;
-  background: #e5e7eb;
-  border-radius: 6px 6px 0 0;
+  color: var(--asset-manager-text-primary);
+  background: var(--asset-manager-bg-secondary);
+  border-radius: var(--asset-manager-border-radius-md) var(--asset-manager-border-radius-md) 0 0;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
 }
 
 .error-details summary:hover {
-  background: #d1d5db;
+  background: var(--asset-manager-interactive-hover);
 }
 
 .error-metadata {
   padding: 12px;
-  border-bottom: 1px solid #d1d5db;
-  background: #ffffff;
+  border-bottom: 1px solid var(--asset-manager-border-primary);
+  background: var(--asset-manager-bg-primary);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .error-metadata p {
   margin: 4px 0;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--asset-manager-text-secondary);
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .error-stack {
@@ -82,11 +99,14 @@
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 12px;
   line-height: 1.4;
-  color: #374151;
-  background: #ffffff;
+  color: var(--asset-manager-text-primary);
+  background: var(--asset-manager-bg-primary);
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
 }
 
 .error-actions {
@@ -100,17 +120,20 @@
 .error-actions button {
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--asset-manager-border-radius-md);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    transform var(--asset-manager-transition-normal),
+    box-shadow var(--asset-manager-transition-normal);
   min-width: 120px;
 }
 
 .error-actions button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--asset-manager-shadow-light);
 }
 
 .error-actions button:active {
@@ -118,88 +141,33 @@
 }
 
 .error-actions button.primary {
-  background: #3b82f6;
+  background: var(--asset-manager-interactive-primary);
   color: white;
 }
 
 .error-actions button.primary:hover {
-  background: #2563eb;
+  opacity: 0.9;
 }
 
 .error-actions button.secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--asset-manager-bg-tertiary);
+  color: var(--asset-manager-text-primary);
+  border: 1px solid var(--asset-manager-border-primary);
 }
 
 .error-actions button.secondary:hover {
-  background: #e5e7eb;
+  background: var(--asset-manager-bg-secondary);
 }
 
 .error-reporting {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--asset-manager-text-secondary);
   font-style: italic;
-  margin-top: 16px;
+  margin-top: var(--asset-manager-spacing-md);
+  transition: color var(--asset-manager-transition-normal);
 }
 
-/* Dark theme */
-@media (prefers-color-scheme: dark) {
-  .error-boundary {
-    background: #1f2937;
-    border-color: #374151;
-  }
-
-  .error-boundary h2 {
-    color: #f9fafb;
-  }
-
-  .error-boundary p {
-    color: #d1d5db;
-  }
-
-  .error-details {
-    border-color: #4b5563;
-    background: #374151;
-  }
-
-  .error-details summary {
-    color: #f9fafb;
-    background: #4b5563;
-  }
-
-  .error-details summary:hover {
-    background: #6b7280;
-  }
-
-  .error-metadata {
-    background: #1f2937;
-    border-color: #4b5563;
-  }
-
-  .error-metadata p {
-    color: #d1d5db;
-  }
-
-  .error-stack {
-    color: #e5e7eb;
-    background: #1f2937;
-  }
-
-  .error-actions button.secondary {
-    background: #374151;
-    color: #f9fafb;
-    border-color: #4b5563;
-  }
-
-  .error-actions button.secondary:hover {
-    background: #4b5563;
-  }
-
-  .error-reporting {
-    color: #9ca3af;
-  }
-}
+/* Theme transitions are handled automatically by CSS variables */
 
 /* Mobile responsiveness */
 @media (max-width: 640px) {

@@ -3,9 +3,12 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
-  background-color: var(--cam-secondary-color);
-  border-bottom: 1px solid var(--cam-border-color);
+  padding: var(--asset-manager-spacing-md);
+  background-color: var(--asset-manager-bg-secondary);
+  border-bottom: 1px solid var(--asset-manager-border-primary);
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 .search-filter-main {
@@ -28,18 +31,22 @@
 .search-input {
   width: 100%;
   padding: 10px 12px 10px 40px;
-  border: 1px solid var(--cam-border-color);
-  border-radius: 6px;
-  background-color: var(--cam-background-color);
-  color: var(--cam-text-color);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  background-color: var(--asset-manager-bg-primary);
+  color: var(--asset-manager-text-primary);
   font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: 
+    border-color var(--asset-manager-transition-normal),
+    box-shadow var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--cam-primary-color);
-  box-shadow: 0 0 0 2px rgba(var(--cam-primary-color-rgb), 0.2);
+  border-color: var(--asset-manager-interactive-primary);
+  box-shadow: 0 0 0 2px var(--asset-manager-shadow-light);
 }
 
 .search-input:disabled {
@@ -48,7 +55,7 @@
 }
 
 .search-input::placeholder {
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-muted);
 }
 
 .search-icon {
@@ -56,8 +63,9 @@
   left: 12px;
   width: 16px;
   height: 16px;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-muted);
   pointer-events: none;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .search-clear-button {
@@ -67,18 +75,20 @@
   height: 24px;
   border: none;
   background: none;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-muted);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--asset-manager-border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: 
+    color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal);
 }
 
 .search-clear-button:hover {
-  color: var(--cam-text-color);
-  background-color: var(--cam-border-color);
+  color: var(--asset-manager-text-primary);
+  background-color: var(--asset-manager-border-primary);
 }
 
 .search-clear-button svg {
@@ -93,8 +103,8 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  border: 2px solid var(--cam-border-color);
-  border-top: 2px solid var(--cam-primary-color);
+  border: 2px solid var(--asset-manager-border-primary);
+  border-top: 2px solid var(--asset-manager-interactive-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -115,24 +125,27 @@
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  border: 1px solid var(--cam-border-color);
-  border-radius: 6px;
-  background-color: var(--cam-background-color);
-  color: var(--cam-text-color);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
+  background-color: var(--asset-manager-bg-primary);
+  color: var(--asset-manager-text-primary);
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    border-color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
   position: relative;
 }
 
 .filter-toggle-button:hover {
-  border-color: var(--cam-primary-color);
-  background-color: var(--cam-secondary-color);
+  border-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-bg-secondary);
 }
 
 .filter-toggle-button.active {
-  border-color: var(--cam-primary-color);
-  background-color: var(--cam-primary-color);
+  border-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-interactive-primary);
   color: white;
 }
 
@@ -143,9 +156,9 @@
   right: -2px;
   width: 8px;
   height: 8px;
-  background-color: var(--cam-accent-color, #ff6b6b);
+  background-color: var(--asset-manager-warning);
   border-radius: 50%;
-  border: 2px solid var(--cam-background-color);
+  border: 2px solid var(--asset-manager-bg-primary);
 }
 
 .filter-toggle-button svg {
@@ -166,20 +179,24 @@
 
 .search-results-count {
   font-size: 14px;
-  color: var(--cam-muted-text-color);
+  color: var(--asset-manager-text-secondary);
   white-space: nowrap;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 /* Filters Panel */
 .search-filters-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
-  background-color: var(--cam-background-color);
-  border: 1px solid var(--cam-border-color);
-  border-radius: 6px;
+  gap: var(--asset-manager-spacing-md);
+  padding: var(--asset-manager-spacing-md);
+  background-color: var(--asset-manager-bg-primary);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-md);
   animation: slideDown 0.2s ease-out;
+  transition: 
+    background-color var(--asset-manager-transition-normal),
+    border-color var(--asset-manager-transition-normal);
 }
 
 @keyframes slideDown {
@@ -202,8 +219,9 @@
 .filter-section-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--cam-text-color);
+  color: var(--asset-manager-text-primary);
   margin: 0;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .filter-chips {
@@ -214,24 +232,27 @@
 
 .filter-chip {
   padding: 6px 12px;
-  border: 1px solid var(--cam-border-color);
+  border: 1px solid var(--asset-manager-border-primary);
   border-radius: 16px;
-  background-color: var(--cam-secondary-color);
-  color: var(--cam-text-color);
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    border-color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
   white-space: nowrap;
 }
 
 .filter-chip:hover {
-  border-color: var(--cam-primary-color);
-  background-color: var(--cam-background-color);
+  border-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-bg-primary);
 }
 
 .filter-chip.active {
-  border-color: var(--cam-primary-color);
-  background-color: var(--cam-primary-color);
+  border-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-interactive-primary);
   color: white;
 }
 
@@ -246,37 +267,42 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: var(--cam-text-color);
+  color: var(--asset-manager-text-primary);
   cursor: pointer;
+  transition: color var(--asset-manager-transition-normal);
 }
 
 .filter-checkbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: var(--cam-primary-color);
+  accent-color: var(--asset-manager-interactive-primary);
 }
 
 .filter-actions {
   display: flex;
   justify-content: flex-end;
   padding-top: 8px;
-  border-top: 1px solid var(--cam-border-color);
+  border-top: 1px solid var(--asset-manager-border-primary);
+  transition: border-color var(--asset-manager-transition-normal);
 }
 
 .filter-clear-button {
   padding: 6px 12px;
-  border: 1px solid var(--cam-border-color);
-  border-radius: 4px;
-  background-color: var(--cam-secondary-color);
-  color: var(--cam-text-color);
+  border: 1px solid var(--asset-manager-border-primary);
+  border-radius: var(--asset-manager-border-radius-sm);
+  background-color: var(--asset-manager-bg-secondary);
+  color: var(--asset-manager-text-primary);
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    border-color var(--asset-manager-transition-normal),
+    background-color var(--asset-manager-transition-normal),
+    color var(--asset-manager-transition-normal);
 }
 
 .filter-clear-button:hover:not(:disabled) {
-  border-color: var(--cam-primary-color);
-  background-color: var(--cam-background-color);
+  border-color: var(--asset-manager-interactive-primary);
+  background-color: var(--asset-manager-bg-primary);
 }
 
 .filter-clear-button:disabled {
