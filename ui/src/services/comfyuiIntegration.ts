@@ -364,11 +364,35 @@ export class ComfyUIIntegrationService {
     try {
       const stored = localStorage.getItem('comfyui-asset-manager-usage');
       if (stored) {
-        const parsed = JSON.parse(stored);
-        this.usageHistory = parsed.map((record: unknown) => ({
-          ...record,
-          timestamp: new Date(record.timestamp)
-        }));
+        const parsed = JSON.parse(stored) as unknown;
+        if (Array.isArray(parsed)) {
+          this.usageHistory = parsed
+            .map((record) => {
+              if (record && typeof record === 'object') {
+                const r = record as {
+                  modelId?: string;
+                  modelPath?: string;
+                  nodeType?: string;
+                  workflowId?: string;
+                  timestamp?: string | number | Date;
+                };
+                if (!r.modelId || !r.modelPath || !r.nodeType || !r.timestamp) {
+                  return null;
+                }
+                return {
+                  modelId: r.modelId,
+                  modelPath: r.modelPath,
+                  nodeType: r.nodeType,
+                  workflowId: r.workflowId,
+                  timestamp: new Date(r.timestamp),
+                } as UsageRecord;
+              }
+              return null;
+            })
+            .filter((v): v is UsageRecord => v !== null);
+        } else {
+          this.usageHistory = [];
+        }
       }
     } catch (error) {
       console.error('Error loading usage history:', error);
