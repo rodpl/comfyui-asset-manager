@@ -1,0 +1,22 @@
+{
+  "showMemoryUsage": true,
+  "showLineNumbers": true,
+  "mcpServers": {
+    "ComfyUI Docs": {
+      "url": "https://gitmcp.io/comfyanonymous/ComfyUI"
+    },
+    "ComfyUI-Frontend Docs": {
+      "url": "https://gitmcp.io/Comfy-Org/ComfyUI_frontend"
+    },
+    "ComfyUI-React-Template Docs": {
+      "url": "https://gitmcp.io/Comfy-Org/ComfyUI-React-Extension-Template"
+    },
+    "ComfyUI-Copilot Docs": {
+      "url": "https://gitmcp.io/AIDC-AI/ComfyUI-Copilot"
+    },
+    "Playwright": {
+      "command": "pnpm",
+      "args": ["dlx", "@playwright/mcp@latest"]
+    }
+  }
+}
