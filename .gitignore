@@ -19,3 +19,4 @@ coverage.xml
 test-results/
 htmlcov/
 web-bundles/
+flattened-codebase.*
