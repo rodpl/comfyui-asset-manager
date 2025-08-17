@@ -1,5 +1,5 @@
 version: 5.0.0
-installed_at: '2025-08-17T00:02:14.778Z'
+installed_at: '2025-08-17T10:04:10.063Z'
 install_type: full
 agent: null
 ides_setup:
@@ -7,6 +7,7 @@ ides_setup:
   - claude-code
   - trae
   - kilo
+  - gemini
   - crush
 expansion_packs: []
 files:
