@@ -20,3 +20,4 @@ test-results/
 htmlcov/
 web-bundles/
 flattened-codebase.*
+# BMAD (local only)

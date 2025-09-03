@@ -187,6 +187,32 @@ If you want to do the planning on the web with Claude (Sonnet 4 or Opus), Gemini
 npx bmad-method install
 ```
 
+### Codex (CLI & Web)
+
+BMAD integrates with OpenAI Codex via `AGENTS.md` and committed core agent files.
+
+- Two installation modes:
+  - Codex (local only): keeps `.bmad-core/` ignored for local dev.
+    - `npx bmad-method install -f -i codex -d .`
+  - Codex Web Enabled: ensures `.bmad-core/` is tracked so you can commit it for Codex Web.
+    - `npx bmad-method install -f -i codex-web -d .`
+
+- What gets generated:
+  - `AGENTS.md` at the project root with a BMAD section containing
+    - How-to-use with Codex (CLI & Web)
+    - Agent Directory (Title, ID, When To Use)
+    - Detailed per‑agent sections with source path, when-to-use, activation phrasing, and YAML
+    - Tasks with quick usage notes
+  - If a `package.json` exists, helpful scripts are added:
+    - `bmad:refresh`, `bmad:list`, `bmad:validate`
+
+- Using Codex:
+  - CLI: run `codex` in the project root and prompt naturally, e.g., “As dev, implement …”.
+  - Web: commit `.bmad-core/` and `AGENTS.md`, then open the repo in Codex and prompt the same way.
+
+- Refresh after changes:
+  - Re-run the appropriate install mode (`codex` or `codex-web`) to update the BMAD block in `AGENTS.md`.
+
 ## Special Agents
 
 There are two BMad agents — in the future they'll be consolidated into a single BMad-Master.
@@ -277,7 +303,7 @@ The documentation uses short forms for convenience. Both styles are valid:
 
 ```text
 *risk    → *risk-profile
-*design  → *test-design  
+*design  → *test-design
 *nfr     → *nfr-assess
 *trace   → *trace-requirements (or just *trace)
 *review  → *review
@@ -376,14 +402,14 @@ Manages quality gate decisions:
 
 The Test Architect provides value throughout the entire development lifecycle. Here's when and how to leverage each capability:
 
-| **Stage** | **Command** | **When to Use** | **Value** | **Output** |
-|-----------|------------|-----------------|-----------|------------|
-| **Story Drafting** | `*risk` | After SM drafts story | Identify pitfalls early | `docs/qa/assessments/{epic}.{story}-risk-{YYYYMMDD}.md` |
-| | `*design` | After risk assessment | Guide dev on test strategy | `docs/qa/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md` |
-| **Development** | `*trace` | Mid-implementation | Verify test coverage | `docs/qa/assessments/{epic}.{story}-trace-{YYYYMMDD}.md` |
-| | `*nfr` | While building features | Catch quality issues early | `docs/qa/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md` |
-| **Review** | `*review` | Story marked complete | Full quality assessment | QA Results in story + gate file |
-| **Post-Review** | `*gate` | After fixing issues | Update quality decision | Updated `docs/qa/gates/{epic}.{story}-{slug}.yml` |
+| **Stage**          | **Command** | **When to Use**         | **Value**                  | **Output**                                                     |
+| ------------------ | ----------- | ----------------------- | -------------------------- | -------------------------------------------------------------- |
+| **Story Drafting** | `*risk`     | After SM drafts story   | Identify pitfalls early    | `docs/qa/assessments/{epic}.{story}-risk-{YYYYMMDD}.md`        |
+|                    | `*design`   | After risk assessment   | Guide dev on test strategy | `docs/qa/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md` |
+| **Development**    | `*trace`    | Mid-implementation      | Verify test coverage       | `docs/qa/assessments/{epic}.{story}-trace-{YYYYMMDD}.md`       |
+|                    | `*nfr`      | While building features | Catch quality issues early | `docs/qa/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md`         |
+| **Review**         | `*review`   | Story marked complete   | Full quality assessment    | QA Results in story + gate file                                |
+| **Post-Review**    | `*gate`     | After fixing issues     | Update quality decision    | Updated `docs/qa/gates/{epic}.{story}-{slug}.yml`              |
 
 #### Example Commands
 
