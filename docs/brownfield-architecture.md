@@ -13,9 +13,30 @@ This document captures the current, real-world state of the ComfyUI Asset Manage
 
 ### Change Log
 
-| Date | Version | Description | Author |
-| ---- | ------- | ----------- | ------ |
-| 2025-09-04 | 1.0 | Initial comprehensive brownfield architecture | Architect |
+| Change | Date | Version | Description | Author |
+| ------ | ---- | ------- | ----------- | ------ |
+| Initial brownfield analysis | 2025-09-04 | 1.0 | First architecture pass reflecting current codebase and rollout plan | Architect |
+
+## Existing Project Analysis
+
+### Current Project State
+- Primary Purpose: ComfyUI extension to manage outputs and models within the ComfyUI interface (inspired by Stability Matrix), with future browsing from external platforms.
+- Current Tech Stack: Python 3.12 + aiohttp 3.12.x (backend); React 18 + Vite 7 (frontend); ComfyUI Frontend host (Vue‑based); Pillow 11.x for imaging; Playwright/Vitest for tests.
+- Architecture Style: Hexagonal (ports & adapters) with a lightweight DI container; REST adapter exposes /asset_manager endpoints.
+- Deployment Method: Installed under ComfyUI `custom_nodes`; UI assets served via `dist/` and ExtensionManager; backend can run standalone for dev.
+
+### Available Documentation
+- Brownfield Architecture: `docs/brownfield-architecture.md`
+- PRD: `docs/prd.md`
+- API Reference: `docs/development/api-reference.md`
+- Settings & Feature Flags: `docs/development/settings-spec.md`, `docs/development/feature-flags-design.md`
+- Domain Models & Ports: `docs/development/domain-models.md`
+- Testing Map & Release Playbook: `docs/development/testing-map.md`, `docs/development/release-playbook.md`
+
+### Identified Constraints
+- Settings API may vary across ComfyUI frontend versions; require feature detection and Outputs‑only fallback.
+- Large output directories (5k–20k files) require server‑side sorting and defensive scanning.
+- Workflow metadata is optional and can be malformed; load‑back must be best‑effort with explicit feedback.
 
 
 ## Quick Reference — Key Files and Entry Points
@@ -58,6 +79,70 @@ This document captures the current, real-world state of the ComfyUI Asset Manage
 - Backend adheres to hexagon boundaries; ports kept in `src/domain/ports` with clear driving vs driven separation.
 - UI uses a context pattern (`AssetManagerContext`) and services layer; tabbed UX rendered in `App.tsx`.
 
+
+## Enhancement Scope and Integration Strategy
+
+### Enhancement Overview
+- Enhancement Type: Outputs‑first release with ComfyUI Settings‑based feature flags; subsequent increments for Local Assets and Model Browser.
+- Scope: UI gating via Settings; Outputs polish (sort/refresh/metadata/actions); theming and accessibility alignment. No database/schema work; no breaking API changes.
+
+### Integration Boundaries
+- Reuse: Existing hexagonal services/adapters, REST endpoints, and ComfyUI ExtensionManager integration.
+- New (v0.1): Settings‑driven tab gating (UI), minor UI refinements for Outputs, theme/a11y polish.
+- Deferred (v0.2+): Local Assets enhancements, Model Browser enablement and UX polish.
+
+### Compatibility Requirements (Architecture)
+- Maintain stable response shapes/status codes for `/asset_manager` Outputs endpoints.
+- Respect ComfyUI theming and visual tokens; scope CSS to the extension root.
+- Safe default when Settings unavailable: Outputs‑only with other tabs hidden.
+
+## Data Models and Schema Changes
+
+No database/schema changes in scope for v0.1. The system remains filesystem‑driven for outputs and model discovery.
+
+## Component Architecture
+
+### New Components (v0.1)
+
+1) SettingsFeatureGate (UI)
+- Responsibility: Read ComfyUI Settings (`AssetManager.Features.*`) and determine which tabs are visible.
+- Integration Points: `window.app.extensionManager.setting.get(...)`.
+- Key Interfaces: `get(id)`, `set(id, value)` (write if needed in future).
+- Dependencies: ComfyUI Frontend (ExtensionManager Settings API).
+- Technology Stack: TypeScript/React; initialized in `ui/src/main.tsx`/`ui/src/App.tsx`.
+
+2) OutputsUIRefinement (UI)
+- Responsibility: Refine Outputs list/grid, sorting/refresh flows, and actions (open/show/load‑workflow) with resilient, typed messaging.
+- Integration Points: `ui/src/services/api.ts` → `/asset_manager/outputs*` endpoints.
+- Key Interfaces: `getOutputs`, `refreshOutputs`, `loadWorkflow`, `openInSystemViewer`, `showInFolder`.
+- Dependencies: Backend Web API adapter; Pillow‑based metadata extraction.
+- Technology Stack: TypeScript/React; CSS scoped under root.
+
+### Component Interaction Diagram
+```mermaid
+graph LR
+  subgraph ComfyUI Frontend
+    A[ExtensionManager\nSettings] -->|get()| G[SettingsFeatureGate]
+    G --> H[App Tabs\n(Local/Browser/Outputs)]
+    H --> O[OutputsUIRefinement]
+  end
+
+  O --> API[/ /asset_manager /]
+  API --> Svc[Domain Services]
+  Svc --> Ad[Adapters (FS, PNG, Proxies)]
+```
+
+## API Design and Integration (v0.1)
+
+### API Integration Strategy
+- No new endpoints in v0.1. Preserve existing `/asset_manager` Outputs endpoints and error taxonomy. Any future additions should be versionless and non‑breaking.
+
+### New API Endpoints
+- None for v0.1. Candidate non‑breaking endpoints may be considered in future versions but are out of scope here.
+
+## External API Integration (v0.1)
+
+- No new external APIs introduced. Existing CivitAI/HuggingFace access remains via proxy endpoints; Model Browser stays disabled by default.
 
 ## Source Tree and Module Organization
 
@@ -224,16 +309,15 @@ PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm e2e  # E2E (ComfyUI must be runni
 - Unify UI visuals with ComfyUI (Vue/PrimeVue) while remaining in React.
 - Complete .kiro/specs: simplified-output-gallery, theme integration, local-asset management, simplified-model-browser.
 
-### Proposed Feature Flagging (design)
+### Feature Flagging and Settings (design)
 
-- Backend config (env):
-  - `FEATURE_OUTPUTS=true|false`
-  - `FEATURE_LOCAL_ASSETS=true|false`
-  - `FEATURE_MODEL_BROWSER=true|false`
-  - Expose a simple `GET /asset_manager/config` returning `{ features: {...}, cache_enabled, external_api: {...} }`.
-- Frontend gating:
-  - Add a feature flag service reading `/asset_manager/config` once at init; store in context.
-  - In `App.tsx`, compute `TABS` dynamically based on flags; default to Outputs-only if flags unavailable.
+- Primary mechanism (UI): Register Asset Manager flags in ComfyUI Settings:
+  - `AssetManager.Features.Outputs` (default: true)
+  - `AssetManager.Features.LocalAssets` (default: false)
+  - `AssetManager.Features.ModelBrowser` (default: false)
+  - Read via `window.app.extensionManager.setting.get(...)` and gate tabs at runtime.
+- Fallback: If Settings are unavailable (older frontend), default to Outputs‑only and hide other tabs.
+- Optional backend config: Only for backend‑enforced constraints (e.g., disabling external APIs irrespective of UI settings). A read‑only `/asset_manager/config` endpoint can mirror server constraints as needed.
 
 Release plan:
 
@@ -268,4 +352,3 @@ Release plan:
 - External API limits and network availability can impact search/browse; maintain clear error types and retries.
 - Implement feature flags end-to-end (env → backend → `/config` → UI gating) before the Outputs-only release cut.
 - Ensure Kiro specs are reflected in acceptance tests (unit + E2E) before enabling each tab in production.
-
