@@ -164,6 +164,18 @@ pnpm run lint
 pnpm run format
 ```
 
+## Documentation
+
+- PRD: `docs/prd.md`
+- Brownfield Architecture: `docs/brownfield-architecture.md`
+- ComfyUI Integration Guide: `docs/development/comfyui-integration.md`
+- REST API Reference: `docs/development/api-reference.md`
+- Settings Specification (ComfyUI Settings): `docs/development/settings-spec.md`
+- Feature Flags Design: `docs/development/feature-flags-design.md`
+- Domain Models & Ports: `docs/development/domain-models.md`
+- Testing Map (Specs → Tests): `docs/development/testing-map.md`
+- Release Playbook (staged rollout): `docs/development/release-playbook.md`
+
 ## End-to-End Testing (Playwright)
 
 These E2E tests target an already running ComfyUI at `http://localhost:8188` and do not start any local dev server. The tests use the PageObject pattern for pages (tabs) and ComponentObject pattern for reusable UI components.
