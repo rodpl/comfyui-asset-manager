@@ -1,0 +1,40 @@
+{
+  "mcpServers": {
+    "ComfyUI-Docs": {
+      "url": "https://gitmcp.io/comfyanonymous/ComfyUI",
+      "alwaysAllow": [
+        "fetch_ComfyUI_documentation",
+        "search_ComfyUI_documentation",
+        "search_ComfyUI_code",
+        "fetch_generic_url_content"
+      ]
+    },
+    "ComfyUI-Frontend-Docs": {
+      "url": "https://gitmcp.io/Comfy-Org/ComfyUI_frontend",
+      "alwaysAllow": [
+        "fetch_ComfyUI_frontend_docs",
+        "search_ComfyUI_frontend_docs",
+        "search_ComfyUI_frontend_code",
+        "fetch_generic_url_content"
+      ]
+    },
+    "ComfyUI-React-Template-Docs": {
+      "url": "https://gitmcp.io/Comfy-Org/ComfyUI-React-Extension-Template",
+      "alwaysAllow": [
+        "fetch_docs",
+        "search_docs",
+        "search_code",
+        "fetch_generic_url_content"
+      ]
+    },
+    "ComfyUI-Copilot-Docs": {
+      "url": "https://gitmcp.io/AIDC-AI/ComfyUI-Copilot",
+      "alwaysAllow": [
+        "fetch_ComfyUI_Copilot_docs",
+        "search_ComfyUI_Copilot_docs",
+        "search_ComfyUI_Copilot_code",
+        "fetch_generic_url_content"
+      ]
+    }
+  }
+}
