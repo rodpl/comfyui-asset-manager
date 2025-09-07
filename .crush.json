@@ -1,0 +1,21 @@
+{
+  "$schema": "https://charm.land/crush.json",
+  "mcp": {
+    "ComfyUI-Docs": {
+      "type": "http",
+      "url": "https://gitmcp.io/comfyanonymous/ComfyUI"
+    },
+    "ComfyUI-Frontend-Docs": {
+      "type": "http",
+      "url": "https://gitmcp.io/Comfy-Org/ComfyUI_frontend"
+    },
+    "ComfyUI-React-Template-Docs": {
+      "type": "http",
+      "url": "https://gitmcp.io/Comfy-Org/ComfyUI-React-Extension-Template"
+    },
+    "ComfyUI-Copilot-Docs": {
+      "type": "http",
+      "url": "https://gitmcp.io/AIDC-AI/ComfyUI-Copilot"
+    }
+  }
+}
