@@ -29,6 +29,7 @@ class OutputService(OutputManagementPort):
         self._cache: Dict[str, Any] = {}
         self._cache_timestamps: Dict[str, datetime] = {}
         self._cache_lock = threading.RLock()
+        self._last_scanned_outputs: Dict[str, Output] = {}
     
     def get_all_outputs(self) -> List[Output]:
         """Get all outputs from the output directory.
@@ -48,16 +49,19 @@ class OutputService(OutputManagementPort):
         
         try:
             outputs = self._output_repository.scan_output_directory()
-            
-            # Enrich outputs with thumbnails and metadata if available
-            enriched_outputs = []
+
+            previous_outputs = self._get_last_scan_snapshot()
+
+            # Enrich outputs with thumbnails and metadata while reusing cached data when possible
+            enriched_outputs: List[Output] = []
             for output in outputs:
-                enriched_output = self._enrich_output(output)
-                enriched_outputs.append(enriched_output)
-            
-            # Cache the results
+                cached_output = previous_outputs.get(output.id)
+                enriched_outputs.append(self._enrich_output(output, cached_output))
+
+            # Cache the results and refresh the snapshot used for reuse
             self._set_cache(cache_key, enriched_outputs)
-            
+            self._update_last_scanned_outputs(enriched_outputs)
+
             return enriched_outputs
         except IOError as e:
             raise ValidationError(f"Failed to access output directory: {str(e)}", "output_directory")
@@ -83,7 +87,11 @@ class OutputService(OutputManagementPort):
             raise NotFoundError("Output", output_id)
         
         # Enrich with additional metadata and thumbnail
-        enriched_output = self._enrich_output(output)
+        enriched_output = self._enrich_output(
+            output,
+            self._get_last_scan_entry(output.id)
+        )
+        self._merge_into_last_scanned_outputs([enriched_output])
         return enriched_output
     
     def refresh_outputs(self) -> List[Output]:
@@ -135,16 +143,19 @@ class OutputService(OutputManagementPort):
             return cached_outputs
         
         outputs = self._output_repository.get_outputs_by_date_range(start_date, end_date)
-        
+
+        previous_outputs = self._get_last_scan_snapshot()
+
         # Enrich outputs with thumbnails and metadata
-        enriched_outputs = []
+        enriched_outputs: List[Output] = []
         for output in outputs:
-            enriched_output = self._enrich_output(output)
-            enriched_outputs.append(enriched_output)
-        
-        # Cache the results
+            cached_output = previous_outputs.get(output.id)
+            enriched_outputs.append(self._enrich_output(output, cached_output))
+
+        # Cache the results and persist reusable snapshot entries
         self._set_cache(cache_key, enriched_outputs)
-        
+        self._merge_into_last_scanned_outputs(enriched_outputs)
+
         return enriched_outputs
     
     def get_outputs_by_format(self, file_format: str) -> List[Output]:
@@ -180,16 +191,19 @@ class OutputService(OutputManagementPort):
             return cached_outputs
         
         outputs = self._output_repository.get_outputs_by_format(normalized_format)
-        
+
+        previous_outputs = self._get_last_scan_snapshot()
+
         # Enrich outputs with thumbnails and metadata
-        enriched_outputs = []
+        enriched_outputs: List[Output] = []
         for output in outputs:
-            enriched_output = self._enrich_output(output)
-            enriched_outputs.append(enriched_output)
-        
-        # Cache the results
+            cached_output = previous_outputs.get(output.id)
+            enriched_outputs.append(self._enrich_output(output, cached_output))
+
+        # Cache the results and persist reusable snapshot entries
         self._set_cache(cache_key, enriched_outputs)
-        
+        self._merge_into_last_scanned_outputs(enriched_outputs)
+
         return enriched_outputs
     
     def sort_outputs(
@@ -240,7 +254,7 @@ class OutputService(OutputManagementPort):
         except Exception as e:
             raise ValidationError(f"Failed to sort outputs: {str(e)}", "sort_operation")
     
-    def _enrich_output(self, output: Output) -> Output:
+    def _enrich_output(self, output: Output, cached_output: Optional[Output] = None) -> Output:
         """Enrich output with thumbnail and workflow metadata.
         
         Args:
@@ -250,20 +264,32 @@ class OutputService(OutputManagementPort):
             Enriched output with thumbnail and metadata
         """
         try:
-            # Try to generate thumbnail if not already present
             thumbnail_path = output.thumbnail_path
-            if not thumbnail_path:
-                thumbnail_path = self._output_repository.generate_thumbnail(output)
-            
-            # Try to extract workflow metadata if not already present
             workflow_metadata = output.workflow_metadata or {}
+
+            if cached_output and self._is_output_unchanged(output, cached_output):
+                cached_thumbnail = cached_output.thumbnail_path
+                cached_metadata = cached_output.workflow_metadata or {}
+
+                if not thumbnail_path and cached_thumbnail:
+                    thumbnail_path = cached_thumbnail
+                if not workflow_metadata and cached_metadata:
+                    workflow_metadata = cached_metadata.copy()
+
+            if not thumbnail_path:
+                generated_thumbnail = self._output_repository.generate_thumbnail(output)
+                if generated_thumbnail:
+                    thumbnail_path = generated_thumbnail
+
             if not workflow_metadata:
                 extracted_metadata = self._output_repository.extract_workflow_metadata(output)
                 if extracted_metadata:
                     workflow_metadata = extracted_metadata
-            
-            # Create enriched output if any enrichment was successful
-            if thumbnail_path != output.thumbnail_path or workflow_metadata != output.workflow_metadata:
+
+            if (
+                thumbnail_path != output.thumbnail_path or
+                workflow_metadata != output.workflow_metadata
+            ):
                 enriched_output = Output(
                     id=output.id,
                     filename=output.filename,
@@ -278,12 +304,10 @@ class OutputService(OutputManagementPort):
                     workflow_metadata=workflow_metadata
                 )
                 return enriched_output
-            
+
         except Exception:
-            # If enrichment fails, return original output
-            # This ensures graceful fallback
             pass
-        
+
         return output
     
     def load_workflow(self, output_id: str) -> bool:
@@ -389,10 +413,10 @@ class OutputService(OutputManagementPort):
                 return None
             
             return self._cache[key]
-    
+
     def _set_cache(self, key: str, data: List[Output]) -> None:
         """Set data in cache with current timestamp.
-        
+
         Args:
             key: Cache key
             data: Data to cache
@@ -400,16 +424,16 @@ class OutputService(OutputManagementPort):
         with self._cache_lock:
             self._cache[key] = data
             self._cache_timestamps[key] = datetime.now()
-    
+
     def _clear_cache(self) -> None:
         """Clear all cached data."""
         with self._cache_lock:
             self._cache.clear()
             self._cache_timestamps.clear()
-    
+
     def _invalidate_cache_key(self, key: str) -> None:
         """Invalidate a specific cache key.
-        
+
         Args:
             key: Cache key to invalidate
         """
@@ -418,3 +442,33 @@ class OutputService(OutputManagementPort):
                 del self._cache[key]
             if key in self._cache_timestamps:
                 del self._cache_timestamps[key]
+
+    def _get_last_scan_snapshot(self) -> Dict[str, Output]:
+        """Create a snapshot of the most recently enriched outputs keyed by ID."""
+        with self._cache_lock:
+            return dict(self._last_scanned_outputs)
+
+    def _update_last_scanned_outputs(self, outputs: List[Output]) -> None:
+        """Replace the cached snapshot with the provided outputs."""
+        with self._cache_lock:
+            self._last_scanned_outputs = {output.id: output for output in outputs}
+
+    def _merge_into_last_scanned_outputs(self, outputs: List[Output]) -> None:
+        """Merge enriched outputs into the cached snapshot without dropping other entries."""
+        with self._cache_lock:
+            for output in outputs:
+                self._last_scanned_outputs[output.id] = output
+
+    def _get_last_scan_entry(self, output_id: str) -> Optional[Output]:
+        """Get a previously enriched output by ID if available."""
+        with self._cache_lock:
+            return self._last_scanned_outputs.get(output_id)
+
+    @staticmethod
+    def _is_output_unchanged(output: Output, cached_output: Output) -> bool:
+        """Determine if a cached output still matches the latest filesystem info."""
+        return (
+            output.file_path == cached_output.file_path
+            and output.modified_at == cached_output.modified_at
+            and output.file_size == cached_output.file_size
+        )

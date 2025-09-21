@@ -9,6 +9,7 @@ from datetime import datetime
 
 from .filesystem_output_adapter import FilesystemOutputAdapter
 from ...domain.entities.output import Output
+from src.utils import logger
 
 
 class ComfyUIOutputAdapter(FilesystemOutputAdapter):
@@ -40,9 +41,15 @@ class ComfyUIOutputAdapter(FilesystemOutputAdapter):
         Returns:
             Path to ComfyUI installation
         """
-        if provided_path and Path(provided_path).exists():
-            # Preserve the original provided path format to match expectations in tests
-            return str(Path(provided_path))
+        if provided_path:
+            provided = Path(provided_path)
+            if provided.exists():
+                # Preserve the original provided path format to match expectations in tests
+                return str(provided)
+
+            logger.warn(
+                f"Provided ComfyUI base path does not exist, falling back to auto-discovery: {provided_path}"
+            )
         
         # Try to detect ComfyUI path from current working directory
         cwd = Path.cwd()
@@ -68,7 +75,10 @@ class ComfyUIOutputAdapter(FilesystemOutputAdapter):
             if path and path.exists() and self._is_comfyui_directory(path):
                 return str(path)
         
-        # Fallback to current directory
+        # Fallback to current directory (typically the ComfyUI root when running under PromptServer)
+        logger.warn(
+            f"Unable to auto-detect ComfyUI installation; defaulting output root to current directory: {cwd}"
+        )
         return str(cwd)
     
     def _is_comfyui_directory(self, path: Path) -> bool:
@@ -124,12 +134,19 @@ class ComfyUIOutputAdapter(FilesystemOutputAdapter):
             if output_folders:
                 return output_folders
         
-        except (ImportError, AttributeError, Exception):
+        except (ImportError, AttributeError, Exception) as exc:
             # If we can't import or get the output directory, fall back to default
-            pass
+            logger.warn(
+                f"Failed to resolve ComfyUI output directory via folder_paths module: {exc}"
+            )
         
         # Fallback to default output directory
         default_output = Path(self.comfyui_base_path) / "output"
+        if not default_output.exists():
+            logger.warn(
+                f"ComfyUI output directory {default_output} does not exist yet; continuing with default path."
+            )
+
         return str(default_output)
     
     def extract_workflow_metadata(self, output: Output) -> Optional[Dict[str, Any]]:

@@ -369,11 +369,59 @@ class TestOutputServiceCaching:
         # Both should hit their respective repositories
         assert mock_repository.scan_output_directory.call_count == 1
         assert mock_repository.get_outputs_by_format.call_count == 1
-        
+
         # Calling same methods again should use cache
         service.get_all_outputs()
         service.get_outputs_by_format("png")
-        
+
         # Repository call counts should remain the same
         assert mock_repository.scan_output_directory.call_count == 1
         assert mock_repository.get_outputs_by_format.call_count == 1
+
+    def test_refresh_outputs_reuses_cached_enrichment(self, service, mock_repository):
+        """Refresh should reuse cached thumbnails/metadata for unchanged files."""
+        now = datetime.now()
+        initial_output = Output(
+            id="output1",
+            filename="image_a.png",
+            file_path="/path/to/image_a.png",
+            file_size=1024,
+            created_at=now,
+            modified_at=now,
+            image_width=512,
+            image_height=512,
+            file_format="png"
+        )
+
+        mock_repository.scan_output_directory.return_value = [initial_output]
+        mock_repository.generate_thumbnail.return_value = "/tmp/thumb.jpg"
+        mock_repository.extract_workflow_metadata.return_value = {"workflow": {"nodes": []}}
+
+        first_scan = service.get_all_outputs()
+        assert first_scan[0].thumbnail_path == "/tmp/thumb.jpg"
+        assert first_scan[0].workflow_metadata == {"workflow": {"nodes": []}}
+        assert mock_repository.generate_thumbnail.call_count == 1
+        assert mock_repository.extract_workflow_metadata.call_count == 1
+
+        refreshed_output = Output(
+            id="output1",
+            filename="image_a.png",
+            file_path="/path/to/image_a.png",
+            file_size=1024,
+            created_at=now,
+            modified_at=now,
+            image_width=512,
+            image_height=512,
+            file_format="png"
+        )
+
+        mock_repository.scan_output_directory.return_value = [refreshed_output]
+        mock_repository.generate_thumbnail.reset_mock()
+        mock_repository.extract_workflow_metadata.reset_mock()
+
+        refreshed_scan = service.refresh_outputs()
+
+        assert mock_repository.generate_thumbnail.call_count == 0
+        assert mock_repository.extract_workflow_metadata.call_count == 0
+        assert refreshed_scan[0].thumbnail_path == "/tmp/thumb.jpg"
+        assert refreshed_scan[0].workflow_metadata == {"workflow": {"nodes": []}}

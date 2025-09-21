@@ -57,32 +57,55 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
         if not self.output_directory.is_dir():
             raise IOError(f"Output path is not a directory: {self.output_directory}")
         
-        outputs = []
-        
-        try:
-            # Recursively scan for image files
-            for file_path in self.output_directory.rglob("*"):
-                # Skip files inside the thumbnail directory
-                try:
-                    if self.thumbnail_directory and file_path.is_relative_to(self.thumbnail_directory):
-                        continue
-                except Exception:
-                    # is_relative_to may raise on some edge cases; treat as not relative
-                    pass
+        outputs: List[Output] = []
 
-                if file_path.is_file() and file_path.suffix.lower() in self.supported_extensions:
-                    try:
-                        output = self._create_output_from_file(file_path)
-                        if output:
-                            outputs.append(output)
-                    except Exception as e:
-                        # Log error but continue processing other files
-                        logger.warn(f"Failed to process file {file_path}: {e}")
-                        continue
-        
-        except Exception as e:
-            raise IOError(f"Failed to scan output directory: {e}")
-        
+        thumbnail_root: Optional[Path] = None
+        if self.thumbnail_directory:
+            try:
+                thumbnail_root = self.thumbnail_directory.resolve(strict=False)
+            except Exception:
+                thumbnail_root = self.thumbnail_directory
+
+        def should_skip_directory(path: Path) -> bool:
+            if not thumbnail_root:
+                return False
+            try:
+                return path == thumbnail_root or path.is_relative_to(thumbnail_root)
+            except Exception:
+                return False
+
+        def onerror(error: OSError) -> None:
+            problem_path = getattr(error, "filename", None) or getattr(error, "filename2", None)
+            location = problem_path or self.output_directory
+            logger.warn(f"Failed to access path while scanning outputs ({location}): {error}")
+
+        for root, dirs, files in os.walk(self.output_directory, onerror=onerror):
+            root_path = Path(root)
+
+            if should_skip_directory(root_path):
+                dirs[:] = []
+                continue
+
+            if thumbnail_root:
+                dirs[:] = [
+                    directory
+                    for directory in dirs
+                    if not should_skip_directory(root_path / directory)
+                ]
+
+            for filename in files:
+                file_path = root_path / filename
+
+                if file_path.suffix.lower() not in self.supported_extensions:
+                    continue
+
+                try:
+                    output = self._create_output_from_file(file_path)
+                    if output:
+                        outputs.append(output)
+                except Exception as exc:
+                    logger.warn(f"Failed to process file {file_path}: {exc}")
+
         return outputs
     
     def get_output_by_id(self, output_id: str) -> Optional[Output]:
@@ -220,8 +243,14 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                     try:
                         workflow_data = json.loads(img.text['workflow'])
                         metadata['workflow'] = workflow_data
-                    except json.JSONDecodeError:
-                        pass
+                    except json.JSONDecodeError as exc:
+                        logger.warn(
+                            f"Failed to parse workflow metadata for {output.file_path}: {exc}"
+                        )
+                    except Exception as exc:
+                        logger.warn(
+                            f"Unexpected error extracting workflow metadata for {output.file_path}: {exc}"
+                        )
                 
                 # Extract prompt metadata
                 if 'prompt' in img.text:
@@ -231,8 +260,14 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                         
                         # Extract common parameters from prompt
                         self._extract_generation_parameters(prompt_data, metadata)
-                    except json.JSONDecodeError:
-                        pass
+                    except json.JSONDecodeError as exc:
+                        logger.warn(
+                            f"Failed to parse prompt metadata for {output.file_path}: {exc}"
+                        )
+                    except Exception as exc:
+                        logger.warn(
+                            f"Unexpected error extracting prompt metadata for {output.file_path}: {exc}"
+                        )
                 
                 # Extract other ComfyUI metadata
                 for key in ['parameters', 'model', 'seed', 'steps', 'cfg', 'sampler', 'scheduler']:
@@ -339,9 +374,10 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                         elif 'negative_prompt' not in metadata:
                             metadata['negative_prompt'] = inputs['text']
         
-        except Exception:
-            # Ignore errors in parameter extraction
-            pass  
+        except Exception as exc:
+            logger.warn(
+                f"Failed to extract generation parameters from prompt metadata: {exc}"
+            )  
   
     def load_workflow_to_comfyui(self, output: Output) -> bool:
         """Load the workflow from the output back into ComfyUI.
