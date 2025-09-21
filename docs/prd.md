@@ -9,14 +9,15 @@
 - Supplemental specifications: `.kiro/specs/*` (theme integration, local assets, simplified model browser, simplified output gallery)
 
 #### Current Project State
-- Hexagonal Python backend (aiohttp) embedded in ComfyUI manages models, folders, outputs, and external catalogs via `/asset_manager` APIs; theme-supporting adapters and ComfyUI workflow integration are in place.
+- Hexagonal (Ports and Adapters) architecture with Python backend (aiohttp) embedded in ComfyUI manages models, folders, outputs, and external catalogs via `/asset_manager` APIs; theme-supporting adapters and ComfyUI workflow integration are in place.
 - React + TypeScript frontend implements Local Assets, Model Browser (CivitAI/HuggingFace sub-tabs), and Outputs features using ComfyUI-aligned theming; Outputs tab is closest to releasable quality, while other tabs retain partially completed functionality.
-- Theme integration tasks (per `.kiro/specs/comfyui-theme-integration`) are complete; Local Assets and Model Browser specs show core flows implemented with outstanding polish/performance/error-handling tasks (#20–25, #11 in respective task lists). Outputs gallery spec indicates base gallery and workflow utilities shipped, with remaining performance and integration validation tasks (#7–8).
+- Theme integration tasks (per `.kiro/specs/comfyui-theme-integration`) are are almost complete; It must be verified. Local Assets and Model Browser specs show core flows implemented with outstanding polish/performance/error-handling tasks (#20–25, #11 in respective task lists). Outputs gallery spec indicates base gallery and workflow utilities shipped, with remaining performance and integration validation tasks (#7–8).
 
 ### Available Documentation Analysis
 - Using existing project analysis from document-project output plus spec files.
 - Key references: `docs/architecture.md`, `.kiro/specs/**`, `docs/development/*`, `.kiro/steering/*`.
 
+#### Available Documentation
 - [x] Tech Stack Documentation
 - [x] Source Tree/Architecture
 - [x] Coding Standards
@@ -24,7 +25,7 @@
 - [x] External API Documentation
 - [ ] UX/UI Guidelines <!-- Dedicated UX design doc not formalized; rely on theme integration spec and development guides. -->
 - [x] Technical Debt Documentation
-- Other: Theme integration guides (`docs/development/theme-integration-guide.md`, `.kiro/specs/comfyui-theme-integration`)
+- [ ] Other: Theme integration guides (`docs/development/theme-integration-guide.md`, `.kiro/specs/comfyui-theme-integration`)
 
 ### Enhancement Scope Definition
 
@@ -64,7 +65,7 @@ Specs in `.kiro/specs/*` capture full feature ambitions. Local Asset Management 
 | Updated with spec analysis | 2025-09-21 | 0.2 | Incorporated `.kiro/specs` status, outstanding tasks, and theme requirements | John |
 
 ## Requirements
-These requirements are based on the validated understanding of the existing system and the referenced specifications.
+These requirements are based on the validated understanding of the existing system and the referenced specifications. These requirements are based on my understanding of your existing system. Please review carefully and confirm they align with your project's reality.
 
 ### Functional
 1. **FR1:** Deliver a production-ready Outputs tab that consumes live `/asset_manager/outputs` data with resilient loading, sorting, and error states, satisfying simplified output gallery requirements 1–5.
@@ -79,11 +80,10 @@ These requirements are based on the validated understanding of the existing syst
 4. **NFR4:** Document remaining backlog items from specs (Local Assets tasks 20–25, Model Browser task 11, Output Gallery tasks 7–8) and ensure gating does not regress their future feasibility.
 
 ### Compatibility Requirements
-- **CR1:** Keep existing `/asset_manager` REST contracts stable for frontend and any external consumers.
-- **CR2:** Avoid introducing new persistent storage; continue leveraging ComfyUI’s filesystem paths and existing cache adapters.
-- **CR3:** Match ComfyUI theme tokens and interaction patterns so the surfaced UI feels native (per theme integration spec).
-- **CR4:** Ensure ComfyUI integrations (drag/drop hooks, extension registration, health endpoint) remain fully operational despite hiding other tabs.
-- **CR5:** Preserve the ability to finish outstanding spec tasks post-release (e.g., ErrorBoundary integration, virtual scrolling) without major refactors.
+1. **CR1:** Keep existing `/asset_manager` REST contracts stable for frontend and any external consumers.
+2. **CR2:** Avoid introducing new persistent storage; continue leveraging ComfyUI’s filesystem paths and existing cache adapters.
+3. **CR3:** Match ComfyUI theme tokens and interaction patterns so the surfaced UI feels native (per theme integration spec).
+4. **CR4:** Ensure ComfyUI integrations (drag/drop hooks, extension registration, health endpoint) remain fully operational despite hiding other tabs.
 
 ## User Interface Enhancement Goals
 
