@@ -38,6 +38,7 @@ Comprehensive documentation of the entire system with emphasis on the Outputs fe
 - Outputs management is fully wired end-to-end (filesystem scan, workflow metadata, REST API, React UI).
 - Local Assets and Model Browser features have UI and partial backend plumbing but will ship later; tabs need gating for the initial release.
 - Extensive unit/integration tests exist for both backend and frontend, plus Playwright E2E coverage.
+- Upcoming Outputs-first release scope leans on existing logging (no new telemetry) and targets typical ComfyUI workloads; feature gating temporarily hides unfinished tabs while preserving future work.
 
 ### Actual Tech Stack (from package.json/requirements.txt)
 | Category          | Technology                    | Version      | Notes                                                             |
@@ -186,7 +187,7 @@ PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e
 ### Files That Will Need Modification
 - `ui/src/features/outputs/` – polish UI (styling, feature completeness) before release.
 - `ui/src/App.tsx`, `ui/src/features/index.ts` – gate unused tabs and expose Outputs-only experience for MVP.
-- `src/domain/services/output_service.py`, `src/adapters/driven/comfyui_output_adapter.py` – final refinements, error handling, and logging for Outputs.
+- `src/domain/services/output_service.py`, `src/adapters/driven/comfyui_output_adapter.py` – final refinements, error handling, and standard logging for Outputs (telemetry work deferred).
 - `ui/src/main.tsx` – integrate version badge once TODO resolved.
 
 ### New Files/Modules Needed
@@ -197,6 +198,7 @@ PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e
 - Ensure frontend theme variables align with ComfyUI CSS tokens (`docs/development/theme-integration-guide.md`).
 - Validate `apiClient` timeouts/retries are appropriate once backend endpoints run inside production ComfyUI instances.
 - Confirm ComfyUI drag-and-drop hooks continue working after tabs are hidden or re-ordered.
+- Lean on existing `src/utils/logger.py` instrumentation for diagnostics; no new telemetry/monitoring will ship with the Outputs-first release, so logging should cover typical usage scenarios.
 
 ## Appendix - Useful Commands and Scripts
 
