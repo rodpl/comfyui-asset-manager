@@ -74,7 +74,7 @@ These requirements are based on the validated understanding of the existing syst
 4. **FR4:** Confirm surfaced UI elements comply with ComfyUI theme integration requirements 1–8, documenting any gaps for follow-up.
 
 ### Non Functional
-1. **NFR1:** Maintain current ComfyUI responsiveness—Outputs interactions must not introduce noticeable latency even with large galleries; address pending performance tasks (#7 in simplified output gallery spec).
+1. **NFR1:** Maintain current ComfyUI responsiveness for typical gallery sizes—large-scale workload optimisations are out of scope for this release; note pending performance tasks (#7 in simplified output gallery spec) for future follow-up.
 2. **NFR2:** Preserve automated test coverage: pytest suites, Vitest unit/integration tests, and Playwright E2E flows must continue to pass, with scenarios updated for gating logic and theme verification.
 3. **NFR3:** Degrade gracefully when external services (CivitAI, HuggingFace) are unavailable—surface non-blocking errors without crashing the extension, reflecting patterns defined in model browser spec.
 4. **NFR4:** Document remaining backlog items from specs (Local Assets tasks 20–25, Model Browser task 11, Output Gallery tasks 7–8) and ensure gating does not regress their future feasibility.
@@ -125,7 +125,7 @@ Adopt ComfyUI theme variables and PrimeVue-influenced layout to ensure the Outpu
 ### Deployment and Operations
 - **Build Process Integration**: Keep Vite build (`pnpm run build`) and Poetry install steps unchanged; ensure Outputs assets included in `dist/asset_manager`.
 - **Deployment Strategy**: Release via ComfyUI custom_nodes distribution; include release notes explaining tab gating and future roadmap.
-- **Monitoring and Logging**: Continue leveraging `src/utils/logger.py`; add targeted logs around workflow actions, system operations, and gating decisions for diagnostics.
+- **Monitoring and Logging**: Rely on existing `src/utils/logger.py` instrumentation; no new telemetry or monitoring tooling will be added in this release.
 - **Configuration Management**: Introduce feature gating via environment flag or config module without expanding configuration surface drastically; document defaults and how to re-enable tabs for internal testing.
 
 ### Risk Assessment and Mitigation
@@ -145,35 +145,35 @@ Based on the existing architecture and spec analysis, this enhancement should be
 
 **Integration Requirements**: Maintain stable `/asset_manager` APIs, respect theme tokens, preserve ComfyUI extension hooks, catalog outstanding spec tasks, and ensure tests remain green across backend/frontend/E2E layers.
 
-### Story 1.0 Feature Flag & Telemetry Scaffolding
+### Story 1.0 Feature Flag & Release Preparation
 As a maintainer,
-I want feature-gating, telemetry, and release-note scaffolding in place first,
-so that subsequent stories can build safely and we capture Outputs-specific metrics from day one.
+I want feature-gating and release-note scaffolding in place first,
+so that subsequent stories can build safely and we set clear expectations for the Outputs-only release.
 
 #### Acceptance Criteria
 1. Feature flag configuration (env variable or config module) controls tab visibility and is documented for QA/release notes.
-2. Telemetry/monitoring hooks (logging fields, optional metrics) defined for Outputs operations, even if initial plumbing is basic.
+2. Gating instructions enable developers/QA to toggle tabs without code changes and are captured alongside the feature flag documentation.
 3. Placeholder release-note template drafted to communicate gated tabs and future roadmap.
 
 #### Integration Verification
 - IV1: Verify gating toggle is accessible to developers/QA without code changes.
-- IV2: Ensure telemetry hooks/logging do not disrupt existing logging pipeline.
-- IV3: Confirm release-note template and documentation references exist for later updates.
+- IV2: Confirm documentation clearly references the gating instructions and outstanding spec tasks for deferred tabs.
+- IV3: Ensure release-note template and related notes are stored for future updates.
 
 ### Story 1.1 Outputs Backend Hardening
 As a ComfyUI user,
-I want backend outputs APIs to behave reliably under real workloads,
+I want backend outputs APIs to behave reliably under typical usage conditions,
 so that I can trust workflow actions and gallery data during daily use.
 
 #### Acceptance Criteria
-1. API responses handle empty directories, malformed metadata, and large collections without 500 errors; logging covers failure modes from simplified output gallery spec.
+1. API responses handle empty directories, malformed metadata, and expected gallery sizes without 500 errors; logging covers failure modes from simplified output gallery spec.
 2. Workflow actions (load, open, show folder, copy path) return success/failure payloads with actionable messages and cover OS-specific cases.
-3. Telemetry/logging from Story 1.0 captures workflow action outcomes and gating decisions for diagnostics.
+3. Standard logging provides actionable summaries for workflow action outcomes without introducing new telemetry systems.
 
 #### Integration Verification
 - IV1: Confirm existing `/asset_manager/outputs` clients (frontend, tests) still receive compatible payloads; use spec task #8 integration tests as reference.
 - IV2: Validate ComfyUI PromptServer registration and health endpoint remain unaffected.
-- IV3: Run pytest integration suite and targeted load tests to ensure caching/performance remain within spec expectations.
+- IV3: Run pytest integration suite to ensure caching/performance remain within expected bounds for typical usage.
 
 ### Story 1.2 Outputs UI Polish and Theme Compliance
 As a ComfyUI user,
@@ -183,7 +183,7 @@ so that I can manage outputs without noticing visual or interaction inconsistenc
 #### Acceptance Criteria
 1. Outputs gallery uses ComfyUI theme variables for colors, typography, spacing, and transitions; verify against theme integration requirements 1–8.
 2. Error banners, modals, context menus, and workflow actions meet accessibility requirements (keyboard shortcuts, focus traps) and match spec expectations.
-3. Vitest component tests, visual regression snapshots, and Playwright “Outputs” suite updated to reflect final design and gating; incorporate spec task #7 monitoring criteria.
+3. Vitest component tests, visual regression snapshots, and Playwright “Outputs” suite updated to reflect final design and gating; incorporate spec task #7 validation criteria.
 
 #### Integration Verification
 - IV1: Check frontend unit tests and Playwright “Outputs” suite pass with new styling and gating.
