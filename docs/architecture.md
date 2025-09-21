@@ -25,6 +25,7 @@ Comprehensive documentation of the entire system with emphasis on the Outputs fe
 - **Configuration**: `pyproject.toml`, `ui/package.json` – define Python/Node dependencies and scripts.
 - **Developer tooling**: `setup.sh`, `dev_server.sh` – install dependencies and run live frontend builds linked into ComfyUI.
 - **Steering docs**: `.kiro/steering/*`, `docs/development/*` – authoritative project/process guidance consumed by agents.
+- **AI knowledge tools**: MCP tools `ComfyUI-Docs` (backend) and `ComfyUI-Frontend-Docs` (frontend) – provide on-demand access to upstream source trees and documentation for the vanilla ComfyUI project. Developers can call the exposed functions (e.g. `ComfyUI-Docs__fetch_ComfyUI_documentation`, `ComfyUI-Docs__search_ComfyUI_code`, `ComfyUI-Frontend-Docs__fetch_ComfyUI_frontend_docs`) to pull design details, API signatures, or code snippets without leaving the agent environment.
 
 ### If PRD Provided - Enhancement Impact Areas
 <!-- No brownfield PRD provided yet; update once the Product Manager delivers it. Current release focus: complete Outputs tab, theme alignment, temporarily hide unfinished tabs. -->
@@ -198,6 +199,13 @@ PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e
 - Confirm ComfyUI drag-and-drop hooks continue working after tabs are hidden or re-ordered.
 
 ## Appendix - Useful Commands and Scripts
+
+### MCP Tooling Reference
+- `ComfyUI-Docs__fetch_ComfyUI_documentation` – loads the canonical backend documentation snapshot from the `comfyanonymous/ComfyUI` repository.
+- `ComfyUI-Docs__search_ComfyUI_code` / `ComfyUI-Docs__search_ComfyUI_documentation` – scoped search across backend source files or docs when you know the symbol or concept to locate.
+- `ComfyUI-Frontend-Docs__fetch_ComfyUI_frontend_docs` – pulls the frontend documentation bundle from `Comfy-Org/ComfyUI_frontend` for UI-specific behaviour and conventions.
+- `ComfyUI-Frontend-Docs__search_ComfyUI_frontend_code` / `ComfyUI-Frontend-Docs__search_ComfyUI_frontend_docs` – targeted lookup of components, hooks, or styling patterns in the upstream ComfyUI UI.
+- `ComfyUI-Docs__fetch_generic_url_content` and `ComfyUI-Frontend-Docs__fetch_generic_url_content` – follow-up fetchers for absolute URLs referenced in the base documentation responses.
 
 ### Frequently Used Commands
 ```bash
