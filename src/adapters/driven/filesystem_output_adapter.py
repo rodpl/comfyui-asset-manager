@@ -59,20 +59,50 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
         
         outputs: List[Output] = []
 
-        thumbnail_root: Optional[Path] = None
+        thumbnail_paths: List[str] = []
+        thumbnail_prefixes: List[str] = []
         if self.thumbnail_directory:
+            candidates: List[Path] = [self.thumbnail_directory]
             try:
-                thumbnail_root = self.thumbnail_directory.resolve(strict=False)
+                resolved_candidate = self.thumbnail_directory.resolve(strict=False)
+                if resolved_candidate not in candidates:
+                    candidates.append(resolved_candidate)
             except Exception:
-                thumbnail_root = self.thumbnail_directory
+                pass
+
+            for candidate in candidates:
+                candidate_str = str(candidate)
+                if candidate_str not in thumbnail_paths:
+                    thumbnail_paths.append(candidate_str)
+                    if not candidate_str.endswith(os.sep):
+                        thumbnail_prefixes.append(candidate_str + os.sep)
+                    else:
+                        thumbnail_prefixes.append(candidate_str)
 
         def should_skip_directory(path: Path) -> bool:
-            if not thumbnail_root:
+            if not thumbnail_paths:
                 return False
-            try:
-                return path == thumbnail_root or path.is_relative_to(thumbnail_root)
-            except Exception:
-                return False
+
+            path_variants: List[str] = []
+            for variant in (path,):
+                variant_str = str(variant)
+                if variant_str not in path_variants:
+                    path_variants.append(variant_str)
+                try:
+                    resolved_variant = str(Path(variant).resolve(strict=False))
+                    if resolved_variant not in path_variants:
+                        path_variants.append(resolved_variant)
+                except Exception:
+                    pass
+
+            for variant_str in path_variants:
+                if variant_str in thumbnail_paths:
+                    return True
+                for prefix in thumbnail_prefixes:
+                    if variant_str.startswith(prefix):
+                        return True
+
+            return False
 
         def onerror(error: OSError) -> None:
             problem_path = getattr(error, "filename", None) or getattr(error, "filename2", None)
@@ -86,7 +116,7 @@ class FilesystemOutputAdapter(OutputRepositoryPort):
                 dirs[:] = []
                 continue
 
-            if thumbnail_root:
+            if thumbnail_paths:
                 dirs[:] = [
                     directory
                     for directory in dirs
