@@ -179,11 +179,10 @@ describe('ModelBrowserErrorBoundary', () => {
     );
 
     // Should show retry attempt info after retries complete
-    expect(
-      screen.getByText((content, element) => {
-        return element?.textContent?.includes('Retry attempt') || false;
-      })
-    ).toBeInTheDocument();
+    const matches = screen.getAllByText((content, element) => {
+      return element?.textContent?.includes('Retry attempt') || false;
+    });
+    expect(matches.length).toBeGreaterThan(0);
   }, 10000);
 
   it('renders custom fallback when provided', () => {

@@ -26,16 +26,16 @@ export const ModelCardSkeleton: React.FC<ModelCardSkeletonProps> = ({
     <div className={`model-card-skeleton ${platform}-skeleton ${className}`}>
       {/* Thumbnail skeleton */}
       <div className="skeleton-thumbnail">
-        <div className="skeleton-shimmer" />
+        <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         
         {/* Platform badge skeleton */}
         <div className="skeleton-platform-badge">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
         
         {/* Compatibility indicator skeleton */}
         <div className="skeleton-compatibility">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
       </div>
 
@@ -44,25 +44,25 @@ export const ModelCardSkeleton: React.FC<ModelCardSkeletonProps> = ({
         {/* Header skeleton */}
         <div className="skeleton-header">
           <div className="skeleton-title">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="skeleton-type-badge">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
         </div>
 
         {/* Author skeleton */}
         <div className="skeleton-author">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
 
         {/* Description skeleton */}
         <div className="skeleton-description">
           <div className="skeleton-line">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="skeleton-line short">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
         </div>
 
@@ -70,26 +70,26 @@ export const ModelCardSkeleton: React.FC<ModelCardSkeletonProps> = ({
         <div className="skeleton-stats">
           <div className="skeleton-stat">
             <div className="skeleton-icon">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="skeleton-value">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           </div>
           <div className="skeleton-stat">
             <div className="skeleton-icon">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="skeleton-value">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           </div>
           <div className="skeleton-stat">
             <div className="skeleton-icon">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="skeleton-value">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           </div>
         </div>
@@ -97,33 +97,33 @@ export const ModelCardSkeleton: React.FC<ModelCardSkeletonProps> = ({
         {/* Technical info skeleton */}
         <div className="skeleton-technical">
           <div className="skeleton-format">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="skeleton-base-model">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
         </div>
 
         {/* ComfyUI info skeleton */}
         <div className="skeleton-comfyui-info">
           <div className="skeleton-folder-icon">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="skeleton-folder-path">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
         </div>
 
         {/* Tags skeleton */}
         <div className="skeleton-tags">
           <div className="skeleton-tag">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="skeleton-tag">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="skeleton-tag short">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
         </div>
       </div>
@@ -139,7 +139,10 @@ export const ModelGridSkeleton: React.FC<ModelGridSkeletonProps> = ({
 }) => {
   return (
     <div className={`model-grid-skeleton ${className}`}>
-      <div className="model-grid">
+      <div
+        className="model-grid"
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}
+      >
         {Array.from({ length: count }, (_, index) => (
           <ModelCardSkeleton
             key={index}
@@ -162,17 +165,17 @@ export const ModelSearchSkeleton: React.FC<{
       {Array.from({ length: count }, (_, index) => (
         <div key={index} className="search-result-skeleton">
           <div className="search-thumbnail-skeleton">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="search-content-skeleton">
             <div className="search-title-skeleton">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="search-author-skeleton">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="search-stats-skeleton">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           </div>
         </div>
@@ -189,10 +192,10 @@ export const LoadMoreSkeleton: React.FC<{
     <div className={`load-more-skeleton ${className}`}>
       <div className="load-more-content">
         <div className="load-more-spinner">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
         <div className="load-more-text">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
       </div>
     </div>
@@ -209,22 +212,22 @@ export const ModelDetailSkeleton: React.FC<{
       {/* Header skeleton */}
       <div className="detail-header-skeleton">
         <div className="detail-title-skeleton">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
         <div className="detail-author-skeleton">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
       </div>
 
       {/* Image gallery skeleton */}
       <div className="detail-gallery-skeleton">
         <div className="gallery-main-image">
-          <div className="skeleton-shimmer" />
+          <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
         </div>
         <div className="gallery-thumbnails">
           {Array.from({ length: 4 }, (_, index) => (
             <div key={index} className="gallery-thumbnail-skeleton">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           ))}
         </div>
@@ -234,31 +237,31 @@ export const ModelDetailSkeleton: React.FC<{
       <div className="detail-info-skeleton">
         <div className="info-section">
           <div className="section-title-skeleton">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="section-content-skeleton">
             <div className="skeleton-line">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="skeleton-line">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="skeleton-line short">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           </div>
         </div>
 
         <div className="info-section">
           <div className="section-title-skeleton">
-            <div className="skeleton-shimmer" />
+            <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
           </div>
           <div className="section-content-skeleton">
             <div className="skeleton-line">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
             <div className="skeleton-line">
-              <div className="skeleton-shimmer" />
+              <div className="skeleton-shimmer" style={{ animation: 'shimmer 1.5s infinite' }} />
             </div>
           </div>
         </div>

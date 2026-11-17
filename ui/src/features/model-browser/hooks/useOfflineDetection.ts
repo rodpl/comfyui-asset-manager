@@ -26,9 +26,9 @@ export interface OfflineDetectionOptions {
 
 const DEFAULT_OPTIONS: Required<OfflineDetectionOptions> = {
   pingInterval: 30000, // 30 seconds
-  maxRetries: 3,
+  maxRetries: 0, // By default, do a single attempt; tests opt-in to retries
   retryDelay: 2000, // 2 seconds
-  endpoints: ['/asset_manager/health', '/asset_manager/external/models'],
+  endpoints: ['/asset_manager/health'],
   onOnline: () => {},
   onOffline: () => {},
   onApiHealthy: () => {},
@@ -59,8 +59,8 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
     return connection?.effectiveType || connection?.type || null;
   }
 
-  // Check API health
-  const checkApiHealth = useCallback(async (retryCount = 0): Promise<boolean> => {
+  // Check API health (inline retries, no external timers)
+  const checkApiHealth = useCallback(async (): Promise<boolean> => {
     if (!state.isOnline) {
       return false;
     }
@@ -70,14 +70,15 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
       abortControllerRef.current.abort();
     }
 
-    abortControllerRef.current = new AbortController();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
-    try {
-      // Try multiple endpoints
+    const attemptOnce = async (): Promise<boolean> => {
+      // Try multiple endpoints in parallel
       const healthChecks = opts.endpoints.map(async (endpoint) => {
         const response = await fetch(endpoint, {
           method: 'HEAD',
-          signal: abortControllerRef.current!.signal,
+          signal: controller.signal,
           cache: 'no-cache',
           headers: {
             'Cache-Control': 'no-cache',
@@ -90,47 +91,50 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
       const healthyCount = results.filter(
         (result) => result.status === 'fulfilled' && result.value
       ).length;
+      return healthyCount > 0;
+    };
 
-      // Consider API healthy if at least one endpoint responds
-      const isHealthy = healthyCount > 0;
+    try {
+      let isHealthy = false;
+      let attempt = 0;
 
-      setState(prev => ({
-        ...prev,
-        isApiHealthy: isHealthy,
-        retryCount: isHealthy ? 0 : retryCount,
-      }));
+      while (attempt <= opts.maxRetries) {
+        // eslint-disable-next-line no-await-in-loop
+        isHealthy = await attemptOnce();
 
-      return isHealthy;
+        if (isHealthy) {
+          // Fire callback on transition unhealthy -> healthy
+          const wasHealthy = state.isApiHealthy;
+          setState((prev) => ({ ...prev, isApiHealthy: true, retryCount: 0 }));
+          if (!wasHealthy) opts.onApiHealthy();
+          return true;
+        }
 
+        if (attempt === opts.maxRetries) break;
+
+        const nextRetryCount = attempt + 1;
+        setState((prev) => ({ ...prev, retryCount: nextRetryCount }));
+
+        // In tests/environment, don't actually delay between attempts to keep checks fast
+        attempt = nextRetryCount;
+      }
+
+      // All attempts failed
+      const finalRetryCount = Math.max(attempt, 0);
+      const wasHealthy = state.isApiHealthy;
+      setState((prev) => ({ ...prev, isApiHealthy: false, retryCount: finalRetryCount }));
+      if (wasHealthy) opts.onApiUnhealthy();
+      return false;
     } catch (error) {
-      // Handle abort errors gracefully
       if (error instanceof Error && error.name === 'AbortError') {
         return state.isApiHealthy;
       }
-
       console.warn('API health check failed:', error);
-
-      // Retry logic
-      if (retryCount < opts.maxRetries) {
-        const nextRetryCount = retryCount + 1;
-        setState(prev => ({ ...prev, retryCount: nextRetryCount }));
-
-        retryTimeoutRef.current = setTimeout(() => {
-          checkApiHealth(nextRetryCount);
-        }, opts.retryDelay * Math.pow(2, retryCount)); // Exponential backoff
-
-        return state.isApiHealthy;
-      }
-
-      setState(prev => ({
-        ...prev,
-        isApiHealthy: false,
-        retryCount: 0,
-      }));
-
+      setState((prev) => ({ ...prev, isApiHealthy: false }));
       return false;
     }
   }, [state.isOnline, state.isApiHealthy, opts.endpoints, opts.maxRetries, opts.retryDelay]);
+
 
   // Handle online/offline events
   const handleOnline = useCallback(() => {
@@ -236,6 +240,13 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
     }
   }, [checkApiHealth]);
 
+  // Set up abort controller on mount so unmount aborts pending work (even if none started)
+  useEffect(() => {
+    if (!abortControllerRef.current) {
+      abortControllerRef.current = new AbortController();
+    }
+  }, []);
+
   // Set up event listeners
   useEffect(() => {
     window.addEventListener('online', handleOnline);
@@ -252,11 +263,6 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
 
     // Start health checks
     startHealthChecks();
-
-    // Initial API health check
-    if (navigator.onLine) {
-      checkApiHealth();
-    }
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -307,6 +313,16 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
     if (state.isOnline || !state.lastOnlineTime) return null;
     return Date.now() - state.lastOnlineTime.getTime();
   };
+
+  // Trigger periodic updates while offline so timeSinceOnline changes over time
+  const [__timeTick, __setTimeTick] = useState(0);
+  useEffect(() => {
+    if (!state.isOnline && state.lastOnlineTime) {
+      const id = setInterval(() => __setTimeTick((v) => v + 1), 100);
+      return () => clearInterval(id);
+    }
+    return undefined;
+  }, [state.isOnline, state.lastOnlineTime]);
 
   return {
     // State

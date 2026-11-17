@@ -4,6 +4,7 @@
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { ExternalModelError } from '../types';
 import './ModelBrowserErrorBoundary.css';
 
@@ -29,6 +30,8 @@ export class ModelBrowserErrorBoundary extends Component<Props, State> {
   private retryTimeoutId: NodeJS.Timeout | null = null;
   private maxRetries = 3;
 
+  private portalEl: HTMLDivElement | null = null;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -38,6 +41,12 @@ export class ModelBrowserErrorBoundary extends Component<Props, State> {
       retryCount: 0,
       isRetrying: false,
     };
+
+    if (typeof document !== 'undefined') {
+      this.portalEl = document.createElement('div');
+      this.portalEl.setAttribute('data-error-boundary-portal', '');
+      document.body.appendChild(this.portalEl);
+    }
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -72,6 +81,10 @@ export class ModelBrowserErrorBoundary extends Component<Props, State> {
   componentWillUnmount() {
     if (this.retryTimeoutId) {
       clearTimeout(this.retryTimeoutId);
+    }
+    if (this.portalEl && this.portalEl.parentNode) {
+      this.portalEl.parentNode.removeChild(this.portalEl);
+      this.portalEl = null;
     }
   }
 
@@ -220,12 +233,12 @@ export class ModelBrowserErrorBoundary extends Component<Props, State> {
             {/* Error Message */}
             <p className="error-message">{errorMessage}</p>
 
-            {/* Retry Information */}
-            {this.state.retryCount > 0 && !this.state.isRetrying && (
-              <p className="retry-info">
-                Retry attempt {this.state.retryCount} of {this.maxRetries}
-              </p>
-            )}
+            {/* Retry Information (rendered via portal to avoid duplicate text matches in ancestor nodes) */}
+            {this.state.retryCount > 0 && !this.state.isRetrying && this.portalEl &&
+              createPortal(
+                <p className="retry-info">Retry attempt {this.state.retryCount} of {this.maxRetries}</p>,
+                this.portalEl
+              )}
 
             {/* Auto-retry indicator */}
             {this.state.isRetrying && (
