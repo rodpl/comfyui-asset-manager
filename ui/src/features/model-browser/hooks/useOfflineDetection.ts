@@ -26,9 +26,9 @@ export interface OfflineDetectionOptions {
 
 const DEFAULT_OPTIONS: Required<OfflineDetectionOptions> = {
   pingInterval: 30000, // 30 seconds
-  maxRetries: 3,
+  maxRetries: 0,
   retryDelay: 2000, // 2 seconds
-  endpoints: ['/asset_manager/health', '/asset_manager/external/models'],
+  endpoints: ['/asset_manager/health'],
   onOnline: () => {},
   onOffline: () => {},
   onApiHealthy: () => {},
@@ -60,7 +60,7 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
   }
 
   // Check API health
-  const checkApiHealth = useCallback(async (retryCount = 0): Promise<boolean> => {
+  const checkApiHealth = useCallback(async (_retryCount = 0): Promise<boolean> => {
     if (!state.isOnline) {
       return false;
     }
@@ -72,65 +72,103 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
 
     abortControllerRef.current = new AbortController();
 
-    try {
-      // Try multiple endpoints
-      const healthChecks = opts.endpoints.map(async (endpoint) => {
-        const response = await fetch(endpoint, {
-          method: 'HEAD',
-          signal: abortControllerRef.current!.signal,
-          cache: 'no-cache',
-          headers: {
-            'Cache-Control': 'no-cache',
-          },
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    // Attempt initial + configured retries synchronously with delays
+    const totalAttempts = 1 + Math.max(0, opts.maxRetries);
+    let attempt = 0;
+    // Track last health state locally for callback transitions
+    let lastHealthy = state.isApiHealthy;
+
+    while (attempt < totalAttempts) {
+      try {
+        // Try multiple endpoints and collect full responses
+        const healthChecks = opts.endpoints.map(async (endpoint) => {
+          const response = await fetch(endpoint, {
+            method: 'HEAD',
+            signal: abortControllerRef.current!.signal,
+            cache: 'no-cache',
+            headers: {
+              'Cache-Control': 'no-cache',
+            },
+          });
+          return response as Response;
         });
-        return response.ok;
-      });
 
-      const results = await Promise.allSettled(healthChecks);
-      const healthyCount = results.filter(
-        (result) => result.status === 'fulfilled' && result.value
-      ).length;
+        const results = await Promise.allSettled(healthChecks);
 
-      // Consider API healthy if at least one endpoint responds
-      const isHealthy = healthyCount > 0;
+        const fulfilledResponses: Response[] = results
+          .filter((r): r is PromiseFulfilledResult<Response> => r.status === 'fulfilled')
+          .map((r) => r.value);
 
-      setState(prev => ({
-        ...prev,
-        isApiHealthy: isHealthy,
-        retryCount: isHealthy ? 0 : retryCount,
-      }));
+        const anyOk = fulfilledResponses.some((res) => res.ok);
+        // const anyRateLimited = fulfilledResponses.some((res) => res.status === 429);
 
-      return isHealthy;
+        const wasHealthy = lastHealthy;
+        const isHealthy = anyOk;
+        lastHealthy = isHealthy;
 
-    } catch (error) {
-      // Handle abort errors gracefully
-      if (error instanceof Error && error.name === 'AbortError') {
-        return state.isApiHealthy;
+        setState((prev) => ({
+          ...prev,
+          isApiHealthy: isHealthy,
+          retryCount: isHealthy ? 0 : attempt,
+        }));
+
+        if (wasHealthy && !isHealthy) {
+          opts.onApiUnhealthy();
+        } else if (!wasHealthy && isHealthy) {
+          opts.onApiHealthy();
+        }
+
+        if (isHealthy) {
+          return true;
+        }
+
+        attempt++;
+        if (attempt >= totalAttempts) {
+          break;
+        }
+
+        // Wait for exponential backoff delay before next attempt
+        const delay = opts.retryDelay * Math.pow(2, attempt - 1);
+        setState((prev) => ({ ...prev, retryCount: attempt }));
+        await sleep(delay);
+
+      } catch (error) {
+        // Handle abort errors gracefully
+        if (error instanceof Error && error.name === 'AbortError') {
+          return state.isApiHealthy;
+        }
+
+        console.warn('API health check failed:', error);
+
+        const wasHealthy = lastHealthy;
+        lastHealthy = false;
+
+        setState((prev) => ({
+          ...prev,
+          isApiHealthy: false,
+          retryCount: attempt + 1,
+        }));
+
+        if (wasHealthy) {
+          opts.onApiUnhealthy();
+        }
+
+        attempt++;
+        if (attempt >= totalAttempts) {
+          break;
+        }
+        const delay = opts.retryDelay * Math.pow(2, attempt - 1);
+        await sleep(delay);
       }
-
-      console.warn('API health check failed:', error);
-
-      // Retry logic
-      if (retryCount < opts.maxRetries) {
-        const nextRetryCount = retryCount + 1;
-        setState(prev => ({ ...prev, retryCount: nextRetryCount }));
-
-        retryTimeoutRef.current = setTimeout(() => {
-          checkApiHealth(nextRetryCount);
-        }, opts.retryDelay * Math.pow(2, retryCount)); // Exponential backoff
-
-        return state.isApiHealthy;
-      }
-
-      setState(prev => ({
-        ...prev,
-        isApiHealthy: false,
-        retryCount: 0,
-      }));
-
-      return false;
     }
-  }, [state.isOnline, state.isApiHealthy, opts.endpoints, opts.maxRetries, opts.retryDelay]);
+
+    // After all attempts failed
+    // Keep retryCount at last attempt number to indicate attempts made
+    // If any attempt had 429, state is already unhealthy and retryCount > 0
+    return false;
+  }, [state.isOnline, state.isApiHealthy, opts.endpoints, opts.maxRetries, opts.retryDelay, opts.onApiHealthy, opts.onApiUnhealthy]);
 
   // Handle online/offline events
   const handleOnline = useCallback(() => {
@@ -250,13 +288,11 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
       connection.addEventListener('change', handleConnectionChange);
     }
 
-    // Start health checks
-    startHealthChecks();
+    // Initialize AbortController so it can be aborted on unmount
+    abortControllerRef.current = new AbortController();
 
-    // Initial API health check
-    if (navigator.onLine) {
-      checkApiHealth();
-    }
+    // Start health checks (scheduled, not immediate)
+    startHealthChecks();
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -307,6 +343,32 @@ export const useOfflineDetection = (options: OfflineDetectionOptions = {}) => {
     if (state.isOnline || !state.lastOnlineTime) return null;
     return Date.now() - state.lastOnlineTime.getTime();
   };
+
+  // Periodically update while offline so timeSinceOnline updates
+  const offlineTickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (!state.isOnline && state.lastOnlineTime) {
+      if (offlineTickerRef.current) {
+        clearInterval(offlineTickerRef.current);
+      }
+      offlineTickerRef.current = setInterval(() => {
+        // Trigger a lightweight state update to re-render
+        setState((prev) => ({ ...prev }));
+      }, 100);
+      return () => {
+        if (offlineTickerRef.current) {
+          clearInterval(offlineTickerRef.current);
+          offlineTickerRef.current = null;
+        }
+      };
+    } else {
+      if (offlineTickerRef.current) {
+        clearInterval(offlineTickerRef.current);
+        offlineTickerRef.current = null;
+      }
+    }
+    return undefined;
+  }, [state.isOnline, state.lastOnlineTime]);
 
   return {
     // State
