@@ -1,0 +1,96 @@
+{
+  "mcpServers": {
+    "Context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    },
+    "ComfyUI-React-Extension Docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/Comfy-Org/ComfyUI-React-Extension-Template"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "fetch_docs",
+        "search_docs",
+        "search_code",
+        "fetch_generic_url_content"
+      ]
+    },
+    "ComfyUI-Frontend Docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/Comfy-Org/ComfyUI_frontend"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "fetch_ComfyUI_frontend_docs",
+        "search_ComfyUI_frontend_docs",
+        "search_ComfyUI_frontend_code",
+        "fetch_generic_url_content"
+      ]
+    },
+    "ComfyUI-Copilot Docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/AIDC-AI/ComfyUI-Copilot"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "fetch_ComfyUI_Copilot_docs",
+        "search_ComfyUI_Copilot_docs"
+      ]
+    },
+    "ComfyUI Docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/comfyanonymous/ComfyUI"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "fetch_ComfyUI_documentation",
+        "search_ComfyUI_documentation",
+        "search_ComfyUI_code",
+        "fetch_generic_url_content"
+      ]
+    },
+    "Chrome MCP": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://127.0.0.1:12306/mcp"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "chrome_navigate",
+        "chrome_get_web_content",
+        "chrome_screenshot",
+        "chrome_console",
+        "chrome_get_interactive_elements",
+        "chrome_click_element",
+        "chrome_inject_script"
+      ]
+    },
+    "Playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
