@@ -5352,3 +5352,30 @@ Choose a number (0-8) or 9 to proceed:
 
 <!-- END: BMAD-AGENTS -->
 
+# Development Commands & Project Information
+
+## Build/Test Commands
+- **Install Python deps**: `poetry install --no-root`
+- **Run Python tests**: `poetry run pytest`  
+- **Run single test**: `poetry run pytest tests/path/to/test_file.py`
+- **Test with coverage**: `poetry run pytest --cov=src --cov-report=html`
+- **Install frontend deps**: `cd ui && pnpm install`
+- **Build frontend**: `cd ui && pnpm run build`
+- **Run frontend tests**: `cd ui && pnpm run test`
+- **Lint frontend**: `cd ui && pnpm run lint`
+- **E2E tests**: `PLAYWRIGHT_BASE_URL=http://localhost:8188 pnpm --filter ./ui e2e`
+
+## Architecture
+- **Project Type**: ComfyUI extension with Python backend and TypeScript React frontend
+- **Backend**: Python 3.12+, aiohttp server, domain-driven design (src/domain/, src/adapters/)
+- **Frontend**: TypeScript, React, Vite build, i18next for localization
+- **Testing**: pytest (Python), vitest (frontend), Playwright (E2E)
+- **Structure**: `src/` (Python backend), `ui/` (TypeScript frontend), `tests/` (Python tests)
+
+## Code Style Guidelines
+- **Python**: Use Poetry for deps, follow domain-driven patterns, 70% test coverage minimum
+- **TypeScript**: ESLint + Prettier, React functional components, CSS custom properties for theming
+- **Imports**: Use relative imports, group external/internal imports separately
+- **Testing**: Use pytest markers (unit, integration, slow), async support enabled
+- **Error Handling**: Proper async/await patterns, structured error responses
+
